@@ -38,6 +38,18 @@ class EvaluateSynapseDetectionParameters(ArgSchema):
 
 
 def load_annotation_file(annotation_path):
+    """function to read an annotation file from disk
+
+    Parameters
+    ----------
+    annotation_path: str
+        path to annotation file on disk
+    
+    Returns
+    -------
+    list[dict]:
+        A list of dictionaries following the AnnotationFile schema that contains the annotations
+    """
     with open(annotation_path,'r') as fp:
             annotation_d = json.load(fp)
     schema = AnnotationFile()
@@ -46,6 +58,17 @@ def load_annotation_file(annotation_path):
     return annotations["area_lists"]
 
 def get_bounding_box_of_al(al):
+    """a function to return a bounding box of an annotation
+
+    Parameters
+    ----------
+    al: dict
+        an arealist following the AreaList schema in AnnotationFile
+
+    Returns:
+    tuple:
+        (minX,minY,minZ,maxX,maxY,maxZ) tuple of bounding box
+    """
     Nareas = len(al['areas'])
     mins = np.zeros((Nareas,2))
     maxs = np.zeros((Nareas,2))
@@ -66,6 +89,18 @@ def get_bounding_box_of_al(al):
     return (minX,minY,minZ,maxX,maxY,maxZ)
 
 def get_annotation_bounds_df(annotations):
+    """function to get a pandas dataframe of annotation bounds from a list of annotations
+
+    Parameters
+    ----------
+    annotations: list[dict]
+        a list of annotation dictionaries that follow to the AreaList schema
+    
+    Returns
+    -------
+    pandas.DataFrame:
+        A data frame containing the following columns 'oid','minX','minY','minZ','maxX','maxY','maxZ'
+    """ 
     ds=[]
     for al in annotations:
         (minX,minY,minZ,maxX,maxY,maxZ)=get_bounding_box_of_al(al)
@@ -82,6 +117,17 @@ def get_annotation_bounds_df(annotations):
     return df
 
 def get_bounding_box_of_annotations(annotations):
+    """a function to get the overall bounding box surrounding all the annotations
+   
+    Parameters
+    ----------
+    annotations: list[dict]
+        a list of annotation dictionaries that follow to the AreaList schema
+    
+    Returns:
+    tuple:
+        (minX,minY,minZ,maxX,maxY,maxZ) tuple of bounding box that contains all annotations
+    """
     df = get_annotation_bounds_df(annotations)
     ann_minX=df.min().minX
     ann_minY=df.min().minY
@@ -93,6 +139,35 @@ def get_bounding_box_of_annotations(annotations):
 
 def is_annotation_near_edge(al,ann_minX,ann_maxX,ann_minY,ann_maxY,ann_minZ,ann_maxZ,
                             distance=100,min_edge_sections=4):
+    """function to test if annotation is near the 'edge' of a dataset
+
+    Parameters
+    ----------
+    al: dict
+        annotation dictionary
+    ann_minX: float
+        minimum X of bounding box of data
+    ann_maxX: float
+        maximum X of bounding box of data
+    ann_minY: float
+        minimum Y of bounding box of data
+    ann_maxY: float
+        maximum Y of bounding box of data
+    ann_minZ: float
+        mininmum Z of bounding box of data
+    ann_maxZ: float
+        maximum Z of bounding box of data
+    distance: int
+        x,y distance from edge to be considered near edge (default 100)
+    min_edge_section: int
+        if annotation is in fewer than these number of sections
+        and touches z border of dataset it will be considered in edge (default 4)
+    
+    Returns
+    -------
+    bool:
+        True/False if this annotation is near edge
+    """
     boundary=geometry.Polygon(np.array([[ann_minX,ann_minY],
                                              [ann_minX,ann_maxY],
                                              [ann_maxX,ann_maxY],
@@ -116,6 +191,35 @@ def is_annotation_near_edge(al,ann_minX,ann_maxX,ann_minY,ann_maxY,ann_minZ,ann_
 def get_edge_annotations(annotations,ann_minX,ann_maxX,ann_minY,ann_maxY,ann_minZ,ann_maxZ,
                          distance=100,
                          min_edge_sections=4):
+    """function to get list of True/False values of whether annotation is near the 'edge' of a dataset
+
+    Parameters
+    ----------
+    annotations: dict
+        annotation dictionary
+    ann_minX: float
+        minimum X of bounding box of data
+    ann_maxX: float
+        maximum X of bounding box of data
+    ann_minY: float
+        minimum Y of bounding box of data
+    ann_maxY: float
+        maximum Y of bounding box of data
+    ann_minZ: float
+        mininmum Z of bounding box of data
+    ann_maxZ: float
+        maximum Z of bounding box of data
+    distance: int
+        x,y distance from edge to be considered near edge (default 100)
+    min_edge_section: int
+        if annotation is in fewer than these number of sections
+        and touches z border of dataset it will be considered in edge (default 4)
+    
+    Returns
+    -------
+    list[bool]:
+        list of True/False if annotations are near edge
+    """
     is_edge = np.zeros(len(annotations),np.bool)
     for k,al in enumerate(annotations):
         is_edge[k]=is_annotation_near_edge(al,
@@ -131,6 +235,19 @@ def get_edge_annotations(annotations,ann_minX,ann_maxX,ann_minY,ann_maxY,ann_min
 
 
 def get_index(name='LM_index'):
+    """convience function to get a spatial index, removing existing one if it exists
+
+    Parameters
+    ----------
+    name: str
+        name of index
+
+    Returns
+    -------
+    rtree.Index:
+        new index ready to be filled
+    """
+
     dataname = '{}.dat'.format(name)
     indexname = '{}.idx'.format(name)
     if os.path.isfile(dataname):
@@ -142,6 +259,21 @@ def get_index(name='LM_index'):
     return index.Index(name,properties = p)
 
 def insert_annotations_into_index(index,annotations):
+    """function to insert annotations into rtree index
+
+    Parameters
+    ----------
+    index: rtree.index
+        spatial index to insert
+    annotations: list[dict]
+        list of annotations following area_list schema in AnnotationFile schema
+
+    Returns
+    -------
+    list:
+        a list of (minX,minY,minZ,maxX,maxY,maxZ) tuples containing bounds of annotations
+    """
+
     bound_list=[]
     for i,al in enumerate(annotations):
         bounds = get_bounding_box_of_al(al)
@@ -150,6 +282,21 @@ def insert_annotations_into_index(index,annotations):
     return bound_list
 
 def do_annotations_overlap(al1,al2):
+    """function to test of two annotations overlap
+
+    Parameters
+    ----------
+    al1: dict
+        AreaList dictionary that follows schema in renderapps.AnnotationFile
+    al2: dict
+        AreaList dictionary that follows schema in renderapps.AnnotationFile
+    
+    Returns
+    -------
+    bool:
+        True/False whether they overlap
+    """
+
     for area2 in al2['areas']:
         poly2 = geometry.Polygon(area2['global_path'])
         for area1 in al1['areas']:
@@ -160,6 +307,7 @@ def do_annotations_overlap(al1,al2):
     return False,None
 
 class EvaluateSynapseDetection(ArgSchemaParser):
+    """Module for evaluating synapse detection results given EM ground truth"""
     default_schema = EvaluateSynapseDetectionParameters
 
     def run(self):
@@ -211,6 +359,7 @@ class EvaluateSynapseDetection(ArgSchemaParser):
         EM_per_LM_counts,edges = np.histogram(EM_per_LM[LM_edge==False],bins=bins,normed=True)
         print(LM_per_EM_counts)
         print(EM_per_LM_counts)
+        
 if __name__ == "__main__":
     mod = EvaluateSynapseDetection(input_data= example_json)
     mod.run()
