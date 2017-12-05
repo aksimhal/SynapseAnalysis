@@ -105,7 +105,7 @@ def loadChannelVolFromQuery(query):
     # Loop over every presynaptic channel 
     for n in xrange(0, len(preIF)):
 
-        print preIF[n]
+        print(preIF[n])
         volume = imreadtiff(preIF[n])
         presynapticvolumes.append(volume)
 
@@ -115,7 +115,7 @@ def loadChannelVolFromQuery(query):
 
     # Loop over every postsynaptic channel 
     for n in xrange(0, len(postIF)):
-        print postIF[n]
+        print(postIF[n])
         volume = imreadtiff(postIF[n])
         postsynapticvolumes.append(volume)
 
@@ -147,7 +147,7 @@ def loadTiffSeriesFromQuery(query, filepath):
     # Loop over every presynaptic channel 
     for n in xrange(0, len(preIF)):
 
-        print preIF[n]
+        print(preIF[n])
         fn = os.path.join(filepath, preIF[n])
         volume = imreadtiffseries(fn)
         presynapticvolumes.append(volume)
@@ -158,7 +158,7 @@ def loadTiffSeriesFromQuery(query, filepath):
 
     # Loop over every postsynaptic channel 
     for n in xrange(0, len(postIF)):
-        print postIF[n]
+        print(postIF[n])
         fn = os.path.join(filepath, postIF[n])
         volume = imreadtiffseries(fn)
         postsynapticvolumes.append(volume)

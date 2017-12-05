@@ -5,7 +5,7 @@ import renderapi
 import scipy
 import numpy as np
 from scipy.stats import norm
-from render_module import RenderModule
+from renderapps.module.render_module import RenderModule
 from scipy import signal
 import csv
 

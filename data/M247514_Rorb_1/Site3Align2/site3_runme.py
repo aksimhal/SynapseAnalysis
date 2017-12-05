@@ -1,15 +1,15 @@
 # run site3 synapse detections 
 import numpy as np
 from skimage import measure
-import dataAccess as da
-import SynapseDetection as syn
-import processDetections as pd
+from at_synapse_detection import dataAccess as da
+from at_synapse_detection import SynapseDetection as syn
+from at_synapse_detection import processDetections as pd
 
 def main():
     
     # Example use case of the synapse detection pipeline
     # Load metadata
-    metadataFN = 'metadatatest.json'
+    metadataFN = 'site3_metadata.json'
     metadata = syn.loadMetadata(metadataFN)
     
     datalocation = metadata['datalocation']
@@ -18,7 +18,7 @@ def main():
     # List of Queries
     listOfQueries = syn.createQueries(queryFN)
 
-    for n in xrange(0, len(listOfQueries)): 
+    for n in range(0, len(listOfQueries)): 
         
         query = listOfQueries[n]
         # Load the data 
