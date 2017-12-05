@@ -22,7 +22,7 @@ def getProbMap(data):
     if len(data.shape) == 2: 
         data = scipy.stats.norm.cdf(data, np.mean(data), np.std(data))
     else: 
-        for zInd in xrange(0, data.shape[2]): 
+        for zInd in range(0, data.shape[2]): 
 
             # Calculate foreground probabilities
             data[:, :, zInd] = scipy.stats.norm.cdf(data[:, :, zInd], np.mean(data[:, :, zInd]), np.std(data[:, :, zInd]))
@@ -46,17 +46,19 @@ def convolveVolume(vol, kernalLength):
 
     kernal = np.ones([kernalLength, kernalLength])
 
-    for n in xrange(0, vol.shape[2]):
+    for n in range(0, vol.shape[2]):
         img = vol[:, :, n];
 
         if (kernalLength % 2 == 0): 
             img = signal.convolve2d(img, kernal, 'full')
 
-            rstartInd = kernalLength/2
+            rstartInd = int(kernalLength/2)
             rendInd = img.shape[0] - kernalLength/2 + 1
-
-            cstartInd = kernalLength/2
+            rendInd = int(rendInd)
+            
+            cstartInd = int(kernalLength/2) # Python3 division is converted to float
             cendInd = img.shape[1] - kernalLength/2 + 1
+            cendInd = int(cendInd)
 
             Csame = img[rstartInd:rendInd, cstartInd:cendInd]
             vol[:, :, n] = Csame;
@@ -91,7 +93,7 @@ def computeFactor(vol, numslices):
     if (numslices == 1):
         return factorVol
 
-    for n in xrange(0, vol.shape[2]):
+    for n in range(0, vol.shape[2]):
 
         # Edge cases
         # First Slice
@@ -154,7 +156,7 @@ def createQueries(fileName):
 
                 rowItr = rowItr + 1
                 cellItr = 0
-                for ncell in xrange(0, len(row)):
+                for ncell in range(0, len(row)):
 
                     if (row[ncell] == ''):
                         break
@@ -165,7 +167,7 @@ def createQueries(fileName):
                         preIF.append(row[ncell])
                         cellItr = cellItr + 1
                     elif (cellItr == 1):
-                        preIF_z.append(row[ncell])
+                        preIF_z.append(int(row[ncell]))
                         cellItr = 0
 
             # Read the postsynaptic row 
@@ -174,7 +176,7 @@ def createQueries(fileName):
                 rowItr = rowItr + 1
 
                 cellItr = 0
-                for ncell in xrange(0, len(row)):
+                for ncell in range(0, len(row)):
 
                     if (row[ncell] == "NULL"):
                         # print row[ncell]
@@ -186,7 +188,7 @@ def createQueries(fileName):
                         postIF.append(row[ncell])
                         cellItr = cellItr + 1
                     elif (cellItr == 1):
-                        postIF_z.append(row[ncell])
+                        postIF_z.append(int(row[ncell]))
                         cellItr = 0
             
             # blank row separating queries 
@@ -233,9 +235,9 @@ def createLookupTables(inputVol):
     inputVol : 3D Numpy Array
     
     """
-    print len(inputVol)
-    for volItr in xrange(0, len(inputVol)):
-        for z in xrange(0, inputVol[0].shape[2]):
+    #print(len(inputVol))
+    for volItr in range(0, len(inputVol)):
+        for z in range(0, inputVol[0].shape[2]):
             inputVol[volItr][:, :, z] = np.cumsum(np.cumsum(inputVol[volItr][:, :, z], 1), 0)
 
     return inputVol
@@ -270,10 +272,10 @@ def searchAdjacentChannel(adjacentVolList, search_win, cInd, rInd, zInd):
     for zItr in zrange:
         rstart = rInd - 1.5 * search_win
 
-        for row in xrange(0, 3):
+        for row in range(0, 3):
             cstart = cInd - 1.5 * search_win
-            for col in xrange(0, 3):
-                for volItr in xrange(0, len(adjacentVolList)):
+            for col in range(0, 3):
+                for volItr in range(0, len(adjacentVolList)):
 
                     sumIF1 = \
                         adjacentVolList[volItr][int(rstart + search_win), int(cstart + search_win), zItr] + \
@@ -316,7 +318,7 @@ def searchColocalizeChannel(baseVolList, search_win, cInd, rInd, zInd):
     rstart = rInd - search_win/2
     cstart = cInd - search_win/2
 
-    for volItr in xrange(1, len(baseVolList)): 
+    for volItr in range(1, len(baseVolList)): 
         sumIF1 = baseVolList[volItr][rstart+search_win, cstart+search_win, zInd] + \
             baseVolList[volItr][rstart, cstart, zInd] - baseVolList[volItr][rstart+search_win, cstart, zInd] - \
             baseVolList[volItr][rstart, cstart + search_win, zInd]
@@ -355,7 +357,7 @@ def combinePrePostVolumes(baseVolList, adjacentVolList, edge_win, search_win):
     if len(adjacentVolList) > 0: 
         adjacentVolList = createLookupTables(adjacentVolList)
 
-    print 'starting to loop through each slice'
+    print('starting to loop through each slice')
     baseVol = baseVolList[0]
     rStartEdge = edge_win
     rEndEdge = baseVol.shape[0] - edge_win
@@ -363,11 +365,11 @@ def combinePrePostVolumes(baseVolList, adjacentVolList, edge_win, search_win):
     cEndEdge = baseVol.shape[1] - edge_win
 
     # For each z slice
-    for zInd in xrange(0, baseVol.shape[2]):
-        print "starting z ind: " + str(zInd)
+    for zInd in range(0, baseVol.shape[2]):
+        print("starting z ind: " + str(zInd))
 
-        for rInd in xrange(rStartEdge, rEndEdge):
-            for cInd in xrange(cStartEdge, cEndEdge):
+        for rInd in range(rStartEdge, rEndEdge):
+            for cInd in range(cStartEdge, cEndEdge):
 
                 if (baseVol[rInd, cInd, zInd] < 0.5): 
                     continue;
@@ -412,7 +414,7 @@ def getSynapseDetections(synapticVolumes, query):
     preIF_z = query['preIF_z']
     postIF_z = query['postIF_z']
 
-    for n in xrange(0, len(presynapticVolumes)):
+    for n in range(0, len(presynapticVolumes)):
         presynapticVolumes[n] = getProbMap(presynapticVolumes[n]) # Step 1
         presynapticVolumes[n] = convolveVolume(presynapticVolumes[n], kernalLength) # Step 2
 
@@ -420,7 +422,7 @@ def getSynapseDetections(synapticVolumes, query):
             factorVol = computeFactor(presynapticVolumes[n], int(preIF_z[n])) # Step 3
             presynapticVolumes[n] = presynapticVolumes[n] * factorVol
 
-    for n in xrange(0, len(postsynapticVolumes)):
+    for n in range(0, len(postsynapticVolumes)):
         postsynapticVolumes[n] = getProbMap(postsynapticVolumes[n]) # Step 1
         postsynapticVolumes[n] = convolveVolume(postsynapticVolumes[n], kernalLength) # Step 2
 

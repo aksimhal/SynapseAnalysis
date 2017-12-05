@@ -21,7 +21,7 @@ def imreadtiff(fn):
 
     # Format tiff stack into a numpy array
     output = np.zeros([im.shape[1], im.shape[2], im.shape[0]])
-    for n in xrange(0, im.shape[0]): 
+    for n in range(0, im.shape[0]): 
         output[:, :, n] = im[n, :, :]
 
     return output
@@ -51,7 +51,7 @@ def imreadtiffseries(folderpath):
     output = np.zeros([im.shape[0], im.shape[1], numImages])
 
     # Read tiff stack
-    for n in xrange(0, numImages): 
+    for n in range(0, numImages): 
         fn = os.path.join(folderpath, str(n).zfill(5))
         fn = fn + '.tiff'
         im = io.imread(fn) 
@@ -103,7 +103,7 @@ def loadChannelVolFromQuery(query):
     preIF = query['preIF']
 
     # Loop over every presynaptic channel 
-    for n in xrange(0, len(preIF)):
+    for n in range(0, len(preIF)):
 
         print(preIF[n])
         volume = imreadtiff(preIF[n])
@@ -114,7 +114,7 @@ def loadChannelVolFromQuery(query):
     postIF = query['postIF']
 
     # Loop over every postsynaptic channel 
-    for n in xrange(0, len(postIF)):
+    for n in range(0, len(postIF)):
         print(postIF[n])
         volume = imreadtiff(postIF[n])
         postsynapticvolumes.append(volume)
@@ -145,7 +145,7 @@ def loadTiffSeriesFromQuery(query, filepath):
     preIF = query['preIF']
 
     # Loop over every presynaptic channel 
-    for n in xrange(0, len(preIF)):
+    for n in range(0, len(preIF)):
 
         print(preIF[n])
         fn = os.path.join(filepath, preIF[n])
@@ -157,7 +157,7 @@ def loadTiffSeriesFromQuery(query, filepath):
     postIF = query['postIF']
 
     # Loop over every postsynaptic channel 
-    for n in xrange(0, len(postIF)):
+    for n in range(0, len(postIF)):
         print(postIF[n])
         fn = os.path.join(filepath, postIF[n])
         volume = imreadtiffseries(fn)

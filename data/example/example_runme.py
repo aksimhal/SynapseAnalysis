@@ -1,14 +1,14 @@
 from skimage import measure
 
-import dataAccess as da
-import SynapseDetection as syn
+from at_synapse_detection import dataAccess as da
+from at_synapse_detection import SynapseDetection as syn
 
 
 def main():
     
     # Example use case of the synapse detection pipeline
     # Location of Queries
-    fileName = 'testqueries.csv'
+    fileName = 'examplequeries.csv'
 
     # List of Queries
     listOfQueries = syn.createQueries(fileName)
@@ -26,7 +26,7 @@ def main():
     # Verify Output Matches 
     labelVol = measure.label(resultVol > 0.9)
     stats = measure.regionprops(labelVol)
-    print len(stats) #output should be 5402
+    print(len(stats)) #output should be 5402
 
 
 if __name__ == '__main__':

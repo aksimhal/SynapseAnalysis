@@ -16,7 +16,7 @@ def main():
     queryFN = metadata['querylocation']
 
     # List of Queries
-    listOfQueries = syn.createQueries(queryFN)
+    listOfQueries = syn.loadQueriesJSON(queryFN)
 
     for n in range(0, len(listOfQueries)): 
         

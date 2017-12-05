@@ -63,7 +63,7 @@ def getVolumeFromRender(stack, volDimensions, scale, intensityrange, mod):
 
     vol = np.zeros(
         [int(deltaX * scale), int(deltaY * scale), int(endZ - startZ)])
-    for sliceInd in xrange(startZ, endZ):
+    for sliceInd in range(startZ, endZ):
 
         img = getCutout(stack, sliceInd, xstart, ystart, deltaX,
                     deltaY, scale, intensityrange[0], intensityrange[1], mod)
@@ -97,7 +97,7 @@ def getChannelVolumes(query, volDimensions, scale, intensityrange, mod):
     presynapticvolumes = []
     preIF = query['preIF']
 
-    for n in xrange(0, len(preIF)):
+    for n in range(0, len(preIF)):
 
         print preIF[n]
 
@@ -109,7 +109,7 @@ def getChannelVolumes(query, volDimensions, scale, intensityrange, mod):
     postsynapticvolumes = []
     postIF = query['postIF']
 
-    for n in xrange(0, len(postIF)):
+    for n in range(0, len(postIF)):
         print postIF[n]
         volume = getVolumeFromRender(
             postIF[n], volDimensions, scale, intensityrange, mod)

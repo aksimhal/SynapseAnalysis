@@ -3,7 +3,7 @@ import scipy
 import numpy as np
 from scipy.stats import norm
 from skimage import measure
-import synaptogram
+from at_synapse_detection import synaptogram
 from scipy import io
 from shapely import geometry
 import os
@@ -62,6 +62,9 @@ def createSynapseObject(detection, detection_number, resolution):
 
     bbox = synaptogram.getBoundingBoxFromLabel(detection)
     global_path = bboxToListOfPoints(bbox) 
+    global_path = np.array(global_path)
+    global_path = global_path.tolist()
+    
     zlist = synaptogram.getZListFromBoundingBox(bbox)
     areas = [] 
     
@@ -72,7 +75,7 @@ def createSynapseObject(detection, detection_number, resolution):
     native_z = native_z.tolist()
     
     # This currently repeats the boundary along the z axis
-    for n in xrange(0, len(zlist)): 
+    for n in range(0, len(zlist)): 
         subarea = {'global_path' : global_path, 'z' : zlist[n], 'native_path' : native_path, 'native_z' : native_z[n]}
         areas.append(subarea)
 
@@ -95,7 +98,7 @@ def detectionsToJSONFormat(listofdetections, resolution):
 
     """
     area_lists = [] 
-    for n in xrange(0, len(listofdetections)): 
+    for n in range(0, len(listofdetections)): 
         detection = listofdetections[n]
         synapse = createSynapseObject(detection, n, resolution)
         area_lists.append(synapse)
@@ -146,9 +149,11 @@ def probMapToJSON(probmapvolume, metadata, n):
     """
 
     thresh = metadata['thresh'] 
-    datalocation = metadata['datalocation']
-    outputFN = os.path.join(datalocation, 'resultVol')
-    outputFN = outputFN + str(n) + '.json'
+    jsonFN = metadata['outputJSONlocation']
+
+    jsonFN = os.path.join(jsonFN, 'resultVol')
+    jsonFN = jsonFN + str(n) + '.json'
+    
     resolution = metadata['resolution']
 
     labelVol = measure.label(probmapvolume > thresh)
@@ -156,7 +161,7 @@ def probMapToJSON(probmapvolume, metadata, n):
     
     data = detectionsToJSONFormat(stats, resolution)
 
-    writeJSONDetectionFile(outputFN, data)
+    writeJSONDetectionFile(jsonFN, data)
 
 
 

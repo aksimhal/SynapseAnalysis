@@ -2,7 +2,7 @@ import renderapi
 import scipy
 import numpy as np
 from scipy.stats import norm
-from renderapps.module.render_module import RenderModule
+#from renderapps.module.render_module import RenderModule
 from PIL import Image
 from PIL import ImageDraw
 from PIL import ImageColor
@@ -11,8 +11,8 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
-import dataAccess as da
-import SynapseDetection as syn
+from at_synapse_detection import dataAccess as da
+from at_synapse_detection import SynapseDetection as syn
 
 def getAnnotationBoundingBox(synapse, render_args):
 
@@ -235,7 +235,7 @@ def getSynaptogramFromRender(bboxCoordinates, win_xy, win_z, stackList, scale, s
     slicepos = 0; # x 
     
     # iterate over each slice 
-    for sliceInd in xrange(startZ, endZ + 1):
+    for sliceInd in range(startZ, endZ + 1):
         #print sliceInd; 
         
         ifpos = 0; # y 
@@ -599,7 +599,7 @@ def getSynaptogramFromFile(bboxCoordinates, win_xy, win_z, stackList, showProb, 
     slicepos = 0; # x 
     
     # iterate over each slice 
-    for sliceInd in xrange(startZ, endZ + 1):
+    for sliceInd in range(startZ, endZ + 1):
         #print sliceInd; 
         
         ifpos = 0; # y 
@@ -655,6 +655,6 @@ def synapseAnnotationToSynaptogram(synapse, render_args, win_xy, win_z, filepath
     
     img = getSynaptogramFromFile(bbox, win_xy, win_z, stackList, showProb, filepath);
     plotOutlinesOnImg(img, synapseOutlinesDict, expandedBox, filename, stackList, textXOffset, textYOffset)
-    print filename
+    #print(filename)
     
 
