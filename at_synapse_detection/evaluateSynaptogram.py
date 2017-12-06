@@ -3,7 +3,7 @@ from functools import partial
 from argschema import ArgSchema, ArgSchemaParser
 import argschema
 import marshmallow as mm
-from renderapps.TrakEM2.AnnotationJsonSchema import AnnotationFile
+from renderapps.TrakEM2.AnnotationJsonSchema import AnnotationFile, NumpyArray
 import json
 import pandas as pd
 from rtree import index
@@ -38,9 +38,9 @@ class EvaluateSynapseDetectionParameters(ArgSchema):
         description="synapses occuring in fewer than this many sections and bordering the first or last section will be considered to be edge cases")
 
 class EvaluateSynapseDetectionOutput(mm.Schema):
-    LM_per_EM = argschema.fields.List(argschema.fields.Float,required=True,
+    LM_per_EM = argschema.fields.NumpyArray(dtype=np.float,required=True,
         description="list of fraction of EM synapses with 0,1, or 2+ synapses over them")
-    EM_per_LM = argschema.fields.List(argschema.fields.Float,required=True,
+    EM_per_LM = argschema.fields.NumpyArray(dtype=np.float,required=True,
         description ="list of fraction of LM synapses with 0,1, or 2+ EM synapses over them")
     missed_EM = argschema.fields.List(argschema.fields.Str, required=True,
         description= "list of EM synapses oids for which there were no LM detections")
@@ -329,6 +329,7 @@ def do_annotations_overlap(al1,al2):
 class EvaluateSynapseDetection(ArgSchemaParser):
     """Module for evaluating synapse detection results given EM ground truth"""
     default_schema = EvaluateSynapseDetectionParameters
+    default_output_schema = EvaluateSynapseDetectionOutput
 
     def run(self):
         print(json.dumps(self.args,indent=4))
@@ -354,21 +355,24 @@ class EvaluateSynapseDetection(ArgSchemaParser):
                          distance=self.args['edge_distance'],
                          min_edge_sections=self.args['edge_min_sections'])
         
-        EM_edge=get_edge_annotations(EM_annotations,ann_minX,ann_maxX,ann_minY,ann_maxY,ann_minZ,ann_maxZ,
+        EM_edge=get_edge_annotations(good_annotations,ann_minX,ann_maxX,ann_minY,ann_maxY,ann_minZ,ann_maxZ,
                     distance=self.args['edge_distance'],
                     min_edge_sections=self.args['edge_min_sections'])
+        
+
+
 
         LM_index=get_index('LM_index')
         LM_bounds=insert_annotations_into_index(LM_index,LM_annotations)
         EM_index = get_index('EM_index')
-        EM_bounds=insert_annotations_into_index(EM_index,EM_annotations)
+        EM_bounds=insert_annotations_into_index(EM_index,good_annotations)
 
-        overlap_matrix = np.zeros((len(EM_annotations),len(LM_annotations)),np.bool)
-
+        overlap_matrix = np.zeros((len(good_annotations),len(LM_annotations)),np.bool)
+        j=0
         for i,alLM in enumerate(LM_annotations):
             res=EM_index.intersection(LM_bounds[i])
             for k in res:
-                alEM=LM_annotations[k]
+                alEM=good_annotations[k]
                 overlaps,zsection = do_annotations_overlap(alLM,alEM)
                 if overlaps:
                     overlap_matrix[k,i]=True
@@ -377,13 +381,17 @@ class EvaluateSynapseDetection(ArgSchemaParser):
         EM_per_LM = np.sum(overlap_matrix,axis=0)
         LM_per_EM_counts,edges = np.histogram(LM_per_EM[EM_edge==False],bins=bins,normed=True)
         EM_per_LM_counts,edges = np.histogram(EM_per_LM[LM_edge==False],bins=bins,normed=True)
-        
+        print("EM_per_LM",EM_per_LM_counts)
+        print("LM_per_EM",LM_per_EM_counts)
+        print('lm edge detections:',np.sum(LM_edge))
+        print('em edge annotations',np.sum(EM_edge))
+        print('LM detections:',len(LM_edge))
         d= {}
         d['EM_per_LM']=EM_per_LM_counts
         d['LM_per_EM']=LM_per_EM_counts
-        d['missed_EM']= [al['oid'] for k,al in enumerate(EM_annotations) if (EM_edge[k]==False) and (LM_per_EM[k]==0)]
-        d['split_EM']= [al['oid'] for k,al in enumerate(EM_annotations) if (EM_edge[k]==False) and (LM_per_EM[k]>1)]
-        d['correct_EM']= [al['oid'] for k,al in enumerate(EM_annotations) if (EM_edge[k]==False) and (LM_per_EM[k]==1)]
+        d['missed_EM']= [al['oid'] for k,al in enumerate(good_annotations) if (EM_edge[k]==False) and (LM_per_EM[k]==0)]
+        d['split_EM']= [al['oid'] for k,al in enumerate(good_annotations) if (EM_edge[k]==False) and (LM_per_EM[k]>1)]
+        d['correct_EM']= [al['oid'] for k,al in enumerate(good_annotations) if (EM_edge[k]==False) and (LM_per_EM[k]==1)]
         d['false_pos_LM']= [al['oid'] for k,al in enumerate(LM_annotations) if (LM_edge[k]==False) and (EM_per_LM[k]==0)]
         d['merge_LM']= [al['oid'] for k,al in enumerate(LM_annotations) if (LM_edge[k]==False) and (EM_per_LM[k]>1)]
         d['correct_LM']= [al['oid'] for k,al in enumerate(LM_annotations) if (LM_edge[k]==False) and (EM_per_LM[k]==1)]
