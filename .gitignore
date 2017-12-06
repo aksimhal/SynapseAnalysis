@@ -102,5 +102,5 @@ ENV/
 
 .DS_Store
 
-.dat
-.idx
+*.dat
+*.idx
