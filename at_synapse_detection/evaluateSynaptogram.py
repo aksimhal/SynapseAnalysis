@@ -71,7 +71,9 @@ def load_annotation_file(annotation_path):
     with open(annotation_path,'r') as fp:
             annotation_d = json.load(fp)
     schema = AnnotationFile()
-    annotations,errors = schema.load(annotation_d)        
+    annotations,errors = schema.load(annotation_d)      
+    if len(errors)>0:
+        print(errors)
     assert(len(errors)==0)
     return annotations["area_lists"]
 
