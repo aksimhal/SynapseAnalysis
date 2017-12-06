@@ -7,7 +7,8 @@ from at_synapse_detection import synaptogram
 from scipy import io
 from shapely import geometry
 import os
-
+import cv2
+ 
 
 def bboxToListOfPoints(bbox): 
     """
@@ -61,6 +62,9 @@ def createSynapseObject(detection, detection_number, resolution):
     """
 
     bbox = synaptogram.getBoundingBoxFromLabel(detection)
+    if len(detection.coords) == 1 : 
+        bbox = synaptogram.expandBoundingBox()
+    
     global_path = bboxToListOfPoints(bbox) 
     global_path = np.array(global_path)
     global_path = global_path.tolist()
@@ -98,9 +102,15 @@ def detectionsToJSONFormat(listofdetections, resolution):
 
     """
     area_lists = [] 
+    lm_minX = 7096
+    lm_minY = 5871 
+    ds_scale = 100/3
+
     for n in range(0, len(listofdetections)): 
         detection = listofdetections[n]
-        synapse = createSynapseObject(detection, n, resolution)
+        #synapse = createSynapseObject(detection, n, resolution)
+        synapse = make_prop_into_contours(detection, ds_scale, lm_minX, lm_minY)
+        
         area_lists.append(synapse)
 
     data = {'area_lists': area_lists}
@@ -163,6 +173,64 @@ def probMapToJSON(probmapvolume, metadata, n):
 
     writeJSONDetectionFile(jsonFN, data)
 
+def make_prop_into_contours(prop, ds_scale, lm_minX, lm_minY):
+    
+    #input prob is [y, x, z]
+    
+    #the method below assumes prop.coords z, y, x
+    
+    coors = []
+    for pt in prop.coords: 
+        newpt = [pt[2], pt[0], pt[1]]
+        coors.append(newpt)
+    
+    coors = np.flip(np.copy(coors),1)
+    zvalues = np.unique(coors[:,2])
+    areas =[]
+    for z in zvalues:
+       
+        c2 = coors[coors[:,2]==z]
 
+        mins = np.min(c2,axis=0)
+        maxs = np.max(c2,axis=0)
+        c2 = c2 - mins
+        rng = maxs-mins
+        width=rng[0]+1
+        height=rng[1]+1
+        min_img = np.zeros((height,width),np.uint8)
+        idx=np.ravel_multi_index((c2[:,1],c2[:,0]),(height,width))
+        min_img_unravel = np.ravel(min_img)
+        min_img_unravel[idx]=255
+        min_img = np.reshape(min_img_unravel,(height,width))
+        min_img_up=cv2.resize(min_img,(2*width,2*height))  
+        #f,ax = plt.subplots()
+        #ax.imshow(min_img_up,interpolation='nearest',extent=[mins[0],maxs[0]+1,maxs[1]+1,mins[1]])
+        #ax.imshow(psdvol[z,:,:],interpolation='nearest',cmap=plt.cm.gray)
+        a,cs,b = cv2.findContours(min_img_up,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
+        csf = []
+        for c in cs:
+            
+            c = np.squeeze(c)
+            #c+=.5
+            c = .5*(np.array(c,np.float64)+.5)
+            c[:,0]+=mins[0]
+            c[:,1]+=mins[1]
+            c = np.vstack((c,c[0,:]))
+            c=c/ds_scale
+            c[:,0]=c[:,0]+lm_minX
+            c[:,1]=c[:,1]+lm_minY
+            #ax.plot(c[:,0],c[:,1],linewidth=3)
+
+            c = np.array(c)
+            c = c.tolist()
+
+            z = np.array(z)
+            z = z.tolist()
+            
+            d={'z':z,'global_path':c}
+            areas.append(d)
+    d={'areas':areas,'oid':int(prop.label), 'id':int(prop.label)}
+    return d
+        
 
 

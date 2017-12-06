@@ -393,7 +393,7 @@ def plotOutlinesOnImg(img, synapseOutlinesDict, expandedBox, filename, channelNa
     plt.close()
 
 
-def plotAnnoDetectionsOnImg(img, synapseOutlinesDict, expandedBox, filename, channelNames, textXOffset, textYOffset):
+def plotAnnoDetectionsOnImg(img, listOfOutlines, expandedBox, filename, channelNames, textXOffset, textYOffset):
 
     """
     Plot outlines. 
@@ -405,16 +405,14 @@ def plotAnnoDetectionsOnImg(img, synapseOutlinesDict, expandedBox, filename, cha
     -------
 
     """
-    #['startZ', 'startX', 'startY', 'deltaX', 'deltaY', 'endZ']
-    ypt = textYOffset
 
+    ypt = textYOffset
 
     listOfSubAreas = synapseOutlinesDict['subAreas']
     listOfZinds = synapseOutlinesDict['zInds']
     deltaX = expandedBox['deltaX']
     deltaY = expandedBox['deltaY']
-    #print deltaY
-    #%matplotlib notebook
+
     plt.ioff()
 
     plt.imshow(img, cmap='gray')
@@ -424,6 +422,9 @@ def plotAnnoDetectionsOnImg(img, synapseOutlinesDict, expandedBox, filename, cha
     for chname in channelNames:  
         plt.text(textXOffset, ypt, chname, color='red', horizontalalignment='right')
         ypt = ypt + deltaY 
+
+        listOfSubAreas = synapseOutlinesDict['subAreas']
+        listOfZinds = synapseOutlinesDict['zInds']
         
         
         for x in range(0, len(listOfZinds)): 

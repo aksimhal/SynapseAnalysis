@@ -1,25 +1,29 @@
 import numpy as np
-import processDetections as pd
-import SynapseDetection as syn 
+from at_synapse_detection import processDetections as pd
+from at_synapse_detection import SynapseDetection as syn 
 import os 
 
 def main():
     
     # Example use case of processing detections
     # Load probability map 
-    metadataFN = 'metadatatest.json'
+    metadataFN = '/Users/anish/Documents/Connectome/SynapseAnalysis/data/M247514_Rorb_1/Site3Align2/site3_metadata.json'
     metadata = syn.loadMetadata(metadataFN)
-    n = 0 
-    fn = os.path.join(metadata['datalocation'], 'resultVol')
-    fn = fn + str(n) + '.npy'
+    
+    queryFN = metadata['querylocation']
 
-    resultVol = np.load(fn)
+    # List of Queries
+    listOfQueries = syn.loadQueriesJSON(queryFN)
 
-    resolution = metadata['resolution']
-    thresh = metadata['thresh']
-    outputFN = 'test.json'
+    for n in range(0, len(listOfQueries)): 
+        fn = os.path.join(metadata['datalocation'], 'resultVol')
+        fn = fn + str(n) + '.npy'
 
-    pd.probMapToJSON(resultVol, thresh, outputFN, resolution)
+        resultVol = np.load(fn)
+
+
+        pd.probMapToJSON(resultVol, metadata, n)
+    
 
 if __name__ == '__main__':
     main()
