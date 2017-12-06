@@ -229,7 +229,7 @@ def make_prop_into_contours(prop, ds_scale, lm_minX, lm_minY):
             
             d={'z':z,'global_path':c}
             areas.append(d)
-    d={'areas':areas,'oid':int(prop.label), 'id':int(prop.label)}
+    d={'areas':areas,'oid':str(prop.label), 'id':int(prop.label)}
     return d
         
 
