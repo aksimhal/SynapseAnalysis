@@ -16,7 +16,8 @@ example_json={
     "EM_metadata_csv":"/Users/forrestc/Site3Align2/MNSite3Synaptograms_v2.csv",
     "LM_metadata_file":"/Users/forrestc/SynapseAnalysis/data/M247514_Rorb_1/Site3Align2/site3_metadata.json",
     "EM_inclass_column":"glutsynapse",
-    "EM_not_synapse_column":"ConsensusNotSynapse"
+    "EM_not_synapse_column":"ConsensusNotSynapse",
+    "output_json":"/Users/forrestc/Site3Align2/Anish_evaluation_output.json"
 }
 
 class EvaluateSynapseDetectionParameters(ArgSchema):
@@ -36,6 +37,23 @@ class EvaluateSynapseDetectionParameters(ArgSchema):
     edge_min_sections = argschema.fields.Int(required=False,default=4,
         description="synapses occuring in fewer than this many sections and bordering the first or last section will be considered to be edge cases")
 
+class EvaluateSynapseDetectionOutput(mm.Schema):
+    LM_per_EM = argschema.fields.List(argschema.fields.Float,required=True,
+        description="list of fraction of EM synapses with 0,1, or 2+ synapses over them")
+    EM_per_LM = argschema.fields.List(argschema.fields.Float,required=True,
+        description ="list of fraction of LM synapses with 0,1, or 2+ EM synapses over them")
+    missed_EM = argschema.fields.List(argschema.fields.Str, required=True,
+        description= "list of EM synapses oids for which there were no LM detections")
+    split_EM = argschema.fields.List(argschema.fields.Str, required=True,
+        description= "list of EM synapses oids for which there were LM detections")
+    correct_EM = argschema.fields.List(argschema.fields.Str, required=True,
+        description= "list of EM synapses oids for which there were exactly one LM detections")
+    false_pos_LM = argschema.fields.List(argschema.fields.Str, required=True,
+        description= "list of LM synapses oids for which there were no EM synapses")
+    merge_LM = argschema.fields.List(argschema.fields.Str, required=True,
+        description= "list of LM synapses oids for which there were more than one EM synapses")
+    correct_LM = argschema.fields.List(argschema.fields.Str, required=True,
+        description= "list of LM synapses oids for which there were more exactly one EM synapses")
 
 def load_annotation_file(annotation_path):
     """function to read an annotation file from disk
@@ -357,9 +375,18 @@ class EvaluateSynapseDetection(ArgSchemaParser):
         EM_per_LM = np.sum(overlap_matrix,axis=0)
         LM_per_EM_counts,edges = np.histogram(LM_per_EM[EM_edge==False],bins=bins,normed=True)
         EM_per_LM_counts,edges = np.histogram(EM_per_LM[LM_edge==False],bins=bins,normed=True)
-        print(LM_per_EM_counts)
-        print(EM_per_LM_counts)
         
+        d= {}
+        d['EM_per_LM']=EM_per_LM_counts
+        d['LM_per_EM']=LM_per_EM_counts
+        d['missed_EM']= [al['oid'] for k,al in enumerate(EM_annotations) if (EM_edge[k]==False) and (LM_per_EM[k]==0)]
+        d['split_EM']= [al['oid'] for k,al in enumerate(EM_annotations) if (EM_edge[k]==False) and (LM_per_EM[k]>1)]
+        d['correct_EM']= [al['oid'] for k,al in enumerate(EM_annotations) if (EM_edge[k]==False) and (LM_per_EM[k]==1)]
+        d['false_pos_LM']= [al['oid'] for k,al in enumerate(LM_annotations) if (LM_edge[k]==False) and (EM_per_LM[k]==0)]
+        d['merge_LM']= [al['oid'] for k,al in enumerate(LM_annotations) if (LM_edge[k]==False) and (EM_per_LM[k]>1)]
+        d['correct_LM']= [al['oid'] for k,al in enumerate(LM_annotations) if (LM_edge[k]==False) and (EM_per_LM[k]==1)]
+        self.output(d)
+
 if __name__ == "__main__":
     mod = EvaluateSynapseDetection(input_data= example_json)
     mod.run()
