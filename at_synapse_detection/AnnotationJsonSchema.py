@@ -19,6 +19,7 @@ class Area(argschema.schemas.mm.Schema):
         description='Nx2 numpy array of local points')
     global_path = NumpyArray(argschema.fields.List(argschema.fields.Float),
         description='Nx2 numpy array of global coordinates')
+    z = argschema.fields.Float(required=False,description="z value of tileId")
 
 class AreaList(argschema.schemas.mm.Schema):
     oid = argschema.fields.Str()
