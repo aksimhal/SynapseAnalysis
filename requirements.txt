@@ -2,6 +2,5 @@ scipy
 numpy
 scikit-image
 argschema>1.15.5
-render-python-apps
 rtree
 shapely
