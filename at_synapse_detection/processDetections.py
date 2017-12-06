@@ -102,9 +102,9 @@ def detectionsToJSONFormat(listofdetections, resolution):
 
     """
     area_lists = [] 
-    lm_minX = 7096
-    lm_minY = 5871 
-    ds_scale = 100/3
+    lm_minX = 0
+    lm_minY = 0 
+    ds_scale = 100.0/3
 
     for n in range(0, len(listofdetections)): 
         detection = listofdetections[n]
