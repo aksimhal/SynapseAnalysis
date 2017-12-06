@@ -3,7 +3,7 @@ from functools import partial
 from argschema import ArgSchema, ArgSchemaParser
 import argschema
 import marshmallow as mm
-from renderapps.TrakEM2.AnnotationJsonSchema import AnnotationFile, NumpyArray
+from at_synapse_detection.AnnotationJsonSchema import AnnotationFile, NumpyArray
 import json
 import pandas as pd
 from rtree import index
@@ -307,9 +307,9 @@ def do_annotations_overlap(al1,al2):
     Parameters
     ----------
     al1: dict
-        AreaList dictionary that follows schema in renderapps.AnnotationFile
+        AreaList dictionary that follows schema in AnnotationJsonSchema.AnnotationFile
     al2: dict
-        AreaList dictionary that follows schema in renderapps.AnnotationFile
+        AreaList dictionary that follows schema in AnnotationJsonSchema.AnnotationFile
     
     Returns
     -------

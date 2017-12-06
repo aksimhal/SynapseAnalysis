@@ -3,7 +3,7 @@ import renderapi
 import scipy
 import numpy as np
 from scipy.stats import norm
-from renderapps.module.render_module import RenderModule
+from at_synapse_detection.render_module import RenderModule
 from scipy import signal
 import csv
 

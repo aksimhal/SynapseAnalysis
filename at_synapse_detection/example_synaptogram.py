@@ -1,6 +1,6 @@
 import numpy as np 
 import synaptogram
-from renderapps.module.render_module import RenderModule
+from at_synapse_detection.render_module import RenderModule
 import renderapi
 import matplotlib.pyplot as plt
 import dataAccess as da

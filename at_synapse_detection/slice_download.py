@@ -4,7 +4,7 @@
 # In[ ]:
 
 import os
-from renderapps.module.render_module import RenderModule
+from at_synapse_detection.render_module import RenderModule
 import renderapi
 from PIL import Image
 #get_ipython().magic(u'matplotlib notebook')
