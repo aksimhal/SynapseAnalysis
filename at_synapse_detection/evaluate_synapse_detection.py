@@ -9,16 +9,21 @@ import pandas as pd
 from rtree import index
 from shapely import geometry
 import numpy as np
+import socket
 
-example_json={
-    "EM_annotation_json":"/Users/forrestc/Site3Align2/m247514_Site3Annotation_MN_global_v2.json",
-    "LM_annotation_json":"/Users/forrestc/SynapseAnalysis/data/M247514_Rorb_1/Site3Align2/results/resultVol0.json",
-    "EM_metadata_csv":"/Users/forrestc/Site3Align2/MNSite3Synaptograms_v2.csv",
-    "LM_metadata_file":"/Users/forrestc/SynapseAnalysis/data/M247514_Rorb_1/Site3Align2/site3_metadata.json",
+
+hostname = socket.gethostname()
+
+example_json = {
+    "EM_annotation_json":"../data/M247514_Rorb_1/Site3Align2/json_annotations/m247514_Site3Annotation_MN_global_v2.json",
+    "LM_annotation_json":"../data/M247514_Rorb_1/Site3Align2/results/resultVol0.json",
+    "EM_metadata_csv":"../data/M247514_Rorb_1/Site3Align2/MNSite3Synaptograms_v2.csv",
+    "LM_metadata_file":"../data/M247514_Rorb_1/Site3Align2/site3_metadata.json",
     "EM_inclass_column":"glutsynapse",
     "EM_not_synapse_column":"ConsensusNotSynapse",
-    "output_json":"/Users/forrestc/Site3Align2/Anish_evaluation_output.json"
-}
+    "output_json":"../data/M247514_Rorb_1/Site3Align2/results/Anish_evaluation_output.json"
+    }
+
 
 class EvaluateSynapseDetectionParameters(ArgSchema):
     EM_annotation_json = argschema.fields.InputFile(required=True,
@@ -93,7 +98,7 @@ def get_bounding_box_of_al(al):
     mins = np.zeros((Nareas,2))
     maxs = np.zeros((Nareas,2))
     zvalues = []
-    for i,area in enumerate(al['areas']):
+    for i,area in enumerate(al['areas']): 
         gp = area['global_path']
         mins[i,:] = np.min(gp,axis=0)
         maxs[i,:] = np.max(gp,axis=0)
@@ -158,7 +163,7 @@ def get_bounding_box_of_annotations(annotations):
     return (ann_minX,ann_minY,ann_minZ,ann_maxX,ann_maxY,ann_maxZ)
 
 def is_annotation_near_edge(al,ann_minX,ann_maxX,ann_minY,ann_maxY,ann_minZ,ann_maxZ,
-                            distance=100,min_edge_sections=4):
+                            distance=-100,min_edge_sections=4):
     """function to test if annotation is near the 'edge' of a dataset
 
     Parameters
@@ -192,12 +197,21 @@ def is_annotation_near_edge(al,ann_minX,ann_maxX,ann_minY,ann_maxY,ann_minZ,ann_
                                              [ann_minX,ann_maxY],
                                              [ann_maxX,ann_maxY],
                                              [ann_maxX,ann_minY]]))
-    b2=boundary.buffer(distance)
-    
+    try:
+        b2=boundary.buffer(distance)
+    except:
+        print(distance)
+        print(ann_minX,ann_minY,ann_minX,ann_maxY)
+        assert False
     for area in al['areas']:
         poly1 = geometry.Polygon(area['global_path'])
-        if(not b2.contains(poly1)):
-            return True
+        try:
+            if(not b2.contains(poly1)):
+                return True
+        except:
+            print(area['global_path'])
+            print()
+            assert False
     zvals=np.unique(np.array([area['z'] for area in al['areas']]))
     if len(zvals)<min_edge_sections:
         if ann_minZ in zvals:
@@ -255,7 +269,7 @@ def get_edge_annotations(annotations,ann_minX,ann_maxX,ann_minY,ann_maxY,ann_min
 
 
 def get_index(name='LM_index'):
-    """convience function to get a spatial index, removing existing one if it exists
+    """function to get a spatial index, removing existing one if it exists
 
     Parameters
     ----------
