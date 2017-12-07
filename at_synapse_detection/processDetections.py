@@ -8,7 +8,7 @@ from scipy import io
 from shapely import geometry
 import os
 import cv2
- 
+import scipy.ndimage as ndimage
 
 def bboxToListOfPoints(bbox): 
     """
@@ -166,7 +166,10 @@ def probMapToJSON(probmapvolume, metadata, n):
     
     resolution = metadata['resolution']
 
-    labelVol = measure.label(probmapvolume > thresh)
+    SE = np.ones((3, 3, 2))
+    dilated_volume = ndimage.binary_dilation(probmapvolume > thresh, SE) 
+
+    labelVol = measure.label(dilated_volume)
     stats = measure.regionprops(labelVol, probmapvolume)
     
     data = detectionsToJSONFormat(stats, resolution)

@@ -163,7 +163,7 @@ def get_bounding_box_of_annotations(annotations):
     return (ann_minX,ann_minY,ann_minZ,ann_maxX,ann_maxY,ann_maxZ)
 
 def is_annotation_near_edge(al,ann_minX,ann_maxX,ann_minY,ann_maxY,ann_minZ,ann_maxZ,
-                            distance=-100,min_edge_sections=4):
+                            distance=100,min_edge_sections=4):
     """function to test if annotation is near the 'edge' of a dataset
 
     Parameters
@@ -198,7 +198,7 @@ def is_annotation_near_edge(al,ann_minX,ann_maxX,ann_minY,ann_maxY,ann_minZ,ann_
                                              [ann_maxX,ann_maxY],
                                              [ann_maxX,ann_minY]]))
     try:
-        b2=boundary.buffer(distance)
+        b2=boundary.buffer(-distance)
     except:
         print(distance)
         print(ann_minX,ann_minY,ann_minX,ann_maxY)

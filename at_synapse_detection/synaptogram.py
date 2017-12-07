@@ -100,7 +100,7 @@ def getAnnotationBoundingBox2(synapse, render_args):
 
     for synapsesubarea in synapseSubareasList:
         subarea_tile = synapsesubarea['global_path']
-        subarea_tile = map(list, zip(*subarea_tile))
+        subarea_tile = list(map(list, zip(*subarea_tile)))
         xcolumn = subarea_tile[0]
         ycolumn = subarea_tile[1]
         z = synapsesubarea['z']
@@ -299,7 +299,7 @@ def getAnnotationOutlines(synapse, render_args):
         subarea_tile = synapsesubarea['global_path']
 
         # remap
-        subarea_outline = map(list, zip(*subarea_tile))
+        subarea_outline = list(map(list, zip(*subarea_tile)))
 
         tileIds_subarea = synapsesubarea['tileIds']
         tileid = tileIds_subarea[0]
