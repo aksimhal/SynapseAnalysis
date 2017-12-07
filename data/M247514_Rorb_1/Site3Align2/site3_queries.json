@@ -1,1 +1,34 @@
-{"listOfQueries": [{"postIF": ["PSD95"], "preIF_z": [2], "preIF": ["synapsin"], "postIF_z": [1]}, {"postIF": ["Gephyrin"], "preIF_z": [2, 1], "preIF": ["synapsin", "GABA"], "postIF_z": [1]}]}
+{
+    "listOfQueries": [
+        {
+            "postIF": [
+                "PSD95"
+            ],
+            "preIF_z": [
+                2
+            ],
+            "preIF": [
+                "synapsin"
+            ],
+            "postIF_z": [
+                1
+            ]
+        },
+        {
+            "postIF": [
+                "Gephyrin"
+            ],
+            "preIF_z": [
+                2,
+                1
+            ],
+            "preIF": [
+                "synapsin",
+                "GABA"
+            ],
+            "postIF_z": [
+                1
+            ]
+        }
+    ]
+}
