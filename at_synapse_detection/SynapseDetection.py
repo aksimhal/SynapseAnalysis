@@ -47,7 +47,7 @@ def convolveVolume(vol, kernelLength):
     kernel = np.ones([kernelLength, kernelLength])
 
     for n in range(0, vol.shape[2]):
-        img = vol[:, :, n];
+        img = vol[:, :, n]
 
         if (kernelLength % 2 == 0): 
             img = signal.convolve2d(img, kernel, 'full')
@@ -61,11 +61,11 @@ def convolveVolume(vol, kernelLength):
             cendInd = int(cendInd)
 
             Csame = img[rstartInd:rendInd, cstartInd:cendInd]
-            vol[:, :, n] = Csame;
+            vol[:, :, n] = Csame
 
         else: 
             img = signal.convolve2d(img, kernel, 'same')
-            vol[:, :, n] = img;
+            vol[:, :, n] = img
 
     kernelsize = np.prod(kernel.shape)
     vol = np.divide(vol, kernelsize)
@@ -111,7 +111,7 @@ def computeFactor(vol, numslices):
             elif (numslices == 2):
                 diff = np.exp(-1 * (np.power((vol[:, :, n] - vol[:, :, n + 1]), 2)))
 
-        factorVol[:, :, n] = diff;
+        factorVol[:, :, n] = diff
 
     return factorVol
 
@@ -195,7 +195,7 @@ def createQueries(fileName):
             else:
                 rowItr = 0
                 query = {'preIF': preIF, 'preIF_z': preIF_z,
-                         'postIF': postIF, 'postIF_z': postIF_z};
+                         'postIF': postIF, 'postIF_z': postIF_z}
                 listOfQueries.append(query)
                 preIF = []
                 preIF_z = []
@@ -372,7 +372,7 @@ def combinePrePostVolumes(baseVolList, adjacentVolList, edge_win, search_win):
             for cInd in range(cStartEdge, cEndEdge):
 
                 if (baseVol[rInd, cInd, zInd] < 0.5): 
-                    continue;
+                    continue
 
                 if len(adjacentVolList) > 0: 
                     adjResult = searchAdjacentChannel(adjacentVolList, search_win, cInd, rInd, zInd)
