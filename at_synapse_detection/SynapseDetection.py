@@ -30,13 +30,13 @@ def getProbMap(data):
     return data
 
 
-def convolveVolume(vol, kernalLength):
+def convolveVolume(vol, kernelLength):
     """
     Returns convolved volume
     Parameters
     ----------
     vol : 3D numpy volume
-    kernalLength : ind - minimum blob size
+    kernelLength : ind - minimum blob size
 
     Returns
     ----------
@@ -44,31 +44,31 @@ def convolveVolume(vol, kernalLength):
     """
     vol = np.log(vol)
 
-    kernal = np.ones([kernalLength, kernalLength])
+    kernel = np.ones([kernelLength, kernelLength])
 
     for n in range(0, vol.shape[2]):
         img = vol[:, :, n];
 
-        if (kernalLength % 2 == 0): 
-            img = signal.convolve2d(img, kernal, 'full')
+        if (kernelLength % 2 == 0): 
+            img = signal.convolve2d(img, kernel, 'full')
 
-            rstartInd = int(kernalLength/2)
-            rendInd = img.shape[0] - kernalLength/2 + 1
+            rstartInd = int(kernelLength/2)
+            rendInd = img.shape[0] - kernelLength/2 + 1
             rendInd = int(rendInd)
             
-            cstartInd = int(kernalLength/2) # Python3 division is converted to float
-            cendInd = img.shape[1] - kernalLength/2 + 1
+            cstartInd = int(kernelLength/2) # Python3 division is converted to float
+            cendInd = img.shape[1] - kernelLength/2 + 1
             cendInd = int(cendInd)
 
             Csame = img[rstartInd:rendInd, cstartInd:cendInd]
             vol[:, :, n] = Csame;
 
         else: 
-            img = signal.convolve2d(img, kernal, 'same')
+            img = signal.convolve2d(img, kernel, 'same')
             vol[:, :, n] = img;
 
-    kernalsize = np.prod(kernal.shape)
-    vol = np.divide(vol, kernalsize)
+    kernelsize = np.prod(kernel.shape)
+    vol = np.divide(vol, kernelsize)
     vol = np.exp(vol)
 
     return vol
@@ -388,15 +388,23 @@ def combinePrePostVolumes(baseVolList, adjacentVolList, edge_win, search_win):
                     
     return outputVol
 
-def getSynapseDetections(synapticVolumes, query):
+def getSynapseDetections(synapticVolumes, query, kernelLength=2, edge_win = 8,
+    search_win = 2):
     """
     This function calls the functions needed to run probabilistic synapse detection 
 
     Parameters
     ----------
-    synapticVolumes : dict - has two keys which contain lists of 3D numpy arrays 
-    query : dict - contains the minumum slice information for each channel 
-
+    synapticVolumes : dict
+        has two keys (presynaptic,postsynaptic) which contain lists of 3D numpy arrays 
+    query : dict
+        contains the minumum slice information for each channel 
+    kernelLength : int
+        Minimum 2D Blob Size (default 2)
+    edge_win: int
+        Edge window (default 8)
+    search_win: int
+        Search windows (default 2)
 
     Returns
     ----------
@@ -407,16 +415,13 @@ def getSynapseDetections(synapticVolumes, query):
     presynapticVolumes = synapticVolumes['presynaptic']
     postsynapticVolumes = synapticVolumes['postsynaptic']
 
-    # Minimum 2D Blob Size; 
-    kernalLength = 2
-
     # Number of slices each blob should span 
     preIF_z = query['preIF_z']
     postIF_z = query['postIF_z']
 
     for n in range(0, len(presynapticVolumes)):
         presynapticVolumes[n] = getProbMap(presynapticVolumes[n]) # Step 1
-        presynapticVolumes[n] = convolveVolume(presynapticVolumes[n], kernalLength) # Step 2
+        presynapticVolumes[n] = convolveVolume(presynapticVolumes[n], kernelLength) # Step 2
 
         if preIF_z[n] > 1: 
             factorVol = computeFactor(presynapticVolumes[n], int(preIF_z[n])) # Step 3
@@ -424,17 +429,11 @@ def getSynapseDetections(synapticVolumes, query):
 
     for n in range(0, len(postsynapticVolumes)):
         postsynapticVolumes[n] = getProbMap(postsynapticVolumes[n]) # Step 1
-        postsynapticVolumes[n] = convolveVolume(postsynapticVolumes[n], kernalLength) # Step 2
+        postsynapticVolumes[n] = convolveVolume(postsynapticVolumes[n], kernelLength) # Step 2
 
         if postIF_z[n] > 1:
             factorVol = computeFactor(postsynapticVolumes[n], int(postIF_z[n])) # Step 3
             postsynapticVolumes[n] = postsynapticVolumes[n] * factorVol
-
-    # Edge window
-    edge_win = 8
-
-    # Minimum 2D Blob Size
-    search_win = 2
 
     # combinePrePostVolumes(base, adjacent)
     # Step 4 
