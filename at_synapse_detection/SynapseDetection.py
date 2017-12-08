@@ -389,7 +389,7 @@ def combinePrePostVolumes(baseVolList, adjacentVolList, edge_win, search_win):
     return outputVol
 
 def getSynapseDetections(synapticVolumes, query, kernelLength=2, edge_win = 8,
-    search_win = 2):
+                         search_win = 2):
     """
     This function calls the functions needed to run probabilistic synapse detection 
 
