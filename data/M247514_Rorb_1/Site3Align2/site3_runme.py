@@ -21,6 +21,8 @@ def main():
     for n in range(0, len(listOfQueries)): 
         
         query = listOfQueries[n]
+        print(query)
+        
         # Load the data 
         synapticVolumes = da.loadTiffSeriesFromQuery(query, datalocation)
 

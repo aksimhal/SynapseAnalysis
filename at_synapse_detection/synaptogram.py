@@ -71,7 +71,7 @@ def getAnnotationBoundingBox(synapse, render_args):
         
     return bboxCoordinates
     
-def getAnnotationBoundingBox2(synapse, render_args):
+def getAnnotationBoundingBox2(synapse):
 
     """
     Get coordinates of a boundingbox containing the entire synapse annotations
@@ -275,7 +275,7 @@ def getSynaptogramFromRender(bboxCoordinates, win_xy, win_z, stackList, scale, s
             
     return img; 
             
-def getAnnotationOutlines(synapse, render_args):
+def getAnnotationOutlines(synapse):
 
     """
     Get annotation outlines, organized by EM slice. 
@@ -290,7 +290,7 @@ def getAnnotationOutlines(synapse, render_args):
     """
     
     synapseSubareasList = synapse['areas']
-    stackname = 'BIGALIGN_LENS_EMclahe_all'
+    # stackname = 'BIGALIGN_LENS_EMclahe_all'
 
     listOfSubAreas = []; 
     listOfZinds = []; 
@@ -301,13 +301,13 @@ def getAnnotationOutlines(synapse, render_args):
         # remap
         subarea_outline = list(map(list, zip(*subarea_tile)))
 
-        tileIds_subarea = synapsesubarea['tileIds']
-        tileid = tileIds_subarea[0]
-        tspec = renderapi.tilespec.get_tile_spec(stackname, tileid, 
-                                                 render_args['host'], render_args['port'], 
-                                                 render_args['owner'], render_args['project'])
+        # tileIds_subarea = synapsesubarea['tileIds']
+        # tileid = tileIds_subarea[0]
+        # tspec = renderapi.tilespec.get_tile_spec(stackname, tileid, 
+        #                                          render_args['host'], render_args['port'], 
+        #                                          render_args['owner'], render_args['project'])
         listOfSubAreas.append(subarea_outline)
-        listOfZinds.append(tspec.z)
+        listOfZinds.append(synapsesubarea['z'])
 
     synapseOutlinesDict = {'subAreas': listOfSubAreas, 'zInds': listOfZinds}
 
@@ -357,12 +357,14 @@ def plotOutlinesOnImg(img, synapseOutlinesDict, expandedBox, filename, channelNa
     plt.imshow(img, cmap='gray')
 
     yAnnoOffset = 0; 
+    xMid = np.round(deltaX / 2)
+    yMid = np.round(deltaY / 2)
 
     for chname in channelNames:  
         plt.text(textXOffset, ypt, chname, color='red', horizontalalignment='right')
         ypt = ypt + deltaY 
         
-        
+        xMid = np.round(deltaX / 2)
         for x in range(0, len(listOfZinds)): 
 
             subareaOutline = listOfSubAreas[x]
@@ -380,17 +382,58 @@ def plotOutlinesOnImg(img, synapseOutlinesDict, expandedBox, filename, channelNa
 
             ycolumn = ycolumn + yAnnoOffset; 
             
-            plt.plot(xcolumn, ycolumn, color='red')
+            plt.plot(xcolumn, ycolumn, color='red', linewidth=0.5)
+            listoflines = getGridLines(yMid, xMid)
+            for line in listoflines: 
+                plt.plot(line[1], line[0], color='green', linewidth=0.5)
+
+            xMid = xMid + deltaX
             
         yAnnoOffset = yAnnoOffset + deltaY
+        yMid = yMid + deltaY
 
-
+    plt.colorbar()
     plt.axis('off')
     #plt.show()
 
     plt.savefig(filename, bbox_inches='tight', dpi=300)
     plt.clf()
     plt.close()
+
+def getGridLines(rInd, cInd, search_win=2): 
+
+    # rInd = 10 
+    # cInd = 20 
+    # search_win = 2 
+
+    rstart = rInd - 1.5 * search_win
+    rstart = int(rstart)
+
+    cstart = cInd - 1.5 * search_win
+    cstart = int(cstart)
+
+    rinds = list(range(rstart, rstart+search_win*3+1, search_win))
+    cinds = list(range(cstart, cstart+search_win*3+1, search_win))
+
+
+    listoflines = []; 
+    for n in range(0, 4):   
+
+        rline = [min(rinds), max(rinds)]
+        cline = [cinds[n], cinds[n]]
+        line = [rline, cline]
+
+        listoflines.append(line)
+
+    for n in range(0, 4):   
+
+        rline = [rinds[n], rinds[n]]
+        cline = [min(cinds), max(cinds)]
+        line = [rline, cline]
+
+        listoflines.append(line)
+
+    return listoflines
 
 
 def plotAnnoDetectionsOnImg(img, listOfOutlines, expandedBox, filename, channelNames, textXOffset, textYOffset):
@@ -418,6 +461,9 @@ def plotAnnoDetectionsOnImg(img, listOfOutlines, expandedBox, filename, channelN
     plt.imshow(img, cmap='gray')
 
     yAnnoOffset = 0; 
+    xMid = np.round(deltaX / 2)
+    yMid = np.round(deltaY / 2)
+
 
     for chname in channelNames:  
         plt.text(textXOffset, ypt, chname, color='red', horizontalalignment='right')
@@ -426,6 +472,10 @@ def plotAnnoDetectionsOnImg(img, listOfOutlines, expandedBox, filename, channelN
         listOfSubAreas = synapseOutlinesDict['subAreas']
         listOfZinds = synapseOutlinesDict['zInds']
         
+          
+        listoflines = getGridLines(yMid, xMid)
+        for line in listoflines: 
+            plt.plot(line[1], line[0], color='green')
         
         for x in range(0, len(listOfZinds)): 
 
@@ -435,6 +485,8 @@ def plotAnnoDetectionsOnImg(img, listOfOutlines, expandedBox, filename, channelN
 
             startX = expandedBox['startX']
             startY = expandedBox['startY']
+
+ 
 
             xcolumn -= startX
             ycolumn -= startY
@@ -447,7 +499,7 @@ def plotAnnoDetectionsOnImg(img, listOfOutlines, expandedBox, filename, channelN
             plt.plot(xcolumn, ycolumn, color='red')
             
         yAnnoOffset = yAnnoOffset + deltaY
-
+        yMid = yMid + deltaY
 
     plt.axis('off')
     #plt.show()

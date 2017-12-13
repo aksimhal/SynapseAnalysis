@@ -4,30 +4,96 @@
             "postIF": [
                 "PSD95"
             ],
+            "postIF_z": [
+                1
+            ],
             "preIF_z": [
-                2
+                1
             ],
             "preIF": [
                 "synapsin"
-            ],
-            "postIF_z": [
-                1
             ]
         },
         {
             "postIF": [
-                "Gephyrin"
-            ],
-            "preIF_z": [
-                2,
-                1
-            ],
-            "preIF": [
-                "synapsin",
-                "GABA"
+                "PSD95"
             ],
             "postIF_z": [
                 1
+            ],
+            "preIF_z": [
+                1
+            ],
+            "preIF": [
+                "VGlut1"
+            ]
+        },
+        {
+            "postIF": [
+                "PSD95"
+            ],
+            "postIF_z": [
+                1
+            ],
+            "preIF_z": [],
+            "preIF": []
+        },
+        {
+            "postIF": [],
+            "postIF_z": [],
+            "preIF_z": [
+                1
+            ],
+            "preIF": [
+                "synapsin"
+            ]
+        },
+        {
+            "postIF": [],
+            "postIF_z": [],
+            "preIF_z": [
+                1
+            ],
+            "preIF": [
+                "VGlut1"
+            ]
+        },
+        {
+            "postIF": [
+                "GluN1"
+            ],
+            "postIF_z": [
+                1
+            ],
+            "preIF_z": [],
+            "preIF": []
+        },
+        {
+            "postIF": [
+                "GluN1"
+            ],
+            "postIF_z": [
+                1
+            ],
+            "preIF_z": [
+                1
+            ],
+            "preIF": [
+                "VGlut1"
+            ]
+        },
+        {
+            "postIF": [
+                "GluN1"
+            ],
+            "postIF_z": [
+                1
+            ],
+            "preIF_z": [
+                1
+            ],
+            "preIF": [
+                "synapsin"
             ]
         }
     ]

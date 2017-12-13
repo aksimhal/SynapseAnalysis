@@ -10,7 +10,7 @@
         "project": "M247514_Rorb_1",
         "client_scripts": "/home/anish/Connectome/render/render-ws-java-client/src/main/scripts"
     },
-    "thresh": 0.9,
+    "thresh": 0.8,
     "querylocation": "/Users/anish/Documents/Connectome/SynapseAnalysis/data/M247514_Rorb_1/Site3Align2/site3_queries.json",
     "datalocation": "/Users/anish/Documents/Connectome/Synaptome-Duke/data/collman17/Site3Align2Stacks/",
     "offset": {
