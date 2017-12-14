@@ -20,7 +20,7 @@ def main():
         fn = fn + str(n) + '.npy'
 
         resultVol = np.load(fn)
-
+        print(fn)
 
         pd.probMapToJSON(resultVol, metadata, n)
     

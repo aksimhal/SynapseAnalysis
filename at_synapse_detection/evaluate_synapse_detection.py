@@ -16,7 +16,7 @@ hostname = socket.gethostname()
 
 example_json = {
     "EM_annotation_json":"../data/M247514_Rorb_1/Site3Align2/json_annotations/m247514_Site3Annotation_MN_global_v2.json",
-    "LM_annotation_json":"../data/M247514_Rorb_1/Site3Align2/results/resultVol0.json",
+    "LM_annotation_json":"../data/M247514_Rorb_1/Site3Align2/results/resultVol7.json",
     "EM_metadata_csv":"../data/M247514_Rorb_1/Site3Align2/MNSite3Synaptograms_v2.csv",
     "LM_metadata_file":"../data/M247514_Rorb_1/Site3Align2/site3_metadata.json",
     "EM_inclass_column":"glutsynapse",
@@ -346,7 +346,7 @@ class EvaluateSynapseDetection(ArgSchemaParser):
     default_output_schema = EvaluateSynapseDetectionOutput
 
     def run(self):
-        print(json.dumps(self.args,indent=4))
+        #print(json.dumps(self.args,indent=4))
         EM_annotations = load_annotation_file(self.args['EM_annotation_json'])
         LM_annotations = load_annotation_file(self.args['LM_annotation_json'])
         
@@ -410,7 +410,12 @@ class EvaluateSynapseDetection(ArgSchemaParser):
         d['merge_LM']= [al['oid'] for k,al in enumerate(LM_annotations) if (LM_edge[k]==False) and (EM_per_LM[k]>1)]
         d['correct_LM']= [al['oid'] for k,al in enumerate(LM_annotations) if (LM_edge[k]==False) and (EM_per_LM[k]==1)]
         self.output(d)
+        outputdict = {'EM_per_LM': EM_per_LM_counts, 'LM_per_EM': LM_per_EM_counts, 'lm_edge_detections': np.sum(LM_edge), 
+                        'em_edge_annotations': np.sum(EM_edge), 'LM_detections': len(LM_edge), 'EM_detections': len(EM_edge) }
+        return outputdict
+
+    
 
 if __name__ == "__main__":
     mod = EvaluateSynapseDetection(input_data= example_json)
-    mod.run()
+    d = mod.run()
