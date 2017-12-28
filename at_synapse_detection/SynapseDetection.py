@@ -437,6 +437,9 @@ def getSynapseDetections(synapticVolumes, query, kernelLength=2, edge_win = 8,
 
     # combinePrePostVolumes(base, adjacent)
     # Step 4 
+
+    print(len(presynapticVolumes))
+    print(len(postsynapticVolumes))
     if len(postsynapticVolumes) == 0: 
         resultVol = combinePrePostVolumes(presynapticVolumes, postsynapticVolumes, edge_win, search_win)
     else: 

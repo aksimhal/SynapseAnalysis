@@ -9,6 +9,8 @@ from shapely import geometry
 import os
 import cv2
 import scipy.ndimage as ndimage
+from at_synapse_detection import evaluate_synapse_detection as esd
+from at_synapse_detection.AnnotationJsonSchema import AnnotationFile, NumpyArray
 
 def bboxToListOfPoints(bbox): 
     """
@@ -117,10 +119,17 @@ def detectionsToJSONFormat(listofdetections, resolution):
     
     return data
 
-def writeJSONDetectionFile(filename, data): 
+def writeJSONDetectionFile(filename, output_json): 
+   
     with open(filename, 'w') as outfile:
-        json.dump(data, outfile)
+        json.dump(output_json, outfile)
 
+def writeJSONDetectionFile2(filename, data): 
+    schema = AnnotationFile()
+    (output_json, errors)=schema.dump(data)
+   
+    with open(filename, 'w') as outfile:
+        json.dump(output_json, outfile)
 
 
 def createPolygonFromBBox(bbox): 
@@ -234,6 +243,46 @@ def make_prop_into_contours(prop, ds_scale, lm_minX, lm_minY):
             areas.append(d)
     d={'areas':areas,'oid':str(prop.label), 'id':int(prop.label)}
     return d
+
+def consolidateDetections(detections1, detections2): 
+
+    #detections1 == EM
+    #detections2 == LM 
+
+    LM_index1=esd.get_index('LM_index1')
+    LM_index2 = esd.get_index('LM_index2')
+
+    LM_bounds1= esd.insert_annotations_into_index(LM_index1,detections1)
+    LM_bounds2= esd.insert_annotations_into_index(LM_index2,detections2)
+    
+    overlap_matrix = np.zeros((len(detections1),len(detections2)),np.bool)
+
+    for i,anno2 in enumerate(detections2):
+
+        # if i > 100: 
+        #     break
+
+        res=LM_index1.intersection(LM_bounds2[i])
+        for k in res:
+            anno1=detections1[k]
+            try: 
+                overlaps,zsection = esd.do_annotations_overlap(anno2,anno1)
+            except: 
+                print(anno1['oid'], anno2['oid'])
+            if overlaps:
+                overlap_matrix[k,i]=True
+
+
+    #remove all annotations from LM2 which overlap with LM1
+
+    anno2Overlaps = np.sum(overlap_matrix,axis=0)
+    indsToRemove = np.nonzero(anno2Overlaps) 
+
+    uniqueDetections = np.delete(detections2, indsToRemove)
+
+    detections = detections1 + uniqueDetections.tolist() 
+
+    return detections #detections1, uniqueDetections
         
 
 

@@ -365,6 +365,8 @@ def plotOutlinesOnImg(img, synapseOutlinesDict, expandedBox, filename, channelNa
         ypt = ypt + deltaY 
         
         xMid = np.round(deltaX / 2)
+        xMid = xMid + deltaX
+
         for x in range(0, len(listOfZinds)): 
 
             subareaOutline = listOfSubAreas[x]
@@ -618,7 +620,7 @@ def getSynaptogramFromFile(bboxCoordinates, win_xy, win_z, stackList, showProb, 
     -----------
     
     """
-    EMfilename = "foo"
+    EMfilename = "EM"
     
     # check for boundary issues
     startZ = bboxCoordinates['minZ']
@@ -683,7 +685,7 @@ def getSynaptogramFromFile(bboxCoordinates, win_xy, win_z, stackList, showProb, 
                     if (np.mean(cutout) != 0):
                         cutout = syn.getProbMap(cutout)
                         
-                #cutout  = cutout > 0.9
+                #cutout  = cutout > 0.7
 
             #cutout = getProbMap(cutout);
             img[ifpos:(ifpos + deltaY), slicepos:(slicepos + deltaX)] = cutout; 
