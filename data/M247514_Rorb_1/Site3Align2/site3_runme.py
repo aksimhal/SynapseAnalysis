@@ -18,7 +18,7 @@ def main():
     # List of Queries
     listOfQueries = syn.loadQueriesJSON(queryFN)
 
-    for n in range(0, len(listOfQueries)): 
+    for n in range(27, len(listOfQueries)): 
         
         query = listOfQueries[n]
         print(query)
