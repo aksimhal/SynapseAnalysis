@@ -11,6 +11,7 @@ import cv2
 import scipy.ndimage as ndimage
 from at_synapse_detection import evaluate_synapse_detection as esd
 from at_synapse_detection.AnnotationJsonSchema import AnnotationFile, NumpyArray
+import pandas 
 
 def bboxToListOfPoints(bbox): 
     """
@@ -278,11 +279,89 @@ def consolidateDetections(detections1, detections2):
     anno2Overlaps = np.sum(overlap_matrix,axis=0)
     indsToRemove = np.nonzero(anno2Overlaps) 
 
-    uniqueDetections = np.delete(detections2, indsToRemove)
+    uniqueDetections = np.delete(detections2, indsToRemove[0])
 
     detections = detections1 + uniqueDetections.tolist() 
 
     return detections #detections1, uniqueDetections
         
 
+def getMissedAnnoIds(missed_annotations): 
+    missedAnnoIds = []
+    for anno in missed_annotations: 
+        missedAnnoIds.append(anno['oid'])
+    
+    return missedAnnoIds
+
+def evalsyndetections(args): 
+    EM_annotations = esd.load_annotation_file(args['EM_annotation_json'])
+    LM_annotations = esd.load_annotation_file(args['LM_annotation_json'])
+
+    df = pandas.read_csv(args['EM_metadata_csv'])
+
+    good_rows = (df[args['EM_not_synapse_column']]==False) & (df[args['EM_inclass_column']]==True)        
+    good_df=df[good_rows]
+
+    ann_minX=good_df.min().minX
+    ann_minY=good_df.min().minY
+    ann_maxX=good_df.max().maxX
+    ann_maxY=good_df.max().maxY
+    ann_minZ=good_df.min().minZ
+    ann_maxZ=good_df.max().maxZ
+    good_annotations = [al for al in EM_annotations if al['id'] in good_df.index]
+
+    (ann_minX,ann_minY,ann_minZ,ann_maxX,ann_maxY,ann_maxZ) = esd.get_bounding_box_of_annotations(good_annotations)
+
+    LM_edge=esd.get_edge_annotations(LM_annotations,ann_minX,ann_maxX,ann_minY,ann_maxY,ann_minZ,ann_maxZ)
+
+    EM_edge=esd.get_edge_annotations(good_annotations,ann_minX,ann_maxX,ann_minY,ann_maxY,ann_minZ,ann_maxZ)
+
+
+    LM_index=esd.get_index('LM_index')
+    LM_bounds=esd.insert_annotations_into_index(LM_index,LM_annotations)
+    EM_index = esd.get_index('EM_index')
+    EM_bounds=esd.insert_annotations_into_index(EM_index,good_annotations)
+
+    overlap_matrix = np.zeros((len(good_annotations),len(LM_annotations)),np.bool)
+    j=0
+    for i,alLM in enumerate(LM_annotations):
+        res=EM_index.intersection(LM_bounds[i])
+        for k in res:
+            alEM=good_annotations[k]
+            overlaps,zsection = esd.do_annotations_overlap(alLM,alEM)
+            if overlaps:
+                overlap_matrix[k,i]=True
+    bins = np.arange(0,4)
+    LM_per_EM = np.sum(overlap_matrix,axis=1)
+    EM_per_LM = np.sum(overlap_matrix,axis=0)
+    LM_per_EM_counts,edges = np.histogram(LM_per_EM[EM_edge==False],bins=bins,normed=True)
+    EM_per_LM_counts,edges = np.histogram(EM_per_LM[LM_edge==False],bins=bins,normed=True)
+    print("EM_per_LM",EM_per_LM_counts)
+    print("LM_per_EM",LM_per_EM_counts)
+    print('lm edge detections:',np.sum(LM_edge))
+    print('em edge annotations',np.sum(EM_edge))
+    print('LM detections:',len(LM_edge))
+    
+    
+    missed_annotations = [] 
+    for counter, synapse in enumerate(good_annotations): 
+        if (LM_per_EM[counter] == 0 and EM_edge[counter]==False): 
+            missed_annotations.append(synapse)
+    
+    
+    false_positives = [] 
+    for counter, anno in enumerate(LM_annotations): 
+        if (EM_per_LM[counter] == 0 and LM_edge[counter]==False): 
+            false_positives.append(anno)
+        
+    tp_detections = [] 
+    for counter, anno in enumerate(LM_annotations): 
+        if (EM_per_LM[counter] != 0 and LM_edge[counter]==False): 
+            tp_detections.append(anno)
+
+    output = {'missed_annotations': missed_annotations, 'false_positives': false_positives, 
+            'tp_detections': tp_detections, 'good_annotations': good_annotations, 
+            'overlap_matrix': overlap_matrix, 'EM_edge':EM_edge, 'LM_edge': LM_edge}
+    
+    return output
 

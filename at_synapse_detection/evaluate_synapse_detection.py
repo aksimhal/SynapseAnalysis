@@ -16,7 +16,7 @@ hostname = socket.gethostname()
 
 example_json = {
     "EM_annotation_json":"../data/M247514_Rorb_1/Site3Align2/json_annotations/m247514_Site3Annotation_MN_global_v2.json",
-    "LM_annotation_json":"../data/M247514_Rorb_1/Site3Align2/results/resultVol7.json",
+    "LM_annotation_json":"../data/M247514_Rorb_1/Site3Align2/results/combineddetections.json",
     "EM_metadata_csv":"../data/M247514_Rorb_1/Site3Align2/MNSite3Synaptograms_v2.csv",
     "LM_metadata_file":"../data/M247514_Rorb_1/Site3Align2/site3_metadata.json",
     "EM_inclass_column":"glutsynapse",

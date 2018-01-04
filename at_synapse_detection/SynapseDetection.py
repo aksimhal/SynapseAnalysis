@@ -319,9 +319,9 @@ def searchColocalizeChannel(baseVolList, search_win, cInd, rInd, zInd):
     cstart = cInd - search_win/2
 
     for volItr in range(1, len(baseVolList)): 
-        sumIF1 = baseVolList[volItr][rstart+search_win, cstart+search_win, zInd] + \
-            baseVolList[volItr][rstart, cstart, zInd] - baseVolList[volItr][rstart+search_win, cstart, zInd] - \
-            baseVolList[volItr][rstart, cstart + search_win, zInd]
+        sumIF1 = baseVolList[volItr][int(rstart+search_win), int(cstart+search_win), int(zInd)] + \
+            baseVolList[volItr][int(rstart), int(cstart), int(zInd)] - baseVolList[volItr][int(rstart+search_win), int(cstart), int(zInd)] - \
+            baseVolList[volItr][int(rstart), int(cstart + search_win), int(zInd)]
         
         localizationGrid[volItr-1] = sumIF1/(search_win * search_win)
 
@@ -380,7 +380,7 @@ def combinePrePostVolumes(baseVolList, adjacentVolList, edge_win, search_win):
 
                     if len(baseVolList) > 1: 
                         coresult = searchColocalizeChannel(baseVolList, search_win, cInd, rInd, zInd)
-                        outputVol[rInd, cInd, zInd] = baseVol[rInd, cInd, zInd] * adjResult * coresult
+                        outputVol[rInd, cInd, zInd] = baseVol[rInd, cInd, zInd] * coresult
                 else: 
                     coresult = searchColocalizeChannel(baseVolList, search_win, cInd, rInd, zInd)
                     outputVol[rInd, cInd, zInd] = baseVol[rInd, cInd, zInd] * coresult
