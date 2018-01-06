@@ -18,7 +18,7 @@ def main():
     # List of Queries
     listOfQueries = syn.loadQueriesJSON(queryFN)
 
-    for n in range(27, len(listOfQueries)): 
+    for n in range(0, len(listOfQueries)): 
         
         query = listOfQueries[n]
         print(query)
@@ -30,9 +30,12 @@ def main():
         # Takes ~5 minutes to run
         resultVol = syn.getSynapseDetections(synapticVolumes, query)
 
+        # Save the probability map 
         syn.saveresultvol(resultVol, datalocation, n)
 
-        pd.probMapToJSON(resultVol, metadata, n)
+        # Save the thresholded results as annotation objects
+        # in a json file
+        pd.probMapToJSON(resultVol, metadata, query, n)
 
 
 if __name__ == '__main__':

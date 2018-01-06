@@ -47,22 +47,28 @@ def main():
     evalparam = metadata['evalparam']
     # List of Queries
     listOfQueries = syn.loadQueriesJSON(queryFN)
-
+    listOfThresholds = [] 
     listofevals = []
 
+    # Evaluate each query individually
     for n, query in enumerate(listOfQueries): 
         print(query)
-
+        listOfThresholds.append(query['thresh'])
         jsonfile = os.path.join(outputJSONlocation, 'resultVol'); 
         jsonfile = jsonfile + str(n) + '.json'
         evalparam['LM_annotation_json'] = jsonfile
 
-        mod = esd.EvaluateSynapseDetection(evalparam)
-        evalresults = mod.run()
-        listofevals.append(evalresults)
+        # mod = esd.EvaluateSynapseDetection(evalparam)
+        # evalresults = mod.run()
+        # listofevals.append(evalresults)
 
-    printEvalToText(listofevals, listOfQueries, metadata['thresh'])
-        
+        # printEvalToText(listofevals, listOfQueries, metadata['thresh'])
+
+    # Combine Queries  
+    evaluation_parameters = metadata['evalparam']
+    pd.combineResultVolumes(list(range(0,len(listOfQueries))), listOfThresholds, metadata, evaluation_parameters)
+
+    
 
 
 if __name__ == '__main__':

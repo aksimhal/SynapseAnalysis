@@ -1,1 +1,130 @@
-{"listOfQueries": [{"preIF": [], "preIF_z": [], "postIF": ["PSD95"], "postIF_z": [1]}, {"preIF": ["synapsin"], "preIF_z": [1], "postIF": ["PSD95"], "postIF_z": [1]}, {"preIF": ["synapsin"], "preIF_z": [2], "postIF": ["PSD95"], "postIF_z": [1]}, {"preIF": ["synapsin"], "preIF_z": [1], "postIF": ["PSD95"], "postIF_z": [2]}, {"preIF": ["synapsin"], "preIF_z": [2], "postIF": ["PSD95"], "postIF_z": [2]}, {"preIF": ["synapsin"], "preIF_z": [3], "postIF": ["PSD95"], "postIF_z": [1]}, {"preIF": ["synapsin"], "preIF_z": [1], "postIF": ["PSD95"], "postIF_z": [3]}, {"preIF": ["synapsin"], "preIF_z": [2], "postIF": ["PSD95"], "postIF_z": [3]}, {"preIF": ["synapsin"], "preIF_z": [3], "postIF": ["PSD95"], "postIF_z": [2]}, {"preIF": ["synapsin"], "preIF_z": [3], "postIF": ["PSD95"], "postIF_z": [3]}, {"preIF": ["VGlut1"], "preIF_z": [1], "postIF": ["PSD95"], "postIF_z": [1]}, {"preIF": ["VGlut1"], "preIF_z": [1], "postIF": ["PSD95"], "postIF_z": [2]}, {"preIF": ["VGlut1"], "preIF_z": [2], "postIF": ["PSD95"], "postIF_z": [1]}, {"preIF": ["VGlut1"], "preIF_z": [2], "postIF": ["PSD95"], "postIF_z": [2]}, {"preIF": ["VGlut1"], "preIF_z": [3], "postIF": ["PSD95"], "postIF_z": [1]}, {"preIF": ["VGlut1"], "preIF_z": [1], "postIF": ["PSD95"], "postIF_z": [3]}, {"preIF": ["VGlut1"], "preIF_z": [2], "postIF": ["PSD95"], "postIF_z": [3]}, {"preIF": ["VGlut1"], "preIF_z": [3], "postIF": ["PSD95"], "postIF_z": [2]}, {"preIF": ["VGlut1"], "preIF_z": [3], "postIF": ["PSD95"], "postIF_z": [3]}, {"preIF": ["synapsin", "VGlut1"], "preIF_z": [1, 1], "postIF": ["PSD95"], "postIF_z": [2]}, {"preIF": ["VGlut1"], "preIF_z": [1], "postIF": ["PSD95", "GluN1"], "postIF_z": [2, 1]}, {"preIF": ["synapsin"], "preIF_z": [1], "postIF": ["PSD95", "GluN1"], "postIF_z": [2, 1]}, {"preIF": [], "preIF_z": [], "postIF": ["PSD95", "GluN1"], "postIF_z": [3, 1]}, {"preIF": ["GABA"], "preIF_z": [3], "postIF": ["Gephyrin"], "postIF_z": [3]}, {"preIF": ["VGlut1"], "preIF_z": [3], "postIF": ["GluN1"], "postIF_z": [3]}, {"preIF": ["VGlut1"], "preIF_z": [2], "postIF": ["GluN1"], "postIF_z": [2]}, {"preIF": ["synapsin"], "preIF_z": [1], "postIF": ["GluN1"], "postIF_z": [3]}, {"preIF": ["synapsin", "VGlut1"], "preIF_z": [1, 1], "postIF": ["PSD95", "GluN1"], "postIF_z": [1, 1]}]}
+{
+    "listOfQueries": [
+        {
+            "preIF": [
+                "synapsin"
+            ],
+            "preIF_z": [
+                1
+            ],
+            "postIF": [
+                "PSD95"
+            ],
+            "postIF_z": [
+                2
+            ],
+            "thresh": 0.8
+        },
+        {
+            "preIF": [
+                "synapsin"
+            ],
+            "preIF_z": [
+                2
+            ],
+            "postIF": [
+                "PSD95"
+            ],
+            "postIF_z": [
+                2
+            ],
+            "thresh": 0.7
+        },
+        {
+            "preIF": [
+                "synapsin"
+            ],
+            "preIF_z": [
+                1
+            ],
+            "postIF": [
+                "PSD95"
+            ],
+            "postIF_z": [
+                3
+            ],
+            "thresh": 0.7
+        },
+        {
+            "preIF": [
+                "VGlut1"
+            ],
+            "preIF_z": [
+                1
+            ],
+            "postIF": [
+                "PSD95"
+            ],
+            "postIF_z": [
+                2
+            ],
+            "thresh": 0.8
+        },
+        {
+            "preIF": [
+                "VGlut1"
+            ],
+            "preIF_z": [
+                1
+            ],
+            "postIF": [
+                "PSD95"
+            ],
+            "postIF_z": [
+                3
+            ],
+            "thresh": 0.7
+        },
+        {
+            "preIF": [
+                "synapsin",
+                "VGlut1"
+            ],
+            "preIF_z": [
+                1,
+                1
+            ],
+            "postIF": [
+                "PSD95"
+            ],
+            "postIF_z": [
+                2
+            ],
+            "thresh": 0.7
+        },
+        {
+            "preIF": [
+                "VGlut1"
+            ],
+            "preIF_z": [
+                1
+            ],
+            "postIF": [
+                "PSD95",
+                "GluN1"
+            ],
+            "postIF_z": [
+                2,
+                1
+            ],
+            "thresh": 0.9
+        },
+        {
+            "preIF": [
+                "synapsin"
+            ],
+            "preIF_z": [
+                1
+            ],
+            "postIF": [
+                "PSD95",
+                "GluN1"
+            ],
+            "postIF_z": [
+                2,
+                1
+            ],
+            "thresh": 0.9
+        }
+    ]
+}

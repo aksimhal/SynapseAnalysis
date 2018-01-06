@@ -26,6 +26,10 @@ def getProbMap(data):
 
             # Calculate foreground probabilities
             data[:, :, zInd] = scipy.stats.norm.cdf(data[:, :, zInd], np.mean(data[:, :, zInd]), np.std(data[:, :, zInd]))
+            # img = data[:, :, zInd]
+            # scale_param = np.sqrt(0.5 * np.mean(np.power(img.flatten(), 2)));
+            # data[:, :, zInd] = 1-np.exp((-np.power(img, 2))/(2*np.power(scale_param, 2)));
+
 
     return data
 
