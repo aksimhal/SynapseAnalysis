@@ -10,7 +10,15 @@ from at_synapse_detection import evaluate_synapse_detection as esd
 
 
 def printEvalToText(listofevals, listOfQueries, thresh): 
+    """
+    Outputs the evaluation results for each query to a text file 
 
+    Parameters
+    --------------
+    listofevals : list of dictionaries 
+    listOfQueries: list of dictionaries 
+    thresh: threshold at which detections are computed
+    """
     file = open('output.txt', 'w')
     
     file.write('Threshold: ' + str(thresh))
@@ -40,11 +48,11 @@ def main():
     # Example use case of the synapse detection pipeline
     # Load metadata
     metadataFN = 'site3_metadata.json'
-
     metadata = syn.loadMetadata(metadataFN)
     outputJSONlocation = metadata['outputJSONlocation']; 
     queryFN = metadata['querylocation']
     evalparam = metadata['evalparam']
+
     # List of Queries
     listOfQueries = syn.loadQueriesJSON(queryFN)
     listOfThresholds = [] 
@@ -56,6 +64,8 @@ def main():
         listOfThresholds.append(query['thresh'])
         jsonfile = os.path.join(outputJSONlocation, 'resultVol'); 
         jsonfile = jsonfile + str(n) + '.json'
+        
+        # Location of LM detection output
         evalparam['LM_annotation_json'] = jsonfile
 
         # mod = esd.EvaluateSynapseDetection(evalparam)

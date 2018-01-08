@@ -7,11 +7,11 @@ from at_synapse_detection import processDetections as pd
 
 def main():
     
-    # Example use case of the synapse detection pipeline
     # Load metadata
     metadataFN = 'site3_metadata.json'
     metadata = syn.loadMetadata(metadataFN)
     
+    # This is where the image data is located on disk 
     datalocation = metadata['datalocation']
     queryFN = metadata['querylocation']
 

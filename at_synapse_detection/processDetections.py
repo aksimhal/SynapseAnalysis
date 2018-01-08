@@ -287,6 +287,16 @@ def consolidateDetections(detections1, detections2):
         
 
 def getMissedAnnoIds(missed_annotations): 
+    """
+    Extract oid from annotations 
+    Parameters 
+    ----------------
+    missed_annotations: list of dict 
+    
+    Returns
+    ----------------
+    missedAnnoIds: list of ints
+    """
     missedAnnoIds = []
     for anno in missed_annotations: 
         missedAnnoIds.append(anno['oid'])
@@ -294,14 +304,29 @@ def getMissedAnnoIds(missed_annotations):
     return missedAnnoIds
 
 def evalsyndetections(args): 
+    """
+    Evaluate glutamatergic synapse detection 
+
+    Parameters 
+    --------------
+    args: dict of strs
+        - contains information needed for evaluation 
+    Returns: 
+    output: dict
+        - contains evaluation results 
+    """
+
+    # Load EM Annotations 
     EM_annotations = esd.load_annotation_file(args['EM_annotation_json'])
+    # Load LM Annotations (detections)
     LM_annotations = esd.load_annotation_file(args['LM_annotation_json'])
 
     df = pandas.read_csv(args['EM_metadata_csv'])
-
+    # Eliminate annotations which are not synapses or are not glutamatergic 
     good_rows = (df[args['EM_not_synapse_column']]==False) & (df[args['EM_inclass_column']]==True)        
     good_df=df[good_rows]
 
+    # Find bounding cube that contains 
     ann_minX=good_df.min().minX
     ann_minY=good_df.min().minY
     ann_maxX=good_df.max().maxX
@@ -312,11 +337,12 @@ def evalsyndetections(args):
 
     (ann_minX,ann_minY,ann_minZ,ann_maxX,ann_maxY,ann_maxZ) = esd.get_bounding_box_of_annotations(good_annotations)
 
+    # Determine LM Edge Annotations 
     LM_edge=esd.get_edge_annotations(LM_annotations,ann_minX,ann_maxX,ann_minY,ann_maxY,ann_minZ,ann_maxZ)
-
+    # Determine EM Edge Annotations 
     EM_edge=esd.get_edge_annotations(good_annotations,ann_minX,ann_maxX,ann_minY,ann_maxY,ann_minZ,ann_maxZ)
 
-
+    # Place detections in a spatial index 
     LM_index=esd.get_index('LM_index')
     LM_bounds=esd.insert_annotations_into_index(LM_index,LM_annotations)
     EM_index = esd.get_index('EM_index')
@@ -324,14 +350,14 @@ def evalsyndetections(args):
 
     overlap_matrix = np.zeros((len(good_annotations),len(LM_annotations)),np.bool)
     j=0
-    for i,alLM in enumerate(LM_annotations):
-        res=EM_index.intersection(LM_bounds[i])
+    for i,alLM in enumerate(LM_annotations): #Loop over each LM detection
+        res=EM_index.intersection(LM_bounds[i]) #check to see if LM detection overlaps with any EM anno
         for k in res:
             alEM=good_annotations[k]
             overlaps,zsection = esd.do_annotations_overlap(alLM,alEM)
             if overlaps:
                 overlap_matrix[k,i]=True
-    bins = np.arange(0,4)
+    bins = np.arange(0,4) #3 bins. 0 overlap, 1 overlap, 1+ overlaps
     LM_per_EM = np.sum(overlap_matrix,axis=1)
     EM_per_LM = np.sum(overlap_matrix,axis=0)
     LM_per_EM_counts,edges = np.histogram(LM_per_EM[EM_edge==False],bins=bins,normed=True)
@@ -342,23 +368,27 @@ def evalsyndetections(args):
     print('em edge annotations',np.sum(EM_edge))
     print('LM detections:',len(LM_edge))
     
-    
+    # Sort annotations into categories 
+
+    # False Negatives (EM Detections)
     missed_annotations = [] 
     for counter, synapse in enumerate(good_annotations): 
         if (LM_per_EM[counter] == 0 and EM_edge[counter]==False): 
             missed_annotations.append(synapse)
     
-    
+    # False Positives (LM Detections)
     false_positives = [] 
     for counter, anno in enumerate(LM_annotations): 
         if (EM_per_LM[counter] == 0 and LM_edge[counter]==False): 
             false_positives.append(anno)
-        
+    
+    # True Positive (LM Detections)
     tp_detections = [] 
     for counter, anno in enumerate(LM_annotations): 
         if (EM_per_LM[counter] != 0 and LM_edge[counter]==False): 
             tp_detections.append(anno)
 
+    # Collate results into a dict
     output = {'missed_annotations': missed_annotations, 'false_positives': false_positives, 
             'tp_detections': tp_detections, 'good_annotations': good_annotations, 
             'overlap_matrix': overlap_matrix, 'EM_edge':EM_edge, 'LM_edge': LM_edge}
@@ -368,6 +398,19 @@ def evalsyndetections(args):
 
 
 def evalGABAsyndetections(args): 
+    """
+    Evaluate GABA Synapses (incomplete)
+        
+    Parameters 
+    --------------
+    args: dict of strs
+        - contains information needed for evaluation 
+    Returns: 
+    output: dict
+        - contains evaluation results 
+    """
+
+
     EM_annotations = esd.load_annotation_file(args['EM_annotation_json'])
     LM_annotations = esd.load_annotation_file(args['LM_annotation_json'])
 
@@ -439,49 +482,28 @@ def evalGABAsyndetections(args):
     
     return output
 
-# def combineResultVolumes_test(listOfQueryNumbers, listOfThresholds, args): 
-#     """
-    
-#     """
-#     resultVolList = [] 
-#     for n, queryNum in enumerate(listOfQueryNumbers): 
-    
-#         fn = os.path.join(metadata['datalocation'], 'resultVol')
-#         fn = fn + str(queryNum) + '.npy'
-#         resultVol_n = np.load(fn)
-#         print(fn)
-
-#         resultVol_n = resultVol_n > listOfThresholds[n]
-#         resultVolList.append(resultVol_n)
-
-#     resultVol = resultVolList[0]
-#     combinedQNum = str(listOfQueryNumbers[0]) 
-#     for volItr in range(1, len(resultVolList)): 
-#         resultVol = resultVol + resultVolList[volItr]
-#         combinedQNum = combinedQNum + str(listOfQueryNumbers[volItr])
-        
-#     combinedQNum = combinedQNum + str(0) + str(0) 
-    
-#     pd.probMapToJSON(resultVol, metadata, combinedQNum)
-    
-#     fn = "../data/M247514_Rorb_1/Site3Align2/results/resultVol" + combinedQNum + ".json"
-    
-#     args['LM_annotation_json'] = fn
-#     queryresult = pd.evalsyndetections(args)
-#     missedAnnoIds = pd.getMissedAnnoIds(queryresult['missed_annotations'])
-#     len(missedAnnoIds)
-
-#     return queryresult
-    
 
 
 def combineResultVolumes(listOfQueryNumbers, listOfThresholds, metadata, args): 
     """
-    
+    Combine multiple queries and evaluate performance 
+
+    Parameters
+    ---------------
+    listOfQueryNumbers : list of ints
+    listOfThresholds : list of ints 
+    metadata : dict 
+    args : dict 
+
+    Returns
+    ----------------
+    queryresult : dict
     """
-    resultVolList = [] 
+
+    resultVolList = [] #list of thresholded result volumes 
+
     for n, queryNum in enumerate(listOfQueryNumbers): 
-    
+        # load result volume 
         fn = os.path.join(metadata['datalocation'], 'resultVol')
         fn = fn + str(queryNum) + '.npy'
         resultVol_n = np.load(fn)
@@ -499,13 +521,14 @@ def combineResultVolumes(listOfQueryNumbers, listOfThresholds, metadata, args):
     combinedQNum = combinedQNum + str(0) + str(0) 
     #metadata['outputJSONlocation'] = "../data/M247514_Rorb_1/Site3Align2/results/resultVol_combined" + ".json"
 
+    # output detections to json file 
     query = {'thresh': 0.9}
     probMapToJSON(resultVol, metadata, query, "_combined")
     
     jsonFN = metadata['outputJSONlocation']
     jsonFN = os.path.join(jsonFN, 'resultVol_combined.json')
     
-    
+    # Evaluate results 
     args['LM_annotation_json'] = jsonFN
     queryresult = evalsyndetections(args)
     missedAnnoIds = getMissedAnnoIds(queryresult['missed_annotations'])
