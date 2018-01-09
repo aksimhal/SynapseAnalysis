@@ -4,6 +4,7 @@ import numpy as np
 from scipy.stats import norm
 from skimage import measure
 from at_synapse_detection import synaptogram
+from at_synapse_detection import SynapseDetection as syn
 from scipy import io
 from shapely import geometry
 import os
@@ -11,7 +12,7 @@ import cv2
 import scipy.ndimage as ndimage
 from at_synapse_detection import evaluate_synapse_detection as esd
 from at_synapse_detection.AnnotationJsonSchema import AnnotationFile, NumpyArray
-import pandas 
+import pandas
 
 def bboxToListOfPoints(bbox): 
     """
@@ -347,6 +348,23 @@ def evalsyndetections(args):
     LM_bounds=esd.insert_annotations_into_index(LM_index,LM_annotations)
     EM_index = esd.get_index('EM_index')
     EM_bounds=esd.insert_annotations_into_index(EM_index,good_annotations)
+
+    fn = args['annotationToRemove']
+    impossibleanno = syn.loadMetadata(fn)
+    impossibleanno = impossibleanno['missedAnnoIds']
+    
+    print(sum(EM_edge)) 
+
+    for oid in impossibleanno: 
+        #oid = int(oid)
+
+        for n, anno in enumerate(good_annotations): 
+            if anno['oid'] == oid: 
+                EM_edge[n] = True
+                break
+    
+    
+    print(sum(EM_edge)) 
 
     overlap_matrix = np.zeros((len(good_annotations),len(LM_annotations)),np.bool)
     j=0

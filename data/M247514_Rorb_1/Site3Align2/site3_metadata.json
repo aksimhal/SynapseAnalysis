@@ -24,8 +24,10 @@
         "output_json": "results/Anish_evaluation_output.json",
         "LM_metadata_file": "site3_metadata.json",
         "EM_inclass_column": "glutsynapse",
-        "LM_annotation_json": "results/resultVol7.json"
+        "LM_annotation_json": "results/resultVol7.json", 
+        "annotationToRemove": "missedanno.json"
     },
     "querylocation": "/Users/anish/Documents/Connectome/SynapseAnalysis/data/M247514_Rorb_1/Site3Align2/site3_queries.json",
-    "outputJSONlocation": "/Users/anish/Documents/Connectome/SynapseAnalysis/data/M247514_Rorb_1/Site3Align2/results/"
+    "outputJSONlocation": "/Users/anish/Documents/Connectome/SynapseAnalysis/data/M247514_Rorb_1/Site3Align2/resultsDEV/"
+    
 }

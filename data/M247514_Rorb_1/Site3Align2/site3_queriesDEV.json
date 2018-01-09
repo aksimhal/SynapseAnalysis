@@ -1,0 +1,1 @@
+{"listOfQueries": [{"thresh": 0.7, "preIF_z": [1], "postIF_z": [1], "postIF": ["PSD95"], "preIF": ["synapsin"]}, {"thresh": 0.7, "preIF_z": [1], "postIF_z": [1], "postIF": ["PSD95"], "preIF": ["VGlut1"]}]}
