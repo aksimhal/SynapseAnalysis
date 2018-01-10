@@ -361,7 +361,7 @@ def combinePrePostVolumes(baseVolList, adjacentVolList, edge_win, search_win):
     if len(adjacentVolList) > 0: 
         adjacentVolList = createLookupTables(adjacentVolList)
 
-    print('starting to loop through each slice')
+    #print('starting to loop through each slice')
     baseVol = baseVolList[0]
     rStartEdge = edge_win
     rEndEdge = baseVol.shape[0] - edge_win
@@ -370,7 +370,7 @@ def combinePrePostVolumes(baseVolList, adjacentVolList, edge_win, search_win):
 
     # For each z slice
     for zInd in range(0, baseVol.shape[2]):
-        print("starting z ind: " + str(zInd))
+        #print("starting z ind: " + str(zInd))
 
         for rInd in range(rStartEdge, rEndEdge):
             for cInd in range(cStartEdge, cEndEdge):
@@ -392,7 +392,7 @@ def combinePrePostVolumes(baseVolList, adjacentVolList, edge_win, search_win):
                     
     return outputVol
 
-def getSynapseDetections(synapticVolumes, query, kernelLength=2, edge_win = 8,
+def getSynapseDetections(synapticVolumes, query, kernelLength=2, edge_win = 3,
                          search_win = 2):
     """
     This function calls the functions needed to run probabilistic synapse detection 
@@ -442,8 +442,8 @@ def getSynapseDetections(synapticVolumes, query, kernelLength=2, edge_win = 8,
     # combinePrePostVolumes(base, adjacent)
     # Step 4 
 
-    print(len(presynapticVolumes))
-    print(len(postsynapticVolumes))
+    #print(len(presynapticVolumes))
+    #print(len(postsynapticVolumes))
     if len(postsynapticVolumes) == 0: 
         resultVol = combinePrePostVolumes(presynapticVolumes, postsynapticVolumes, edge_win, search_win)
     else: 

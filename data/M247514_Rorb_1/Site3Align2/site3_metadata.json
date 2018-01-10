@@ -28,6 +28,6 @@
         "annotationToRemove": "missedanno.json"
     },
     "querylocation": "/Users/anish/Documents/Connectome/SynapseAnalysis/data/M247514_Rorb_1/Site3Align2/site3_queries.json",
-    "outputJSONlocation": "/Users/anish/Documents/Connectome/SynapseAnalysis/data/M247514_Rorb_1/Site3Align2/resultsDEV/"
+    "outputJSONlocation": "/Users/anish/Documents/Connectome/SynapseAnalysis/data/M247514_Rorb_1/Site3Align2/results/"
     
 }
