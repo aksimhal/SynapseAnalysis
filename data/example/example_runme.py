@@ -1,5 +1,4 @@
 from skimage import measure
-
 from at_synapse_detection import dataAccess as da
 from at_synapse_detection import SynapseDetection as syn
 
@@ -11,7 +10,7 @@ def main():
     fileName = 'examplequeries.csv'
 
     # List of Queries
-    listOfQueries = syn.createQueries(fileName)
+    listOfQueries = syn.loadQueriesCSV(fileName)
 
     # Test the first query
     query = listOfQueries[0]

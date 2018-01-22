@@ -22,7 +22,7 @@ def main():
         resultVol = np.load(fn)
         print(fn)
 
-        pd.probMapToJSON(resultVol, metadata, n)
+        pd.probMapToJSON(resultVol, metadata, listOfQueries[n], n)
     
 
 if __name__ == '__main__':

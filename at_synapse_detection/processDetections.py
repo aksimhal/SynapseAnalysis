@@ -177,7 +177,7 @@ def probMapToJSON(probmapvolume, metadata, query, n):
     
     resolution = metadata['resolution']
 
-    SE = np.ones((3, 3, 2))
+    SE = np.ones((2, 2, 2))
     dilated_volume = ndimage.binary_dilation(probmapvolume > thresh, SE) 
 
     labelVol = measure.label(dilated_volume)
@@ -360,12 +360,12 @@ def evalsyndetections(args):
 
         for n, anno in enumerate(good_annotations): 
             if anno['oid'] == oid: 
-                EM_edge[n] = True
+                #EM_edge[n] = True
                 break
     
     
     print(sum(EM_edge)) 
-
+    
     overlap_matrix = np.zeros((len(good_annotations),len(LM_annotations)),np.bool)
     j=0
     for i,alLM in enumerate(LM_annotations): #Loop over each LM detection

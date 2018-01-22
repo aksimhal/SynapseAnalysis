@@ -10,14 +10,15 @@ def main():
     # Load metadata
     metadataFN = 'site3_metadata.json'
     metadata = syn.loadMetadata(metadataFN)
-    
+
     # This is where the image data is located on disk 
     datalocation = metadata['datalocation']
     queryFN = metadata['querylocation']
 
     # List of Queries
     listOfQueries = syn.loadQueriesJSON(queryFN)
-
+    print("Number of Queries: ", len(listOfQueries))
+    
     for n in range(0, len(listOfQueries)): 
         
         query = listOfQueries[n]

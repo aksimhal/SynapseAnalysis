@@ -1,10 +1,15 @@
 import scipy
-import numpy as np
-from scipy.stats import norm
-from scipy import signal
 import csv
 import json
 import os
+import math
+import numpy as np
+from scipy.stats import norm
+from scipy import signal
+import scipy.ndimage as ndimage
+from at_synapse_detection import synaptogram
+from at_synapse_detection import dataAccess as da
+
 
 def getProbMap(data):
     """
@@ -23,16 +28,105 @@ def getProbMap(data):
         data = scipy.stats.norm.cdf(data, np.mean(data), np.std(data))
     else: 
         for zInd in range(0, data.shape[2]): 
-
             # Calculate foreground probabilities
             data[:, :, zInd] = scipy.stats.norm.cdf(data[:, :, zInd], np.mean(data[:, :, zInd]), np.std(data[:, :, zInd]))
-            # img = data[:, :, zInd]
-            # scale_param = np.sqrt(0.5 * np.mean(np.power(img.flatten(), 2)));
-            # data[:, :, zInd] = 1-np.exp((-np.power(img, 2))/(2*np.power(scale_param, 2)));
-
-
     return data
 
+def getProbMap_MW(data, chname, win=30, stepsize=1): 
+    """ 
+    Returns probability map of input image.  Uses a moving window for background/foreground seperation 
+    Saves probability map to file; if the file already exists, it reloads it and returns it
+
+    Issue: Current output location is hard coded 
+
+    Parameters
+    ----------
+    data : 3D numpy - input volume
+    chname : str - channel name 
+    win : int - window size (default = 30)
+    stepsize : int - moving window step size (default = 1)
+
+    Returns
+    ----------
+    data : 3D numpy
+        output volume with values scaled between 0 to 1
+    """
+    
+    #test to see if data exists # FIX filepath  
+    outputlocation = '/Users/anish/Documents/Connectome/Synaptome-Duke/data/collman17/Site3Align2Stacks/'
+    fn = chname + '_probvol.npy'
+    fn = os.path.join(outputlocation, fn)
+
+    doesfileexist = os.path.exists(fn)
+    
+    if doesfileexist: 
+        outputvol = np.load(fn)
+        print("loaded file")
+        return outputvol
+    else: 
+        print("compute prob file")
+
+        outputvol = np.zeros(data.shape)
+        for zInd in range(0, data.shape[2]): 
+            img = data[:, :, zInd]
+
+            print("Calculating probability slice: ", zInd)
+            imgsize = img.shape 
+            outputimg = np.zeros(imgsize)
+
+            startRow = 0
+            endRow = 0
+            oldEndRow = 0
+
+            exitRowLoop = False
+            for rowstep in range(0, int(np.ceil(imgsize[0]/stepsize))): 
+                startCol = 0
+                endCol = 0
+                oldEndCol = 0
+
+                if exitRowLoop: 
+                    break
+
+                if ((startRow + win) < imgsize[0]): 
+                    endRow = startRow + win 
+                else: 
+                    endRow = imgsize[0]
+                    exitRowLoop = True                 
+
+                exitColLoop = False
+                for colstep in range(0, int(np.ceil(imgsize[1]/stepsize))): 
+
+                    if exitColLoop: 
+                        break       
+
+                    if ((startCol + win) < imgsize[1]): 
+                         endCol = startCol + win
+                    else:
+                        endCol = imgsize[1]
+                        exitColLoop = True
+
+
+                    cutout = img[startRow:endRow, startCol:endCol]
+                    cutout = scipy.stats.norm.cdf(cutout, np.mean(cutout), np.std(cutout))
+
+                    if oldEndRow != 0 and oldEndCol != 0: 
+
+                        priordata = outputimg[startRow:oldEndRow, startCol:oldEndCol]
+                        meancutout = np.mean([priordata, cutout[0:-(endRow-oldEndRow), 0:-(endCol-oldEndCol)]], 0)
+                        cutout[0:-(endRow-oldEndRow), 0:-(endCol-oldEndCol)] = meancutout
+
+                    outputimg[startRow:endRow, startCol:endCol] = cutout
+                    oldEndCol = endCol
+                    startCol = startCol + stepsize
+
+                oldEndRow = endRow
+                startRow = startRow + stepsize
+
+            outputvol[:, :, zInd] = outputimg
+        np.save(fn, outputvol)
+
+    return outputvol
+        
 
 def convolveVolume(vol, kernelLength):
     """
@@ -120,7 +214,7 @@ def computeFactor(vol, numslices):
     return factorVol
 
 
-def createQueries(fileName):
+def loadQueriesCSV(fileName):
     """
     Create query object from csv 
     Query format is: 
@@ -132,6 +226,7 @@ def createQueries(fileName):
     NULL,,,,
     "
     If there is no adjacent signal, the empty synaptic side should be listed as "none"
+    Use loadQueriesJSON instead
 
     Parameters
     ----------
@@ -424,6 +519,10 @@ def getSynapseDetections(synapticVolumes, query, kernelLength=2, edge_win = 3,
     postIF_z = query['postIF_z']
 
     for n in range(0, len(presynapticVolumes)):
+
+        #getProbMap_MW(data, metadata, chname
+
+        #presynapticVolumes[n] = getProbMap_MW(presynapticVolumes[n], query['preIF'][n]) # Step 1
         presynapticVolumes[n] = getProbMap(presynapticVolumes[n]) # Step 1
         presynapticVolumes[n] = convolveVolume(presynapticVolumes[n], kernelLength) # Step 2
 
@@ -432,7 +531,9 @@ def getSynapseDetections(synapticVolumes, query, kernelLength=2, edge_win = 3,
             presynapticVolumes[n] = presynapticVolumes[n] * factorVol
 
     for n in range(0, len(postsynapticVolumes)):
+        
         postsynapticVolumes[n] = getProbMap(postsynapticVolumes[n]) # Step 1
+        #postsynapticVolumes[n] = getProbMap_MW(postsynapticVolumes[n], query['postIF'][n]) # Step 1
         postsynapticVolumes[n] = convolveVolume(postsynapticVolumes[n], kernelLength) # Step 2
 
         if postIF_z[n] > 1:
@@ -453,6 +554,16 @@ def getSynapseDetections(synapticVolumes, query, kernelLength=2, edge_win = 3,
 
 
 def loadMetadata(fn): 
+    """
+    Load Metadata JSON File
+    Parameters: 
+    -------------
+    fn : str - filename
+
+    Returns: 
+    -------------
+    data : dict 
+    """
     data = json.load(open(fn))
     return data
     
@@ -469,3 +580,53 @@ def saveresultvol(vol, datalocation, n):
     fn = os.path.join(datalocation, 'resultVol')
     fn = fn + str(n) + '.npy'
     np.save(fn, vol)
+
+
+
+
+def loadSynapseDataFromQuery(query, anno, win_xy, win_z, filepath):
+    """
+    Load tiff stacks associated with a query
+    Parameters
+    ----------
+    query : dict - object containing filenames associated with pre/post synaptic markers 
+    filepath : str - location of data 
+
+    Returns
+    ----------
+    synapticVolumes : dict
+        dict with two (pre/post) lists of synaptic volumes
+    """
+
+    bbox = synaptogram.getAnnotationBoundingBox2(anno)
+    bbox = synaptogram.transformSynapseCoordinates(bbox)
+    
+    # query = {'preIF' : preIF, 'preIF_z' : preIF_z, 'postIF' : postIF, 'postIF_z' : postIF_z};
+
+    #presynaptic volumes
+    presynapticvolumes = []
+    preIF = query['preIF']
+
+    # Loop over every presynaptic channel 
+    for n in range(0, len(preIF)):
+        #print(preIF[n])
+        
+        volume = getVolume(bbox, win_xy, win_z, preIF[n], filepath)
+        presynapticvolumes.append(volume)
+
+    #postsynaptic volumes
+    postsynapticvolumes = []
+    postIF = query['postIF']
+
+    # Loop over every postsynaptic channel 
+    for n in range(0, len(postIF)):
+       # print(postIF[n])
+        volume = getVolume(bbox, win_xy, win_z, postIF[n], filepath)
+
+        postsynapticvolumes.append(volume)
+
+    synapticVolumes = {'presynaptic': presynapticvolumes,
+                       'postsynaptic': postsynapticvolumes}
+                       
+    return synapticVolumes
+

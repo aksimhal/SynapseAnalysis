@@ -68,11 +68,11 @@ def main():
         # Location of LM detection output
         evalparam['LM_annotation_json'] = jsonfile
 
-        # mod = esd.EvaluateSynapseDetection(evalparam)
-        # evalresults = mod.run()
-        # listofevals.append(evalresults)
+        mod = esd.EvaluateSynapseDetection(evalparam)
+        evalresults = mod.run()
+        listofevals.append(evalresults)
 
-        # printEvalToText(listofevals, listOfQueries, metadata['thresh'])
+        printEvalToText(listofevals, listOfQueries, metadata['thresh'])
 
     # Combine Queries  
     evaluation_parameters = metadata['evalparam']
