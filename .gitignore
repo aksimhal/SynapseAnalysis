@@ -104,3 +104,5 @@ ENV/
 
 *.dat
 *.idx
+
+*.npy

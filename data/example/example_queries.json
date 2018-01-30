@@ -1,0 +1,20 @@
+{
+    "listOfQueries": [
+        {
+            "preIF": [
+                "synapsin_1st.tif"
+            ],
+            "preIF_z": [
+                2
+            ],
+            "postIF": [
+                "PSD95m_1st.tif"
+            ],
+            "postIF_z": [
+                2
+            ],
+            "punctumSize": 2,
+            "thresh": 0.7
+        }
+    ]
+}

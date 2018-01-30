@@ -341,7 +341,10 @@ def do_annotations_overlap(al1,al2):
     return False,None
 
 class EvaluateSynapseDetection(ArgSchemaParser):
-    """Module for evaluating synapse detection results given EM ground truth"""
+    """
+    Module for evaluating synapse detection results given EM ground truth
+    """
+    
     default_schema = EvaluateSynapseDetectionParameters
     default_output_schema = EvaluateSynapseDetectionOutput
 

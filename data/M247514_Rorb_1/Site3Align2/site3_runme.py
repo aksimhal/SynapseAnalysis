@@ -1,39 +1,41 @@
-# run site3 synapse detections 
-import numpy as np
-from skimage import measure
+"""
+run site3 synapse detections
+uses metadata generated from populate_metadata.ipynb
+"""
+
 from at_synapse_detection import dataAccess as da
 from at_synapse_detection import SynapseDetection as syn
 from at_synapse_detection import processDetections as pd
-from at_synapse_detection import singleSynapseAnalysis as ssa
 
 def main():
-    
+    """
+    run site 3 synapse detection
+    """
     # Load metadata
-    metadataFN = 'site3_metadata.json'
-    metadata = syn.loadMetadata(metadataFN)
+    metadata_fn = 'site3_metadata.json'
+    metadata = syn.loadMetadata(metadata_fn)
 
-    # This is where the image data is located on disk 
+    # This is where the image data is located on disk
     datalocation = metadata['datalocation']
-    queryFN = metadata['querylocation']
+    query_fn = metadata['querylocation']
 
     # List of Queries
-    listOfQueries = syn.loadQueriesJSON(queryFN)
+    listOfQueries = syn.loadQueriesJSON(query_fn)
     print("Number of Queries: ", len(listOfQueries))
-    
-    for n in range(0, len(listOfQueries)): 
-        
+
+    for n in range(0, len(listOfQueries)):
+
         query = listOfQueries[n]
         print(query)
-        
-        # Load the data 
+
+        # Load the data
         synapticVolumes = da.loadTiffSeriesFromQuery(query, datalocation)
 
         # Run Synapse Detection
         # Takes ~5 minutes to run
         resultVol = syn.getSynapseDetections(synapticVolumes, query)
-        #resultVol = ssa.getSynapseDetectionsMW(synapticVolumes, query)
 
-        # Save the probability map 
+        # Save the probability map to file
         syn.saveresultvol(resultVol, datalocation, n)
 
         # Save the thresholded results as annotation objects

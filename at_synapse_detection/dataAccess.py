@@ -1,12 +1,12 @@
 import numpy as np
 import fnmatch
-import os 
+import os
 import json
 from skimage import io
 
 def imreadtiff(fn):
     """
-    Load multipage tiff image file 
+    Load multipage tiff image file
     Parameters
     ----------
     fn : str - location of tiff stack
@@ -17,11 +17,11 @@ def imreadtiff(fn):
     """
 
     # Read tiff stack
-    im = io.imread(fn) 
+    im = io.imread(fn)
 
     # Format tiff stack into a numpy array
     output = np.zeros([im.shape[1], im.shape[2], im.shape[0]])
-    for n in range(0, im.shape[0]): 
+    for n in range(0, im.shape[0]):
         output[:, :, n] = im[n, :, :]
 
     return output
@@ -34,7 +34,7 @@ def imreadtiffseries(folderpath):
     Parameters
     ----------
     folderpath : str - location of tiff stack
-    numImages : int - number of images in the folder 
+    numImages : int - number of images in the folder
 
     Returns
     ----------
@@ -42,19 +42,19 @@ def imreadtiffseries(folderpath):
     """
     # Read first image
     fn = os.path.join(folderpath, '00000.tiff')
-    im = io.imread(fn) 
+    im = io.imread(fn)
 
-    # Determine number of tiff images in directory 
+    # Determine number of tiff images in directory
     numImages = len(fnmatch.filter(os.listdir(folderpath), '*.tiff'))
 
-    # Allocate Numpy Array 
+    # Allocate Numpy Array
     output = np.zeros([im.shape[0], im.shape[1], numImages])
 
     # Read tiff stack
-    for n in range(0, numImages): 
+    for n in range(0, numImages):
         fn = os.path.join(folderpath, str(n).zfill(5))
         fn = fn + '.tiff'
-        im = io.imread(fn) 
+        im = io.imread(fn)
 
         output[:, :, n] = im
 
@@ -66,7 +66,7 @@ def imreadtiffSingleSlice(folderpath, sliceInd):
     Parameters
     ----------
     folderpath : str - location of tiff stack
-    numImages : int - the image index to load 
+    numImages : int - the image index to load
 
     Returns
     ----------
@@ -76,7 +76,7 @@ def imreadtiffSingleSlice(folderpath, sliceInd):
     # Read tiff stack
     fn = os.path.join(folderpath, str(sliceInd).zfill(5))
     fn = fn + '.tiff'
-    im = io.imread(fn) 
+    im = io.imread(fn)
 
     output = im
 
@@ -84,11 +84,11 @@ def imreadtiffSingleSlice(folderpath, sliceInd):
 
 def loadChannelVolFromQuery(query):
     """
-    Load tiff stacks associated with a query
+    Load tiff stacks associated with a query. Assumes tiff stacks are in the same directory as the runme.
     Parameters
     ----------
     query : dict
-        dict object containing filenames associated with pre/post synaptic markers 
+        dict object containing filenames associated with pre/post synaptic markers
 
     Returns
     ----------
@@ -96,13 +96,11 @@ def loadChannelVolFromQuery(query):
         dict with two (pre/post) lists of synaptic volumes
     """
 
-    # query = {'preIF' : preIF, 'preIF_z' : preIF_z, 'postIF' : postIF, 'postIF_z' : postIF_z};
-
     #presynaptic volumes
     presynapticvolumes = []
     preIF = query['preIF']
 
-    # Loop over every presynaptic channel 
+    # Loop over every presynaptic channel
     for n in range(0, len(preIF)):
 
         print(preIF[n])
@@ -113,7 +111,7 @@ def loadChannelVolFromQuery(query):
     postsynapticvolumes = []
     postIF = query['postIF']
 
-    # Loop over every postsynaptic channel 
+    # Loop over every postsynaptic channel
     for n in range(0, len(postIF)):
         print(postIF[n])
         volume = imreadtiff(postIF[n])
@@ -121,7 +119,7 @@ def loadChannelVolFromQuery(query):
 
     synapticVolumes = {'presynaptic': presynapticvolumes,
                        'postsynaptic': postsynapticvolumes}
-                       
+
     return synapticVolumes
 
 def loadTiffSeriesFromQuery(query, filepath):
@@ -129,8 +127,8 @@ def loadTiffSeriesFromQuery(query, filepath):
     Load tiff stacks associated with a query
     Parameters
     ----------
-    query : dict - object containing filenames associated with pre/post synaptic markers 
-    filepath : str - location of data 
+    query : dict - object containing filenames associated with pre/post synaptic markers
+    filepath : str - location of data
 
     Returns
     ----------
@@ -144,7 +142,7 @@ def loadTiffSeriesFromQuery(query, filepath):
     presynapticvolumes = []
     preIF = query['preIF']
 
-    # Loop over every presynaptic channel 
+    # Loop over every presynaptic channel
     for n in range(0, len(preIF)):
 
         #print(preIF[n])
@@ -156,7 +154,7 @@ def loadTiffSeriesFromQuery(query, filepath):
     postsynapticvolumes = []
     postIF = query['postIF']
 
-    # Loop over every postsynaptic channel 
+    # Loop over every postsynaptic channel
     for n in range(0, len(postIF)):
         #print(postIF[n])
         fn = os.path.join(filepath, postIF[n])
@@ -165,7 +163,7 @@ def loadTiffSeriesFromQuery(query, filepath):
 
     synapticVolumes = {'presynaptic': presynapticvolumes,
                        'postsynaptic': postsynapticvolumes}
-                       
+
     return synapticVolumes
 
 
@@ -180,29 +178,29 @@ def getImageCutoutFromFile(channelname, sliceInd, startX, startY, deltaX, deltaY
     sliceInd : ind
     startX : ind
     startY : ind
-    deltaX : ind 
-    deltaY : ind 
+    deltaX : ind
+    deltaY : ind
     filepath : str
 
     Returns
     -----------
-    cutout: 2D numpy array 
+    cutout: 2D numpy array
     """
-    
+
     folderpath = os.path.join(filepath, channelname)
     img = imreadtiffSingleSlice(folderpath, sliceInd)
     cutout = img[startY:(startY + deltaY), startX:(startX+deltaX)]
-    
+
     return cutout
 
-def writeJSONFile(filename, data): 
+def writeJSONFile(filename, data):
     """
-    write a json file 
-    
+    write a json file
+
     Parameters
     --------------
     filename : str
-    data : dict 
+    data : dict
 
     Returns
     --------------
