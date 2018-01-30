@@ -669,23 +669,23 @@ def getSynaptogramFromFile(bboxCoordinates, win_xy, win_z, stackList, showProb, 
             else: 
                 maxIntensity = 5000; 
                 
-            cutout = da.getImageCutoutFromFile(stack, sliceInd, startX, startY, deltaX, deltaY, filepath)
+            cutout = getImageProbMapCutoutFromFile(stack, sliceInd, startX, startY, deltaX, deltaY, filepath)
             
             #print(startX)    
             #Convert to floating point precision 
-            cutout.astype(np.float64)
+            # cutout.astype(np.float64)
             
-            if (showProb):
-                if stack == EMfilename: 
-                    cutout = np.divide(cutout, 255.0)
-                elif stack == 'results':
-                    cutout = np.divide(cutout, 255.0)
+            # if (showProb):
+            #     if stack == EMfilename: 
+            #         cutout = np.divide(cutout, 255.0)
+            #     elif stack == 'results':
+            #         cutout = np.divide(cutout, 255.0)
 
-                else: 
-                    if (np.mean(cutout) != 0):
-                        cutout = syn.getProbMap(cutout)
+            #     else: 
+            #         if (np.mean(cutout) != 0):
+            #             cutout = syn.getProbMap(cutout)
                         
-                #cutout  = cutout > 0.7
+            #     #cutout  = cutout > 0.7
 
             #cutout = getProbMap(cutout);
             img[ifpos:(ifpos + deltaY), slicepos:(slicepos + deltaX)] = cutout; 
@@ -696,6 +696,35 @@ def getSynaptogramFromFile(bboxCoordinates, win_xy, win_z, stackList, showProb, 
         slicepos = slicepos + deltaX; 
             
     return img; 
+
+def getImageProbMapCutoutFromFile(channelname, sliceInd, startX, startY, deltaX, deltaY, filepath):
+    """
+    Load cutout of a slice of a tiff image
+
+    Parameters
+    -----------
+    channelname : str
+    sliceInd : ind
+    startX : ind
+    startY : ind
+    deltaX : ind 
+    deltaY : ind 
+    filepath : str
+
+    Returns
+    -----------
+    cutout: 2D numpy array 
+    """
+    
+    folderpath = os.path.join(filepath, channelname)
+    img = da.imreadtiffSingleSlice(folderpath, sliceInd)
+    img.astype(np.float64)
+
+    probimg = syn.getProbMap(img)
+
+    cutout = probimg[startY:(startY + deltaY), startX:(startX+deltaX)]
+    
+    return cutout
 
 def synapseAnnotationToSynaptogram(synapse, render_args, win_xy, win_z, filepath, showProb, stackList,textXOffset, textYOffset ):
     

@@ -27,7 +27,7 @@
         "LM_annotation_json": "results/resultVol7.json", 
         "annotationToRemove": "missedanno.json"
     },
-    "querylocation": "/Users/anish/Documents/Connectome/SynapseAnalysis/data/M247514_Rorb_1/Site3Align2/site3_queries.json",
+    "querylocation": "/Users/anish/Documents/Connectome/SynapseAnalysis/data/M247514_Rorb_1/Site3Align2/site3_queriesDEV.json",
     "outputJSONlocation": "/Users/anish/Documents/Connectome/SynapseAnalysis/data/M247514_Rorb_1/Site3Align2/results/"
     
 }

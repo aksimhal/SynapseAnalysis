@@ -4,6 +4,7 @@ from skimage import measure
 from at_synapse_detection import dataAccess as da
 from at_synapse_detection import SynapseDetection as syn
 from at_synapse_detection import processDetections as pd
+from at_synapse_detection import singleSynapseAnalysis as ssa
 
 def main():
     
@@ -30,6 +31,7 @@ def main():
         # Run Synapse Detection
         # Takes ~5 minutes to run
         resultVol = syn.getSynapseDetections(synapticVolumes, query)
+        #resultVol = ssa.getSynapseDetectionsMW(synapticVolumes, query)
 
         # Save the probability map 
         syn.saveresultvol(resultVol, datalocation, n)

@@ -554,3 +554,37 @@ def combineResultVolumes(listOfQueryNumbers, listOfThresholds, metadata, args):
 
     return queryresult
     
+
+def printEvalToText(listofevals, listOfQueries, listOfThresholds): 
+    """
+    Outputs the evaluation results for each query to a text file 
+
+    Parameters
+    --------------
+    listofevals : list of dictionaries 
+    listOfQueries: list of dictionaries 
+    thresh: threshold at which detections are computed
+    """
+    file = open('output.txt', 'w')
+    
+
+    
+    for n, evalresult in enumerate(listofevals): 
+        query = listOfQueries[n]
+        file.write(json.dumps(query))
+        file.write('\n')
+        file.write('Threshold: ' + str(listOfThresholds[n]))
+        file.write('\n')
+
+        file.write('EM_per_LM: ' + str(evalresult['EM_per_LM']) + '\n')
+        file.write('LM_per_EM: ' + str(evalresult['LM_per_EM']) + '\n')
+        
+        file.write('lm_edge_detections: ' + str(evalresult['lm_edge_detections']) + '\n')
+        file.write('em_edge_annotations: ' + str(evalresult['em_edge_annotations']) + '\n')
+        file.write('LM_detections: ' + str(evalresult['LM_detections']) + '\n')
+        file.write('EM_detections: ' + str(evalresult['EM_detections']) + '\n')
+        file.write('\n')
+
+
+    file.close()
+

@@ -520,9 +520,6 @@ def getSynapseDetections(synapticVolumes, query, kernelLength=2, edge_win = 3,
 
     for n in range(0, len(presynapticVolumes)):
 
-        #getProbMap_MW(data, metadata, chname
-
-        #presynapticVolumes[n] = getProbMap_MW(presynapticVolumes[n], query['preIF'][n]) # Step 1
         presynapticVolumes[n] = getProbMap(presynapticVolumes[n]) # Step 1
         presynapticVolumes[n] = convolveVolume(presynapticVolumes[n], kernelLength) # Step 2
 
@@ -533,7 +530,6 @@ def getSynapseDetections(synapticVolumes, query, kernelLength=2, edge_win = 3,
     for n in range(0, len(postsynapticVolumes)):
         
         postsynapticVolumes[n] = getProbMap(postsynapticVolumes[n]) # Step 1
-        #postsynapticVolumes[n] = getProbMap_MW(postsynapticVolumes[n], query['postIF'][n]) # Step 1
         postsynapticVolumes[n] = convolveVolume(postsynapticVolumes[n], kernelLength) # Step 2
 
         if postIF_z[n] > 1:
@@ -630,3 +626,60 @@ def loadSynapseDataFromQuery(query, anno, win_xy, win_z, filepath):
                        
     return synapticVolumes
 
+def getVolume(bboxCoordinates, win_xy, win_z, volname, filepath): 
+    """    
+    Load a portion of image data 
+
+    Parameters
+    -----------
+    bboxCoordinates : dict - coordinates of EM ennotation 
+    win_xy : int - radius of expansion 
+    win_z : int - z radius of expansion 
+    volname : str - name of volume to load 
+    filepath : str - location of data 
+
+    Returns
+    -----------
+    vol : 3D Numpy array 
+    """
+    
+    # check for boundary issues
+    startZ = bboxCoordinates['minZ']
+    if (startZ - win_z > -1):
+        startZ = startZ - win_z; 
+    
+    endZ = bboxCoordinates['maxZ']
+    
+    if (endZ + win_z < 50):
+        endZ = endZ + win_z; 
+    
+    # get range of x, y values 
+    startX = bboxCoordinates['minX'] - win_xy;
+    startY = bboxCoordinates['minY'] - win_xy;
+    deltaX = bboxCoordinates['maxX'] - startX + win_xy;
+    deltaY = bboxCoordinates['maxY'] - startY + win_xy;
+    
+    startX = int(round(startX))
+    startY = int(round(startY))
+    deltaX = int(round(deltaX))
+    deltaY = int(round(deltaY))
+    startZ = int(round(startZ))
+    endZ   = int(round(endZ))
+    
+    numSlices = endZ - startZ + 1
+    
+    # allocate volume
+    vol = np.zeros((deltaY, deltaX, numSlices), dtype=np.float64)
+        
+    # iterate over each slice 
+    sliceitr = 0 
+    for sliceInd in range(startZ, endZ + 1):
+      
+        cutout = da.getImageCutoutFromFile(volname, sliceInd, startX, startY, deltaX, deltaY, filepath)
+        cutout.astype(np.float64)
+        cutout = getProbMap(cutout)
+
+        vol[:, :, sliceitr] = cutout; 
+        sliceitr = sliceitr + 1 
+        
+    return vol
