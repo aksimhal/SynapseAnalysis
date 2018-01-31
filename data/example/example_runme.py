@@ -11,7 +11,7 @@ def main():
     
     # Example use case of the synapse detection pipeline
     # Location of Queries
-    queryFN = 'data/example/example_queries.json'
+    queryFN = 'example_queries.json'
 
     # List of Queries
     listOfQueries = syn.loadQueriesJSON(queryFN)
