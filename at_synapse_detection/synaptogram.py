@@ -1,8 +1,10 @@
+"""
+Code needed to create synaptograms
+"""
 import renderapi
 import scipy
 import numpy as np
 from scipy.stats import norm
-#from at_synapse_detection.render_module import RenderModule
 from PIL import Image
 from PIL import ImageDraw
 from PIL import ImageColor
@@ -10,15 +12,14 @@ import os
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
-
 from at_synapse_detection import dataAccess as da
 from at_synapse_detection import SynapseDetection as syn
 
-def getAnnotationBoundingBox(synapse, render_args):
 
+def get_anno_boundingbox(synapse):
     """
-    Get coordinates of a boundingbox containing the entire synapse annotations
-    
+    Get coordinates of a boundingbox containing the entire synapse annotation
+
     Parameters
     ----------
     synapse : dict
@@ -28,64 +29,7 @@ def getAnnotationBoundingBox(synapse, render_args):
     bboxCoordinates : dict
         containing min/max x/y/z values
     """
-        
-    synapseSubareasList = synapse['areas']
-    maxX = 0; 
-    minX = float("inf")
 
-    maxY = 0;
-    minY = float("inf")
-
-    maxZ = 0;
-    minZ = float("inf")
-
-    stackname = 'BIGALIGN_LENS_EMclahe_all'
-
-    for synapsesubarea in synapseSubareasList:
-        subarea_tile = synapsesubarea['global_path']
-        subarea_tile = map(list, zip(*subarea_tile))
-        xcolumn = subarea_tile[0]
-        ycolumn = subarea_tile[1]
-
-        tileid = synapsesubarea['tileId']
-
-        tspec = renderapi.tilespec.get_tile_spec(stackname, tileid, 
-                                                 render_args['host'], render_args['port'], 
-                                                 render_args['owner'], render_args['project'])
-        if (tspec.z > maxZ):
-            maxZ = tspec.z; 
-        if (tspec.z < minZ):
-            minZ = tspec.z; 
-
-        if (max(xcolumn) > maxX):
-            maxX = max(xcolumn)
-        if (min(xcolumn) < minX):
-            minX = min(xcolumn)
-
-        if (max(ycolumn) > maxY):
-            maxY = max(ycolumn)
-        if (min(ycolumn) < minY):
-            minY = min(ycolumn)
-
-    bboxCoordinates = {'minX': minX, 'maxX': maxX, 'minY': minY, 'maxY': maxY, 'minZ': minZ, 'maxZ': maxZ}
-        
-    return bboxCoordinates
-    
-def getAnnotationBoundingBox2(synapse):
-
-    """
-    Get coordinates of a boundingbox containing the entire synapse annotations
-    
-    Parameters
-    ----------
-    synapse : dict
-        dictionary object generated from input json file
-    Returns
-    -------
-    bboxCoordinates : dict
-        containing min/max x/y/z values
-    """
-        
     synapseSubareasList = synapse['areas']
     maxX = 0
     minX = float("inf")
@@ -96,8 +40,6 @@ def getAnnotationBoundingBox2(synapse):
     maxZ = 0
     minZ = float("inf")
 
-    #stackname = 'BIGALIGN_LENS_EMclahe_all'
-
     for synapsesubarea in synapseSubareasList:
         subarea_tile = synapsesubarea['global_path']
         subarea_tile = list(map(list, zip(*subarea_tile)))
@@ -106,18 +48,10 @@ def getAnnotationBoundingBox2(synapse):
         z = synapsesubarea['z']
         z = int(z)
 
-        # tileIds_subarea = synapsesubarea['tileIds']
-        # #tileid = synapsesubarea['tileId']
-
-        # #for tileid in tileIds_subarea: 
-        # tileid = tileIds_subarea[0]
-        # tspec = renderapi.tilespec.get_tile_spec(stackname, tileid, 
-        #                                          render_args['host'], render_args['port'], 
-        #                                          render_args['owner'], render_args['project'])
         if (z > maxZ):
-            maxZ = z; 
+            maxZ = z
         if (z < minZ):
-            minZ = z; 
+            minZ = z
 
         if (max(xcolumn) > maxX):
             maxX = max(xcolumn)
@@ -129,23 +63,25 @@ def getAnnotationBoundingBox2(synapse):
         if (min(ycolumn) < minY):
             minY = min(ycolumn)
 
-    bboxCoordinates = {'minX': minX, 'maxX': maxX, 'minY': minY, 'maxY': maxY, 'minZ': minZ, 'maxZ': maxZ}
-        
-    return bboxCoordinates
-    
-def transformSynapseCoordinates(bboxCoordinates): 
+    bbox_coordinates = {'minX': minX, 'maxX': maxX, 'minY': minY,
+                        'maxY': maxY, 'minZ': minZ, 'maxZ': maxZ}
+
+    return bbox_coordinates
+
+def transformSynapseCoordinates(bboxCoordinates):
     """
-    
-    
+    Downsample bounding box coordinates
+
     Parameters
     -----------
-    
+    bboxCoordinates : dict - boundingbox object created by get_anno_boundingbox()
+
     Returns
     -----------
-    
+    bboxCoordinates : dict
     """
-    xoffset = 0#7096.0*3.0/100.0
-    yoffset = 0#5871.0*3.0/100.0
+    xoffset = 0 #7096.0*3.0/100.0
+    yoffset = 0 #5871.0*3.0/100.0
     ds_factor = (3.0 / 100.0)
 
     bboxCoordinates['maxX'] = bboxCoordinates['maxX'] * ds_factor - xoffset
@@ -153,159 +89,72 @@ def transformSynapseCoordinates(bboxCoordinates):
     bboxCoordinates['maxY'] = bboxCoordinates['maxY'] * ds_factor - yoffset
     bboxCoordinates['minY'] = bboxCoordinates['minY'] * ds_factor - yoffset
 
-    return bboxCoordinates        
+    return bboxCoordinates
 
-def expandBoundingBox(bboxCoordinates, win_xy, win_z): 
-    
+def expandBoundingBox(bboxCoordinates, win_xy, win_z):
+    """
+    Expand boundingbox dict by specified amount.
+    Checks for boundary issues so it's not garunteed
+    to be completely centered around an annotation.
+
+    Paramters
+    -------------
+    bboxCoordinates : dict
+    win_xy : int - amount to expand by in the x,y dimensions
+    win_z : int - number of slices to search
+    """
     # check for boundary issues
     startZ = bboxCoordinates['minZ']
     if (startZ - win_z > -1):
-        startZ = startZ - win_z; 
-    
+        startZ = startZ - win_z
+
     endZ = bboxCoordinates['maxZ']
     if (endZ + win_z < 101):
-        endZ = endZ + win_z; 
-    
-    # get range of x, y values 
-    startX = bboxCoordinates['minX'] - win_xy; 
-    startY = bboxCoordinates['minY'] - win_xy; 
-    deltaX = bboxCoordinates['maxX'] - startX + win_xy; 
-    deltaY = bboxCoordinates['maxY'] - startY + win_xy; 
-    
+        endZ = endZ + win_z
+
+    # get range of x, y values
+    startX = bboxCoordinates['minX'] - win_xy
+    startY = bboxCoordinates['minY'] - win_xy
+    deltaX = bboxCoordinates['maxX'] - startX + win_xy
+    deltaY = bboxCoordinates['maxY'] - startY + win_xy
+
     startX = int(round(startX))
     startY = int(round(startY))
     deltaX = int(round(deltaX))
     deltaY = int(round(deltaY))
     startZ = int(round(startZ))
     endZ = int(round(endZ))
-    
-    
 
-    expandedBox = {'startX': startX, 'deltaX': deltaX, 
-                       'startY': startY, 'deltaY': deltaY, 
+
+
+    expandedBox = {'startX': startX, 'deltaX': deltaX,
+                       'startY': startY, 'deltaY': deltaY,
                        'startZ': startZ, 'endZ': endZ}
-    return expandedBox 
+    return expandedBox
 
-def getSynaptogramFromRender(bboxCoordinates, win_xy, win_z, stackList, scale, showProb, mod): 
 
-    """
-    create synaptogram for FC annotation data 
-    
-    Parameters
-    -----------
-    
-    Returns
-    -----------
-    
-    """
-    
-    minIntensity = 0; 
-    EMfilename = 'BIGALIGN_LENS_EMclahe_all'; 
-    
-    # check for boundary issues
-    startZ = bboxCoordinates['minZ']
-    #if (startZ - win_z > -1):
-    startZ = startZ - win_z; 
-    
-    endZ = bboxCoordinates['maxZ']
-    #if (endZ + win_z < 101):
-    endZ = endZ + win_z; 
-    
-    # get range of x, y values 
-    startX = bboxCoordinates['minX'] - win_xy; 
-    startY = bboxCoordinates['minY'] - win_xy; 
-    deltaX = bboxCoordinates['maxX'] - startX + win_xy; 
-    deltaY = bboxCoordinates['maxY'] - startY + win_xy; 
-    
-    startX = int(round(startX))
-    startY = int(round(startY))
-    deltaX = int(round(deltaX))
-    deltaY = int(round(deltaY))
-    startZ = int(round(startZ))
-    endZ = int(round(endZ))
-    
-    
-
-    numSlices = endZ - startZ + 1;  
-    numChannels = len(stackList)
-    
-    # allocate synaptogram img
-    img = np.zeros((numChannels * deltaY, numSlices * deltaX), dtype=np.float64)
-    
-    slicepos = 0; # x 
-    
-    # iterate over each slice 
-    for sliceInd in range(startZ, endZ + 1):
-        #print sliceInd; 
-        
-        ifpos = 0; # y 
-        ifitr = 0;     
-        
-        # iterate over each channel 
-        for stack in stackList: 
-            #print stack
-            
-            if stack == EMfilename: 
-                maxIntensity = 255;
-            else: 
-                maxIntensity = 5000; 
-                
-            cutout = getCutout(stack, sliceInd, startX, 
-                                   startY, deltaX, deltaY, 
-                                   scale, minIntensity, maxIntensity, mod);
-            #print(startX)    
-            # Convert to floating point precision 
-            cutout.astype(np.float64)
-            
-            if (showProb):
-                if stack == EMfilename: 
-                    cutout = np.divide(cutout, 255.0)
-                else: 
-                    if (np.mean(cutout) != 0):
-                        cutout = getProbMap(cutout)
-                        
-
-            #cutout = getProbMap(cutout);
-            img[ifpos:(ifpos + deltaY), slicepos:(slicepos + deltaX)] = cutout; 
-            
-            ifpos = ifpos + deltaY; 
-            ifitr = ifitr + 1; 
-            
-        slicepos = slicepos + deltaX; 
-            
-    return img; 
-            
 def getAnnotationOutlines(synapse):
 
     """
-    Get annotation outlines, organized by EM slice. 
-    
+    Get annotation outlines, organized by EM slice.
+
     Parameters
     ----------
     synapse : dict - synapse object, as defined by FC's json file
     render_args : dict - render arugments to access the server on galicia
     Returns
     -------
-    synapseOutlinesDict : dict - contains the synapse outlines 
+    synapseOutlinesDict : dict - contains the synapse outlines
     """
-    
-    synapseSubareasList = synapse['areas']
-    # stackname = 'BIGALIGN_LENS_EMclahe_all'
 
-    listOfSubAreas = []; 
-    listOfZinds = []; 
+    synapseSubareasList = synapse['areas']
+    listOfSubAreas = []
+    listOfZinds = []
 
     for synapsesubarea in synapseSubareasList:
         subarea_tile = synapsesubarea['global_path']
-
         # remap
         subarea_outline = list(map(list, zip(*subarea_tile)))
-
-        # tileIds_subarea = synapsesubarea['tileIds']
-        # tileid = tileIds_subarea[0]
-        # tspec = renderapi.tilespec.get_tile_spec(stackname, tileid, 
-        #                                          render_args['host'], render_args['port'], 
-        #                                          render_args['owner'], render_args['project'])
         listOfSubAreas.append(subarea_outline)
         listOfZinds.append(synapsesubarea['z'])
 
@@ -314,18 +163,29 @@ def getAnnotationOutlines(synapse):
     return synapseOutlinesDict
 
 def transformSynapseOutlinesDict(synapseOutlinesDict):
+    """
+    Downsamples the points in the outline dict object
+
+    Parameters
+    -------------
+    synapseOutlinesDict : dict
+
+    Returns
+    --------------
+    synapseOutlinesDict : dict
+    """
     listOfSubAreas = synapseOutlinesDict['subAreas']
     transformedListOfSubAreas = []
     xoffset = 0#7096.0*3.0/100.0
     yoffset = 0#5871.0*3.0/100.0
     ds_factor = (3.0 / 100.0)
 
-    
-    for subarea in listOfSubAreas: 
+
+    for subarea in listOfSubAreas:
         subarea[0] = np.array(subarea[0]) * ds_factor - xoffset
         subarea[1] = np.array(subarea[1]) * ds_factor - yoffset
         transformedListOfSubAreas.append(subarea)
-    
+
     synapseOutlinesDict['subAreas'] = listOfSubAreas
 
     return synapseOutlinesDict
@@ -333,7 +193,7 @@ def transformSynapseOutlinesDict(synapseOutlinesDict):
 def plotOutlinesOnImg(img, synapseOutlinesDict, expandedBox, filename, channelNames, textXOffset, textYOffset):
 
     """
-    Plot outlines. 
+    Plot outlines.
 
     Parameters
     ----------
@@ -356,18 +216,18 @@ def plotOutlinesOnImg(img, synapseOutlinesDict, expandedBox, filename, channelNa
 
     plt.imshow(img, cmap='gray')
 
-    yAnnoOffset = 0; 
+    yAnnoOffset = 0
     xMid = np.round(deltaX / 2)
     yMid = np.round(deltaY / 2)
 
-    for chname in channelNames:  
+    for chname in channelNames:
         plt.text(textXOffset, ypt, chname, color='red', horizontalalignment='right')
-        ypt = ypt + deltaY 
-        
+        ypt = ypt + deltaY
+
         xMid = np.round(deltaX / 2)
         xMid = xMid + deltaX
 
-        for x in range(0, len(listOfZinds)): 
+        for x in range(0, len(listOfZinds)):
 
             subareaOutline = listOfSubAreas[x]
             xcolumn = np.array(subareaOutline[0])
@@ -382,15 +242,15 @@ def plotOutlinesOnImg(img, synapseOutlinesDict, expandedBox, filename, channelNa
             xOffset = deltaX*(listOfZinds[x] - min(listOfZinds)) + deltaX
             xcolumn += xOffset
 
-            ycolumn = ycolumn + yAnnoOffset; 
-            
+            ycolumn = ycolumn + yAnnoOffset
+
             plt.plot(xcolumn, ycolumn, color='red', linewidth=0.5)
             listoflines = getGridLines(yMid, xMid)
-            for line in listoflines: 
+            for line in listoflines:
                 plt.plot(line[1], line[0], color='green', linewidth=0.5)
 
             xMid = xMid + deltaX
-            
+
         yAnnoOffset = yAnnoOffset + deltaY
         yMid = yMid + deltaY
 
@@ -402,11 +262,11 @@ def plotOutlinesOnImg(img, synapseOutlinesDict, expandedBox, filename, channelNa
     plt.clf()
     plt.close()
 
-def getGridLines(rInd, cInd, search_win=2): 
+def getGridLines(rInd, cInd, search_win=2):
 
-    # rInd = 10 
-    # cInd = 20 
-    # search_win = 2 
+    # rInd = 10
+    # cInd = 20
+    # search_win = 2
 
     rstart = rInd - 1.5 * search_win
     rstart = int(rstart)
@@ -418,8 +278,8 @@ def getGridLines(rInd, cInd, search_win=2):
     cinds = list(range(cstart, cstart+search_win*3+1, search_win))
 
 
-    listoflines = []; 
-    for n in range(0, 4):   
+    listoflines = []
+    for n in range(0, 4):
 
         rline = [min(rinds), max(rinds)]
         cline = [cinds[n], cinds[n]]
@@ -427,7 +287,7 @@ def getGridLines(rInd, cInd, search_win=2):
 
         listoflines.append(line)
 
-    for n in range(0, 4):   
+    for n in range(0, 4):
 
         rline = [rinds[n], rinds[n]]
         cline = [min(cinds), max(cinds)]
@@ -441,7 +301,7 @@ def getGridLines(rInd, cInd, search_win=2):
 def plotAnnoDetectionsOnImg(img, listOfOutlines, expandedBox, filename, channelNames, textXOffset, textYOffset):
 
     """
-    Plot outlines. 
+    Plot outlines.
 
     Parameters
     ----------
@@ -462,24 +322,24 @@ def plotAnnoDetectionsOnImg(img, listOfOutlines, expandedBox, filename, channelN
 
     plt.imshow(img, cmap='gray')
 
-    yAnnoOffset = 0; 
+    yAnnoOffset = 0
     xMid = np.round(deltaX / 2)
     yMid = np.round(deltaY / 2)
 
 
-    for chname in channelNames:  
+    for chname in channelNames:
         plt.text(textXOffset, ypt, chname, color='red', horizontalalignment='right')
-        ypt = ypt + deltaY 
+        ypt = ypt + deltaY
 
         listOfSubAreas = synapseOutlinesDict['subAreas']
         listOfZinds = synapseOutlinesDict['zInds']
-        
-          
+
+
         listoflines = getGridLines(yMid, xMid)
-        for line in listoflines: 
+        for line in listoflines:
             plt.plot(line[1], line[0], color='green')
-        
-        for x in range(0, len(listOfZinds)): 
+
+        for x in range(0, len(listOfZinds)):
 
             subareaOutline = listOfSubAreas[x]
             xcolumn = np.array(subareaOutline[0])
@@ -488,7 +348,7 @@ def plotAnnoDetectionsOnImg(img, listOfOutlines, expandedBox, filename, channelN
             startX = expandedBox['startX']
             startY = expandedBox['startY']
 
- 
+
 
             xcolumn -= startX
             ycolumn -= startY
@@ -496,10 +356,10 @@ def plotAnnoDetectionsOnImg(img, listOfOutlines, expandedBox, filename, channelN
             xOffset = deltaX*(listOfZinds[x] - min(listOfZinds)) + deltaX
             xcolumn += xOffset
 
-            ycolumn = ycolumn + yAnnoOffset; 
-            
+            ycolumn = ycolumn + yAnnoOffset
+
             plt.plot(xcolumn, ycolumn, color='red')
-            
+
         yAnnoOffset = yAnnoOffset + deltaY
         yMid = yMid + deltaY
 
@@ -511,35 +371,6 @@ def plotAnnoDetectionsOnImg(img, listOfOutlines, expandedBox, filename, channelN
     plt.close()
 
 
-
-def addLabelsOnImg(img, expandedBox, filename, channelNames, textXOffset, textYOffset):
-
-    """
-    Plot outlines. 
-
-    Parameters
-    ----------
-
-    Returns
-    -------
-
-    """
-    ypt = textYOffset
-
-    deltaY = expandedBox['deltaY']
-    plt.ioff()
-    plt.imshow(img, cmap='gray')
-
-    for chname in channelNames:  
-        plt.text(textXOffset, ypt, chname, color='red', horizontalalignment='right')
-        ypt = ypt + deltaY 
-        
-    plt.axis('off')
-
-    plt.savefig(filename, bbox_inches='tight', dpi=300)
-    plt.clf()
-    plt.close()
-
 def getBoundingBoxFromLabel(detection):
     """
     Get coordinates of a boundingbox containing the detection annotations
@@ -549,27 +380,26 @@ def getBoundingBoxFromLabel(detection):
 
     Returns
     -------
-    bboxCoordinates : dict 
+    bboxCoordinates : dict
     """
-    # detection.cords = ROW COL Z / Y X Z 
+    # detection.cords = ROW COL Z / Y X Z
     coordinateList = detection.coords
 
-    #TODO Refactor variable names 
-    maxX = 0; 
+    maxX = 0
     minX = float("inf")
 
-    maxY = 0;
+    maxY = 0
     minY = float("inf")
 
-    maxZ = 0;
+    maxZ = 0
     minZ = float("inf")
 
     for pt in coordinateList:
-        
+
         if (pt[2] > maxZ):
-            maxZ = pt[2]; 
+            maxZ = pt[2]
         if (pt[2] < minZ):
-            minZ = pt[2]; 
+            minZ = pt[2]
 
         if (pt[1] > maxX):
             maxX = pt[1]
@@ -582,120 +412,103 @@ def getBoundingBoxFromLabel(detection):
             minY = pt[0]
 
     bboxCoordinates = {'minX': minX, 'maxX': maxX, 'minY': minY, 'maxY': maxY, 'minZ': minZ, 'maxZ': maxZ}
-        
+
     return bboxCoordinates
-    
-def getZListFromBoundingBox(bbox): 
+
+def getZListFromBoundingBox(bbox):
     """
-    Return list of z indexes that are contained in the bounding box 
-    
+    Return list of z indexes that are contained in the bounding box
+
     Parameters
     -------------
-    bbox : dict 
+    bbox : dict
 
     Returns
     --------------
     zlist : list of z indexes of the bbox
     """
 
-    if 'startZ' in bbox: 
+    if 'startZ' in bbox:
         startZ = bbox['startZ']
         endZ = bbox['endZ']
-    
-    if 'minZ' in bbox: 
+
+    if 'minZ' in bbox:
         startZ = bbox['minZ']
         endZ = bbox['maxZ']
 
     zlist = range(int(startZ), int(endZ+1))
     return zlist
 
-def getSynaptogramFromFile(bboxCoordinates, win_xy, win_z, stackList, showProb, filepath): 
+def getSynaptogramFromFile(bboxCoordinates, win_xy, win_z, stackList, showProb, filepath):
     """
-    create synaptogram for site3 data 
-    
+    create synaptogram for site3 data
+
     Parameters
     -----------
-    
+
     Returns
     -----------
-    
+
     """
     EMfilename = "EM"
-    
+
     # check for boundary issues
     startZ = bboxCoordinates['minZ']
     if (startZ - win_z > -1):
-        startZ = startZ - win_z; 
-    
+        startZ = startZ - win_z
+
     endZ = bboxCoordinates['maxZ']
-    
+
     if (endZ + win_z < 50):
-        endZ = endZ + win_z; 
-    
-    # get range of x, y values 
-    startX = bboxCoordinates['minX'] - win_xy;
-    startY = bboxCoordinates['minY'] - win_xy;
-    deltaX = bboxCoordinates['maxX'] - startX + win_xy;
-    deltaY = bboxCoordinates['maxY'] - startY + win_xy;
-    
+        endZ = endZ + win_z
+
+    # get range of x, y values
+    startX = bboxCoordinates['minX'] - win_xy
+    startY = bboxCoordinates['minY'] - win_xy
+    deltaX = bboxCoordinates['maxX'] - startX + win_xy
+    deltaY = bboxCoordinates['maxY'] - startY + win_xy
+
     startX = int(round(startX))
     startY = int(round(startY))
     deltaX = int(round(deltaX))
     deltaY = int(round(deltaY))
     startZ = int(round(startZ))
     endZ = int(round(endZ))
-    
-    numSlices = endZ - startZ + 1;  
+
+    numSlices = endZ - startZ + 1
     numChannels = len(stackList)
-    
+
     # allocate synaptogram img
     img = np.zeros((numChannels * deltaY, numSlices * deltaX), dtype=np.float64)
-    
-    slicepos = 0; # x 
-    
-    # iterate over each slice 
+
+    slicepos = 0 # x
+
+    # iterate over each slice
     for sliceInd in range(startZ, endZ + 1):
-        #print sliceInd; 
-        
-        ifpos = 0; # y 
-        ifitr = 0;     
-        
-        # iterate over each channel 
-        for stack in stackList: 
+        #print sliceInd
+
+        ifpos = 0 # y
+        ifitr = 0
+
+        # iterate over each channel
+        for stack in stackList:
             #print stack
-            
-            if stack == EMfilename: 
-                maxIntensity = 255;
-            else: 
-                maxIntensity = 5000; 
-                
+
+            if stack == EMfilename:
+                maxIntensity = 255
+            else:
+                maxIntensity = 5000
+
             cutout = getImageProbMapCutoutFromFile(stack, sliceInd, startX, startY, deltaX, deltaY, filepath)
-            
-            #print(startX)    
-            #Convert to floating point precision 
-            # cutout.astype(np.float64)
-            
-            # if (showProb):
-            #     if stack == EMfilename: 
-            #         cutout = np.divide(cutout, 255.0)
-            #     elif stack == 'results':
-            #         cutout = np.divide(cutout, 255.0)
 
-            #     else: 
-            #         if (np.mean(cutout) != 0):
-            #             cutout = syn.getProbMap(cutout)
-                        
-            #     #cutout  = cutout > 0.7
+            img[ifpos:(ifpos + deltaY), slicepos:(slicepos + deltaX)] = cutout
 
-            #cutout = getProbMap(cutout);
-            img[ifpos:(ifpos + deltaY), slicepos:(slicepos + deltaX)] = cutout; 
-            
-            ifpos = ifpos + deltaY; 
-            ifitr = ifitr + 1; 
-            
-        slicepos = slicepos + deltaX; 
-            
-    return img; 
+            ifpos = ifpos + deltaY
+            ifitr = ifitr + 1
+
+        slicepos = slicepos + deltaX
+
+    return img
 
 def getImageProbMapCutoutFromFile(channelname, sliceInd, startX, startY, deltaX, deltaY, filepath):
     """
@@ -707,38 +520,70 @@ def getImageProbMapCutoutFromFile(channelname, sliceInd, startX, startY, deltaX,
     sliceInd : ind
     startX : ind
     startY : ind
-    deltaX : ind 
-    deltaY : ind 
+    deltaX : ind
+    deltaY : ind
     filepath : str
 
     Returns
     -----------
-    cutout: 2D numpy array 
+    cutout: 2D numpy array
     """
-    
+
     folderpath = os.path.join(filepath, channelname)
     img = da.imreadtiffSingleSlice(folderpath, sliceInd)
     img.astype(np.float64)
 
     probimg = syn.getProbMap(img)
-
     cutout = probimg[startY:(startY + deltaY), startX:(startX+deltaX)]
-    
+
     return cutout
 
-def synapseAnnotationToSynaptogram(synapse, render_args, win_xy, win_z, filepath, showProb, stackList,textXOffset, textYOffset ):
-    
-    bbox = getAnnotationBoundingBox2(synapse, render_args)
-    bbox = transformSynapseCoordinates(bbox)
-    expandedBox = expandBoundingBox(bbox, win_xy, win_z)
-    
-    synapseOutlinesDict = getAnnotationOutlines(synapse, render_args)
-    synapseOutlinesDict = transformSynapseOutlinesDict(synapseOutlinesDict)
-    
-    filename = os.path.join(filepath, 'synaptograms', '{}.png'.format(synapse['oid']))
-    
-    img = getSynaptogramFromFile(bbox, win_xy, win_z, stackList, showProb, filepath);
-    plotOutlinesOnImg(img, synapseOutlinesDict, expandedBox, filename, stackList, textXOffset, textYOffset)
-    #print(filename)
-    
+def synapseAnnoToSynaptogram(synapse_anno, synaptogram_args):
+    """
+    Given an annotation following 'argschema' format, output
+    a synaptogram file in the given location
 
+    Parameters
+    ------------
+    synapse_anno : dict
+    synaptogram_args : dict
+
+    Returns
+    -------------
+    img : numpy array - ouput synaptogram without labels
+    """
+
+    # Get bounding box for the synapse annotation
+    bbox = get_anno_boundingbox(synapse_anno)
+
+    # Downsample boundingbox coordinates
+    bbox = transformSynapseCoordinates(bbox)
+
+    # Determine the area (window) to show in the synaptogram, centered
+    # around the synapse annotation bounding box
+    win_xy = synaptogram_args['win_xy']
+    win_z = synaptogram_args['win_z']
+    expandedBox = expandBoundingBox(bbox, win_xy, win_z)
+
+    # Get outline (trace) of the synapse annotation
+    synapseOutlinesDict = getAnnotationOutlines(synapse)
+
+    # Downsample coordinates
+    synapseOutlinesDict = transformSynapseOutlinesDict(synapseOutlinesDict)
+
+    # Create output synaptogram file path
+    outputpath = synaptogram_args['outputpath']
+    output_filepath = os.path.join(outputpath, '{}.png'.format(synapse['oid']))
+
+    # Create synaptogram image
+    stack_list = synaptogram_args['stack_list']
+    data_location = synaptogram_args['data_location']
+    img = getSynaptogramFromFile(bbox, win_xy, win_z, stack_list, data_location)
+
+    # Add labels and save synaptogram
+    text_x_offset = synaptogram_args['text_x_offset']
+    text_y_offset = synaptogram_args['text_y_offset']
+    plotOutlinesOnImg(img, synapseOutlinesDict, expandedBox, output_filepath,
+                      stack_list, text_x_offset, text_y_offset)
+
+    return img
