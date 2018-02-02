@@ -82,17 +82,19 @@ def imreadtiffSingleSlice(folderpath, sliceInd):
 
     return output
 
-def loadChannelVolFromQuery(query):
+def load_tiff_from_query(query, base_dir=None):
     """
-    Load tiff stacks associated with a query. Assumes tiff stacks are in the same directory as the runme.
+    Load tiff stacks associated with a query. 
+
     Parameters
     ----------
     query : dict
         dict object containing filenames associated with pre/post synaptic markers
+    base_dir : str - location of the data 
 
     Returns
     ----------
-    synapticVolumes : dict
+    synaptic_volumes : dict
         dict with two (pre/post) lists of synaptic volumes
     """
 
@@ -102,9 +104,12 @@ def loadChannelVolFromQuery(query):
 
     # Loop over every presynaptic channel
     for n in range(0, len(preIF)):
-
         print(preIF[n])
-        volume = imreadtiff(preIF[n])
+        if base_dir == None: 
+            volume = imreadtiff(preIF[n])
+        else: 
+            fn = os.path.join(base_dir, preIF[n])
+            volume = imreadtiff(fn)
         presynapticvolumes.append(volume)
 
     #postsynaptic volumes
@@ -114,13 +119,17 @@ def loadChannelVolFromQuery(query):
     # Loop over every postsynaptic channel
     for n in range(0, len(postIF)):
         print(postIF[n])
-        volume = imreadtiff(postIF[n])
+        if base_dir == None: 
+            volume = imreadtiff(postIF[n])
+        else: 
+            fn = os.path.join(base_dir, postIF[n])
+            volume = imreadtiff(fn)
         postsynapticvolumes.append(volume)
 
-    synapticVolumes = {'presynaptic': presynapticvolumes,
+    synaptic_volumes = {'presynaptic': presynapticvolumes,
                        'postsynaptic': postsynapticvolumes}
 
-    return synapticVolumes
+    return synaptic_volumes
 
 def loadTiffSeriesFromQuery(query, filepath):
     """

@@ -465,7 +465,7 @@ def combinePrePostVolumes(baseVolList, adjacentVolList, edge_win, search_win):
 
     # For each z slice
     for zInd in range(0, baseVol.shape[2]):
-        #print("starting z ind: " + str(zInd))
+        print("starting z ind: " + str(zInd))
 
         for rInd in range(rStartEdge, rEndEdge):
             for cInd in range(cStartEdge, cEndEdge):
