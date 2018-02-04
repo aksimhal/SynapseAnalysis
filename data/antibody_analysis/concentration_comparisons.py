@@ -31,6 +31,7 @@ def glur1_concentrations():
                                         thresh, resolution, target_filenames)
 
     df = aa.create_df(measure_list, folder_names, target_filenames, conjugate_filenames) 
+    print(df)
 
     return df
 
@@ -61,6 +62,7 @@ def glur2_concentrations():
                                         thresh, resolution, target_filenames)
 
     df = aa.create_df(measure_list, folder_names, target_filenames, conjugate_filenames) 
+    print(df)
     
     return df
 
@@ -75,20 +77,23 @@ def glur3_concentrations():
     target_antibody_name = 'GluR3_1stA.tif'
     conjugate_antibody_name = 'VGluT1A.tif'
     
+    conjugate_filenames = [] 
+    target_filenames = []
     query_list = [] 
     for fn in folder_names: 
         query = {'preIF': [conjugate_antibody_name], 'preIF_z': [2],
                 'postIF': [target_antibody_name], 'postIF_z': [2],
                 'punctumSize': 2}
         query_list.append(query)
+        target_filenames.append(target_antibody_name)
+        conjugate_filenames.append(conjugate_antibody_name)
 
-    measure_list = run_concentration_comparison(query_list, 
-                                                folder_names, base_dir, 
-                                                thresh, resolution, 
-                                                target_antibody_name)
+    measure_list = aa.calculate_measure_lists(query_list, folder_names, base_dir, 
+                                        thresh, resolution, target_filenames)
 
-    df = create_concentration_df(measure_list, folder_names, 
-                                 target_antibody_name, conjugate_antibody_name) 
+    df = aa.create_df(measure_list, folder_names, target_filenames, conjugate_filenames)
+    print(df)
+
     return df
 
 def synapsin_concentrations(): 
@@ -101,20 +106,22 @@ def synapsin_concentrations():
     target_antibody_name = 'ASynCS_1st.tif'
     conjugate_antibody_name = 'AVGluT1_3rd.tif'
     
+    conjugate_filenames = []
+    target_filenames = [] 
     query_list = [] 
     for fn in folder_names: 
         query = {'preIF': [target_antibody_name, conjugate_antibody_name], 'preIF_z': [2, 2],
                 'postIF': [], 'postIF_z': [],
                 'punctumSize': 2}
         query_list.append(query)
+        target_filenames.append(target_antibody_name)
+        conjugate_filenames.append(conjugate_antibody_name)
 
-    measure_list = run_concentration_comparison(query_list, 
-                                                folder_names, base_dir, 
-                                                thresh, resolution, 
-                                                target_antibody_name)
+    measure_list = aa.calculate_measure_lists(query_list, folder_names, base_dir, 
+                                        thresh, resolution, target_filenames)
 
-    df = create_concentration_df(measure_list, folder_names, 
-                                 target_antibody_name, conjugate_antibody_name) 
+    df = aa.create_df(measure_list, folder_names, target_filenames, conjugate_filenames)
+
     print(df)
     return df
 
@@ -133,16 +140,20 @@ def nr1_concentrations():
              'postIF': [target_antibody_name], 'postIF_z': [1],
              'punctumSize': 2}
 
+    conjugate_filenames = []
+    target_filenames = [] 
     query_list = [] 
     for fn in folder_names: 
         query_list.append(query)
+        target_filenames.append(target_antibody_name)
+        conjugate_filenames.append(conjugate_antibody_name)
 
-    measure_list = run_concentration_comparison(query_list, 
-                                                folder_names, base_dir, 
-                                                thresh, resolution, 
-                                                target_antibody_name)
-    df = create_concentration_df(measure_list, folder_names, 
-                                 target_antibody_name, conjugate_antibody_name) 
+    measure_list = aa.calculate_measure_lists(query_list, folder_names, base_dir, 
+                                        thresh, resolution, target_filenames)
+
+    df = aa.create_df(measure_list, folder_names, target_filenames, conjugate_filenames)
+
+    print(df)
 
     return df
 
