@@ -3,6 +3,7 @@ import fnmatch
 import os
 import json
 from skimage import io
+from PIL import Image, ImageSequence
 
 def imreadtiff(fn):
     """
@@ -15,14 +16,12 @@ def imreadtiff(fn):
     ----------
     output : numpy 3D array
     """
-
     # Read tiff stack
-    im = io.imread(fn)
 
-    # Format tiff stack into a numpy array
-    output = np.zeros([im.shape[1], im.shape[2], im.shape[0]])
-    for n in range(0, im.shape[0]):
-        output[:, :, n] = im[n, :, :]
+    im = Image.open(fn)
+    output = np.zeros((im.height, im.width, im.n_frames))
+    for n, page in enumerate(ImageSequence.Iterator(im)):
+        output[:, :, n] = np.array(page)
 
     return output
 
