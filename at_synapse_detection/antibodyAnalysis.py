@@ -300,9 +300,14 @@ def calculate_measure_lists(query_list, folder_names, base_dir, thresh,
     """
 
     measure_list = []
-    for n, foldername in enumerate(folder_names): 
-        query = query_list[n]
-        data_location = os.path.join(base_dir, foldername)
+    for n, query in enumerate(query_list): 
+        #query = query_list[n]
+        
+        if folder_names == None: 
+            data_location = base_dir
+        else: 
+            foldername = folder_names[n]
+            data_location = os.path.join(base_dir, foldername)
         target_antibody_name = target_filenames[n]
         synaptic_volumes = da.load_tiff_from_query(query, data_location)
         measure = run_ab_analysis(synaptic_volumes, query, thresh, resolution, target_antibody_name)
@@ -336,3 +341,68 @@ def create_df(measure_list, folder_names, target_filenames, conjugate_filenames)
         df.iloc[n, 6] = measure.specificity_ratio
 
     return df
+
+def getListOfFolders(base_dir): 
+    """Get list of folders in specified directory
+    
+    Paramters
+    -----------
+    base_dir : str
+    
+    Return
+    -----------
+    folder_list : list of strs
+    """
+    folder_list = os.listdir(base_dir)
+    #print('Raw Folder List: ', folder_list)
+    cleaned_folderlist = []
+    # Remove hidden folders
+    for foldername in folder_list: 
+        #foldername.replace("\r", "")
+        #print('Current Foldername: ', foldername)
+        if foldername[0] == '.': 
+            folder_list.remove(foldername)
+            continue
+        if foldername[0:4] == 'Icon':
+            folder_list.remove(foldername)
+            continue
+        if foldername == 'Icon':
+            folder_list.remove(foldername)
+            continue
+        cleaned_folderlist.append(foldername)
+
+    #print('Cleaned folder_list: ', cleaned_folderlist)
+
+    return cleaned_folderlist
+
+
+def find_filename(str_to_match, foldername, base_dir):
+    """Find target filename
+
+    Parameters
+    --------------
+    str_to_match : str
+
+    Returns
+    --------------
+    matched_filename : str 
+    """
+
+    input_dir = os.path.join(base_dir, foldername)
+    file_list = os.listdir(input_dir) 
+    matched_filename = None
+    for filename in file_list: 
+        # Remove hidden folders
+        if filename[0] == '.': 
+            file_list.remove(filename)
+
+        # Find string
+        if str_to_match == filename[0:len(str_to_match)]: 
+            matched_filename = filename
+
+    if matched_filename == None: 
+        print(file_list)
+
+    return matched_filename
+    
+
