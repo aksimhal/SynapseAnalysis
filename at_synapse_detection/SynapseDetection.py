@@ -188,14 +188,16 @@ def computeFactor(vol, numslices):
 
     factorVol = np.ones(vol.shape)
 
-    if (numslices == 1):
+    if (numslices == 1 or numslices == 2):
         return factorVol
 
     for n in range(0, vol.shape[2]):
 
         # Edge cases
         # First Slice
-        if n == 1:
+        #print(vol.shape)
+        if n == 0:
+            #print(n)
             diff = np.exp(-1 * (np.power((vol[:, :, n] - vol[:, :, n + 1]), 2)))
 
         # Last slice
