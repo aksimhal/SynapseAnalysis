@@ -10,15 +10,15 @@
         "project": "M247514_Rorb_1",
         "client_scripts": "/home/anish/Connectome/render/render-ws-java-client/src/main/scripts"
     },
-    "querylocation": "/Users/anish/Documents/Connectome/SynapseAnalysis/data/M247514_Rorb_1/Site3Align2/site3_queries.json",
-    "outputNPYlocation": "/Users/anish/Documents/Connectome/SynapseAnalysis/data/M247514_Rorb_1/Site3Align2/results/results_npy/",
+    "querylocation": "/Users/anish/Documents/Connectome/SynapseAnalysis/data/M247514_Rorb_1/Site3Align2/site3_queries_TdTomato.json",
+    "outputNPYlocation": "/Users/anish/Documents/Connectome/SynapseAnalysis/data/M247514_Rorb_1/Site3Align2/results/tdtomatoresults/",
     "datalocation": "/Users/anish/Documents/Connectome/Synaptome-Duke/data/collman17/Site3Align2Stacks/",
     "offset": {
         "rowOffset_nm": 0,
         "colOffset_nm": 0,
         "zOffset_nm": 0
     },
-    "outputJSONlocation": "/Users/anish/Documents/Connectome/SynapseAnalysis/data/M247514_Rorb_1/Site3Align2/results/",
+    "outputJSONlocation": "/Users/anish/Documents/Connectome/SynapseAnalysis/data/M247514_Rorb_1/Site3Align2/results_TdTomato/",
     "evalparam": {
         "EM_annotation_json": "json_annotations/m247514_Site3Annotation_MN_global_v2.json",
         "LM_annotation_json": "results/resultVol0.json",

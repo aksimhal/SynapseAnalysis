@@ -13,10 +13,11 @@ def main():
     """
     # Load metadata
     metadata_fn = 'site3_metadata.json'
+    #metadata_fn = 'site3_metadata_TdTomato.json'
     metadata = syn.loadMetadata(metadata_fn)
 
-    # This is where the image data is located on disk
     datalocation = metadata['datalocation']
+    outputNPYlocation = metadata['outputNPYlocation']
     query_fn = metadata['querylocation']
 
     # List of Queries
@@ -24,7 +25,6 @@ def main():
     print("Number of Queries: ", len(listOfQueries))
 
     for n in range(0, len(listOfQueries)):
-
         query = listOfQueries[n]
         print(query)
 
@@ -35,12 +35,12 @@ def main():
         # Takes ~5 minutes to run
         resultVol = syn.getSynapseDetections(synapticVolumes, query)
 
-        # Save the probability map to file
-        syn.saveresultvol(resultVol, datalocation, n)
+        # Save the probability map to file, if you want
+        syn.saveresultvol(resultVol, outputNPYlocation, n)
 
         # Save the thresholded results as annotation objects
         # in a json file
-        pd.probMapToJSON(resultVol, metadata, query, n)
+        # pd.probMapToJSON(resultVol, metadata, query, n)
 
 
 if __name__ == '__main__':

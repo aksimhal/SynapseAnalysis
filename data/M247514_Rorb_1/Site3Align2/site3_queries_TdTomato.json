@@ -1,0 +1,72 @@
+{
+    "listOfQueries": [
+        {
+            "preIF": [
+                "synapsin"
+            ],
+            "preIF_z": [
+                1
+            ],
+            "postIF": [
+                "PSD95"
+            ],
+            "postIF_z": [
+                2
+            ],
+            "thresh": 0.7
+        },
+        {
+            "preIF": [
+                "synapsin",
+                "TdTomato"
+            ],
+            "preIF_z": [
+                1,
+                1
+            ],
+            "postIF": [
+                "PSD95"
+            ],
+            "postIF_z": [
+                2
+            ],
+            "thresh": 0.7
+        },
+        {
+            "preIF": [
+                "synapsin"
+            ],
+            "preIF_z": [
+                1
+            ],
+            "postIF": [
+                "PSD95",
+                "TdTomato"
+            ],
+            "postIF_z": [
+                2,
+                1
+            ],
+            "thresh": 0.7
+        },
+        {
+            "preIF": [
+                "synapsin",
+                "TdTomato"
+            ],
+            "preIF_z": [
+                1,
+                1
+            ],
+            "postIF": [
+                "PSD95",
+                "TdTomato"
+            ],
+            "postIF_z": [
+                2,
+                1
+            ],
+            "thresh": 0.7
+        }
+    ]
+}

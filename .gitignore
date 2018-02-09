@@ -106,3 +106,5 @@ ENV/
 *.idx
 
 *.npy
+
+*.xlsx

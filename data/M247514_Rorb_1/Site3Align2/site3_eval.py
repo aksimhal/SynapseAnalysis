@@ -15,6 +15,7 @@ def main():
     """
     Evaluation of site3 synapse detection results
     """
+
     # Load metadata
     metadataFN = 'site3_metadata.json'
     metadata = syn.loadMetadata(metadataFN)
@@ -25,25 +26,22 @@ def main():
     # List of Queries
     listOfQueries = syn.loadQueriesJSON(queryFN)
     listOfThresholds = []
+    listOfThresholds_to_text = []
+    listOfQueries_to_text = [] 
     listofevals = []
-
+    thresh_list = [0.7, 0.8, 0.9]
     # Evaluate each query individually
     for n, query in enumerate(listOfQueries):
+        listOfThresholds.append(query['thresh'])
         print(query)
 
-        # Evaluate results of a query
-        listOfThresholds.append(query['thresh'])
-        # jsonfile = os.path.join(outputJSONlocation, 'resultVol');
-        # jsonfile = jsonfile + str(n) + '.json'
+        for thresh in thresh_list: 
+            listOfThresholds_to_text.append(thresh)
+            listOfQueries_to_text.append(query)
+            queryresult = pd.combineResultVolumes([n], [thresh], metadata, evalparam)     
+            listofevals.append(queryresult)
 
-        # # Location of LM detection output
-        # evalparam['LM_annotation_json'] = jsonfile
-
-        # mod = esd.EvaluateSynapseDetection(evalparam)
-        # evalresults = mod.run()
-        # listofevals.append(evalresults)
-
-    pd.printEvalToText(listofevals, listOfQueries, listOfThresholds)
+    pd.printEvalToText(listofevals, listOfQueries_to_text, listOfThresholds_to_text)
 
     # Combine Queries
     evaluation_parameters = metadata['evalparam']

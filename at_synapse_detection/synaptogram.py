@@ -10,7 +10,7 @@ from PIL import ImageDraw
 from PIL import ImageColor
 import os
 import matplotlib
-matplotlib.use('Agg')
+#matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from at_synapse_detection import dataAccess as da
 from at_synapse_detection import SynapseDetection as syn
@@ -439,7 +439,7 @@ def getZListFromBoundingBox(bbox):
     zlist = range(int(startZ), int(endZ+1))
     return zlist
 
-def getSynaptogramFromFile(bboxCoordinates, win_xy, win_z, stackList, showProb, filepath):
+def getSynaptogramFromFile(bboxCoordinates, win_xy, win_z, stackList, filepath):
     """
     create synaptogram for site3 data
 
@@ -566,14 +566,17 @@ def synapseAnnoToSynaptogram(synapse_anno, synaptogram_args):
     expandedBox = expandBoundingBox(bbox, win_xy, win_z)
 
     # Get outline (trace) of the synapse annotation
-    synapseOutlinesDict = getAnnotationOutlines(synapse)
+    synapseOutlinesDict = getAnnotationOutlines(synapse_anno)
 
     # Downsample coordinates
     synapseOutlinesDict = transformSynapseOutlinesDict(synapseOutlinesDict)
 
     # Create output synaptogram file path
-    outputpath = synaptogram_args['outputpath']
-    output_filepath = os.path.join(outputpath, '{}.png'.format(synapse['oid']))
+    output_path = synaptogram_args['outputpath']
+    if not os.path.isdir(output_path): 
+        os.makedirs(output_path)
+
+    output_filepath = os.path.join(output_path, '{}.png'.format(synapse_anno['oid']))
 
     # Create synaptogram image
     stack_list = synaptogram_args['stack_list']
@@ -585,5 +588,6 @@ def synapseAnnoToSynaptogram(synapse_anno, synaptogram_args):
     text_y_offset = synaptogram_args['text_y_offset']
     plotOutlinesOnImg(img, synapseOutlinesDict, expandedBox, output_filepath,
                       stack_list, text_x_offset, text_y_offset)
-
+    
+    print(output_filepath)
     return img

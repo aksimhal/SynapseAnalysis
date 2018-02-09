@@ -66,8 +66,8 @@ def createSynapseObject(detection, detection_number, resolution):
     """
 
     bbox = synaptogram.getBoundingBoxFromLabel(detection)
-    if len(detection.coords) == 1:
-        bbox = synaptogram.expandBoundingBox()
+    # if len(detection.coords) == 1:
+    #     bbox = synaptogram.expandBoundingBox(bbox)
 
     global_path = bboxToListOfPoints(bbox)
     global_path = np.array(global_path)
@@ -384,23 +384,6 @@ def evalsyndetections(args):
     EM_index = esd.get_index('EM_index')
     EM_bounds = esd.insert_annotations_into_index(EM_index, good_annotations)
 
-    # fn = args['annotationToRemove']
-    # impossibleanno = syn.loadMetadata(fn)
-    # impossibleanno = impossibleanno['missedAnnoIds']
-
-    # print(sum(EM_edge))
-
-    # for oid in impossibleanno:
-    #     #oid = int(oid)
-
-    #     for n, anno in enumerate(good_annotations):
-    #         if anno['oid'] == oid:
-    #             #EM_edge[n] = True
-    #             break
-
-
-    # print(sum(EM_edge))
-
     overlap_matrix = np.zeros((len(good_annotations), len(LM_annotations)), np.bool)
     j = 0
     for i, alLM in enumerate(LM_annotations): #Loop over each LM detection
@@ -410,6 +393,7 @@ def evalsyndetections(args):
             overlaps, zsection = esd.do_annotations_overlap(alLM, alEM)
             if overlaps:
                 overlap_matrix[k, i] = True
+
     bins = np.arange(0, 4) #3 bins. 0 overlap, 1 overlap, 1+ overlaps
     LM_per_EM = np.sum(overlap_matrix, axis=1)
     EM_per_LM = np.sum(overlap_matrix, axis=0)
@@ -444,94 +428,8 @@ def evalsyndetections(args):
     # Collate results into a dict
     output = {'missed_annotations': missed_annotations, 'false_positives': false_positives,
               'tp_detections': tp_detections, 'good_annotations': good_annotations,
-              'overlap_matrix': overlap_matrix, 'EM_edge':EM_edge, 'LM_edge': LM_edge}
-
-    return output
-
-
-
-def evalGABAsyndetections(args):
-    """
-    Evaluate GABA Synapses (incomplete)
-
-    Parameters
-    --------------
-    args: dict of strs
-        - contains information needed for evaluation
-    Returns:
-    output: dict
-        - contains evaluation results
-    """
-
-
-    EM_annotations = esd.load_annotation_file(args['EM_annotation_json'])
-    LM_annotations = esd.load_annotation_file(args['LM_annotation_json'])
-
-    df = pandas.read_csv(args['EM_metadata_csv'])
-
-    good_rows = (df[args['EM_not_synapse_column']] == False) & (df[args['EM_inclass_column']] == False)
-    good_df = df[good_rows]
-
-    ann_minX = good_df.min().minX
-    ann_minY = good_df.min().minY
-    ann_maxX = good_df.max().maxX
-    ann_maxY = good_df.max().maxY
-    ann_minZ = good_df.min().minZ
-    ann_maxZ = good_df.max().maxZ
-    good_annotations = [al for al in EM_annotations if al['id'] in good_df.index]
-
-    (ann_minX, ann_minY, ann_minZ, ann_maxX, ann_maxY, ann_maxZ) = esd.get_bounding_box_of_annotations(good_annotations)
-
-    LM_edge = esd.get_edge_annotations(LM_annotations, ann_minX, ann_maxX, ann_minY, ann_maxY, ann_minZ, ann_maxZ)
-
-    EM_edge = esd.get_edge_annotations(good_annotations, ann_minX, ann_maxX, ann_minY, ann_maxY, ann_minZ, ann_maxZ)
-
-
-    LM_index = esd.get_index('LM_index')
-    LM_bounds = esd.insert_annotations_into_index(LM_index, LM_annotations)
-    EM_index = esd.get_index('EM_index')
-    EM_bounds = esd.insert_annotations_into_index(EM_index, good_annotations)
-
-    overlap_matrix = np.zeros((len(good_annotations), len(LM_annotations)), np.bool)
-    j = 0
-    for i, alLM in enumerate(LM_annotations):
-        res= EM_index.intersection(LM_bounds[i])
-        for k in res:
-            alEM=good_annotations[k]
-            overlaps,zsection = esd.do_annotations_overlap(alLM,alEM)
-            if overlaps:
-                overlap_matrix[k,i]=True
-    bins = np.arange(0,4)
-    LM_per_EM = np.sum(overlap_matrix,axis=1)
-    EM_per_LM = np.sum(overlap_matrix,axis=0)
-    LM_per_EM_counts,edges = np.histogram(LM_per_EM[EM_edge==False],bins=bins,normed=True)
-    EM_per_LM_counts,edges = np.histogram(EM_per_LM[LM_edge==False],bins=bins,normed=True)
-    print("EM_per_LM",EM_per_LM_counts)
-    print("LM_per_EM",LM_per_EM_counts)
-    print('lm edge detections:',np.sum(LM_edge))
-    print('em edge annotations',np.sum(EM_edge))
-    print('LM detections:',len(LM_edge))
-
-
-    missed_annotations = []
-    for counter, synapse in enumerate(good_annotations):
-        if (LM_per_EM[counter] == 0 and EM_edge[counter]==False):
-            missed_annotations.append(synapse)
-
-
-    false_positives = []
-    for counter, anno in enumerate(LM_annotations):
-        if (EM_per_LM[counter] == 0 and LM_edge[counter]==False):
-            false_positives.append(anno)
-
-    tp_detections = []
-    for counter, anno in enumerate(LM_annotations):
-        if (EM_per_LM[counter] != 0 and LM_edge[counter]==False):
-            tp_detections.append(anno)
-
-    output = {'missed_annotations': missed_annotations, 'false_positives': false_positives,
-            'tp_detections': tp_detections, 'good_annotations': good_annotations,
-            'overlap_matrix': overlap_matrix, 'EM_edge':EM_edge, 'LM_edge': LM_edge}
+              'overlap_matrix': overlap_matrix, 'EM_edge':EM_edge, 'LM_edge': LM_edge, 
+              'EM_per_LM': EM_per_LM_counts, 'LM_per_EM': LM_per_EM_counts }
 
     return output
 
@@ -556,11 +454,9 @@ def combineResultVolumes(listOfQueryNumbers, listOfThresholds, metadata, args):
 
     for n, queryNum in enumerate(listOfQueryNumbers):
         # load result volume
-        fn = os.path.join(metadata['datalocation'], 'resultVol')
+        fn = os.path.join(metadata['outputNPYlocation'], 'resultVol')
         fn = fn + str(queryNum) + '.npy'
         resultVol_n = np.load(fn)
-        print(fn)
-
         resultVol_n = resultVol_n > listOfThresholds[n]
         resultVolList.append(resultVol_n)
 
@@ -571,7 +467,6 @@ def combineResultVolumes(listOfQueryNumbers, listOfThresholds, metadata, args):
         combinedQNum = combinedQNum + str(listOfQueryNumbers[volItr])
 
     combinedQNum = combinedQNum + str(0) + str(0)
-    #metadata['outputJSONlocation'] = "../data/M247514_Rorb_1/Site3Align2/results/resultVol_combined" + ".json"
 
     # output detections to json file
     query = {'thresh': 0.9}
@@ -583,8 +478,6 @@ def combineResultVolumes(listOfQueryNumbers, listOfThresholds, metadata, args):
     # Evaluate results
     args['LM_annotation_json'] = jsonFN
     queryresult = evalsyndetections(args)
-    missedAnnoIds = getMissedAnnoIds(queryresult['missed_annotations'])
-    len(missedAnnoIds)
 
     return queryresult
 
@@ -601,8 +494,6 @@ def printEvalToText(listofevals, listOfQueries, listOfThresholds):
     """
     file = open('output.txt', 'w')
 
-
-
     for n, evalresult in enumerate(listofevals):
         query = listOfQueries[n]
         file.write(json.dumps(query))
@@ -610,13 +501,12 @@ def printEvalToText(listofevals, listOfQueries, listOfThresholds):
         file.write('Threshold: ' + str(listOfThresholds[n]))
         file.write('\n')
 
-        file.write('EM_per_LM: ' + str(evalresult['EM_per_LM']) + '\n')
-        file.write('LM_per_EM: ' + str(evalresult['LM_per_EM']) + '\n')
+        file.write("EM_per_LM: " + str(evalresult['EM_per_LM']) + '\n')
+        file.write("LM_per_EM: " + str(evalresult['LM_per_EM']) + '\n')
+        file.write('lm edge detections: ' + str(np.sum(evalresult['LM_edge'])) + '\n')
+        file.write('em edge annotations: ' +  str(np.sum(evalresult['EM_edge'])) + '\n')
+        file.write('LM detections:' + str(len(evalresult['LM_edge'])) + '\n')        
 
-        file.write('lm_edge_detections: ' + str(evalresult['lm_edge_detections']) + '\n')
-        file.write('em_edge_annotations: ' + str(evalresult['em_edge_annotations']) + '\n')
-        file.write('LM_detections: ' + str(evalresult['LM_detections']) + '\n')
-        file.write('EM_detections: ' + str(evalresult['EM_detections']) + '\n')
         file.write('\n')
 
 

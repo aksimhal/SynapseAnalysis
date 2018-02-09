@@ -334,3 +334,205 @@ def getSynapseDetectionsMW(synapticVolumes, query, kernelLength=2, edge_win = 3,
         resultVol = syn.combinePrePostVolumes(postsynapticVolumes, presynapticVolumes, edge_win, search_win)
 
     return resultVol; 
+
+
+def getProbMap_MW(data, chname, win=30, stepsize=1):
+    """
+    Returns probability map of input image.  Uses a moving window for background/foreground seperation
+    Saves probability map to file; if the file already exists, it reloads it and returns it
+
+    Issue: Current output location is hard coded
+
+    Parameters
+    ----------
+    data : 3D numpy - input volume
+    chname : str - channel name
+    win : int - window size (default = 30)
+    stepsize : int - moving window step size (default = 1)
+
+    Returns
+    ----------
+    data : 3D numpy
+        output volume with values scaled between 0 to 1
+    """
+
+    #test to see if data exists # FIX filepath
+    outputlocation = '/Users/anish/Documents/Connectome/Synaptome-Duke/data/collman17/Site3Align2Stacks/'
+    fn = chname + '_probvol.npy'
+    fn = os.path.join(outputlocation, fn)
+
+    doesfileexist = os.path.exists(fn)
+
+    if doesfileexist:
+        outputvol = np.load(fn)
+        print("loaded file")
+        return outputvol
+    else:
+        print("compute prob file")
+
+        outputvol = np.zeros(data.shape)
+        for zInd in range(0, data.shape[2]):
+            img = data[:, :, zInd]
+
+            print("Calculating probability slice: ", zInd)
+            imgsize = img.shape
+            outputimg = np.zeros(imgsize)
+
+            startRow = 0
+            endRow = 0
+            oldEndRow = 0
+
+            exitRowLoop = False
+            for rowstep in range(0, int(np.ceil(imgsize[0]/stepsize))):
+                startCol = 0
+                endCol = 0
+                oldEndCol = 0
+
+                if exitRowLoop:
+                    break
+
+                if ((startRow + win) < imgsize[0]):
+                    endRow = startRow + win
+                else:
+                    endRow = imgsize[0]
+                    exitRowLoop = True
+
+                exitColLoop = False
+                for colstep in range(0, int(np.ceil(imgsize[1]/stepsize))):
+
+                    if exitColLoop:
+                        break
+
+                    if ((startCol + win) < imgsize[1]):
+                         endCol = startCol + win
+                    else:
+                        endCol = imgsize[1]
+                        exitColLoop = True
+
+
+                    cutout = img[startRow:endRow, startCol:endCol]
+                    cutout = scipy.stats.norm.cdf(cutout, np.mean(cutout), np.std(cutout))
+
+                    if oldEndRow != 0 and oldEndCol != 0:
+
+                        priordata = outputimg[startRow:oldEndRow, startCol:oldEndCol]
+                        meancutout = np.mean([priordata, cutout[0:-(endRow-oldEndRow), 0:-(endCol-oldEndCol)]], 0)
+                        cutout[0:-(endRow-oldEndRow), 0:-(endCol-oldEndCol)] = meancutout
+
+                    outputimg[startRow:endRow, startCol:endCol] = cutout
+                    oldEndCol = endCol
+                    startCol = startCol + stepsize
+
+                oldEndRow = endRow
+                startRow = startRow + stepsize
+
+            outputvol[:, :, zInd] = outputimg
+        np.save(fn, outputvol)
+
+    return outputvol
+
+    
+
+def loadSynapseDataFromQuery(query, anno, win_xy, win_z, filepath):
+    """
+    Load tiff stacks associated with a query
+    Parameters
+    ----------
+    query : dict - object containing filenames associated with pre/post synaptic markers
+    filepath : str - location of data
+
+    Returns
+    ----------
+    synapticVolumes : dict
+        dict with two (pre/post) lists of synaptic volumes
+    """
+
+    bbox = synaptogram.get_anno_boundingbox(anno)
+    bbox = synaptogram.transformSynapseCoordinates(bbox)
+
+    # query = {'preIF' : preIF, 'preIF_z' : preIF_z, 'postIF' : postIF, 'postIF_z' : postIF_z};
+
+    #presynaptic volumes
+    presynapticvolumes = []
+    preIF = query['preIF']
+
+    # Loop over every presynaptic channel
+    for n in range(0, len(preIF)):
+        #print(preIF[n])
+
+        volume = getVolume(bbox, win_xy, win_z, preIF[n], filepath)
+        presynapticvolumes.append(volume)
+
+    #postsynaptic volumes
+    postsynapticvolumes = []
+    postIF = query['postIF']
+
+    # Loop over every postsynaptic channel
+    for n in range(0, len(postIF)):
+       # print(postIF[n])
+        volume = getVolume(bbox, win_xy, win_z, postIF[n], filepath)
+
+        postsynapticvolumes.append(volume)
+
+    synapticVolumes = {'presynaptic': presynapticvolumes,
+                       'postsynaptic': postsynapticvolumes}
+
+    return synapticVolumes
+
+def getVolume(bboxCoordinates, win_xy, win_z, volname, filepath):
+    """
+    Load a portion of image data
+
+    Parameters
+    -----------
+    bboxCoordinates : dict - coordinates of EM ennotation
+    win_xy : int - radius of expansion
+    win_z : int - z radius of expansion
+    volname : str - name of volume to load
+    filepath : str - location of data
+
+    Returns
+    -----------
+    vol : 3D Numpy array
+    """
+
+    # check for boundary issues
+    startZ = bboxCoordinates['minZ']
+    if (startZ - win_z > -1):
+        startZ = startZ - win_z;
+
+    endZ = bboxCoordinates['maxZ']
+
+    if (endZ + win_z < 50):
+        endZ = endZ + win_z;
+
+    # get range of x, y values
+    startX = bboxCoordinates['minX'] - win_xy;
+    startY = bboxCoordinates['minY'] - win_xy;
+    deltaX = bboxCoordinates['maxX'] - startX + win_xy;
+    deltaY = bboxCoordinates['maxY'] - startY + win_xy;
+
+    startX = int(round(startX))
+    startY = int(round(startY))
+    deltaX = int(round(deltaX))
+    deltaY = int(round(deltaY))
+    startZ = int(round(startZ))
+    endZ   = int(round(endZ))
+
+    numSlices = endZ - startZ + 1
+
+    # allocate volume
+    vol = np.zeros((deltaY, deltaX, numSlices), dtype=np.float64)
+
+    # iterate over each slice
+    sliceitr = 0
+    for sliceInd in range(startZ, endZ + 1):
+
+        cutout = da.getImageCutoutFromFile(volname, sliceInd, startX, startY, deltaX, deltaY, filepath)
+        cutout.astype(np.float64)
+        cutout = getProbMap(cutout)
+
+        vol[:, :, sliceitr] = cutout;
+        sliceitr = sliceitr + 1
+
+    return vol
