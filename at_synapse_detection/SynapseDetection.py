@@ -93,7 +93,7 @@ def computeFactor(vol, numslices):
 
     factorVol = np.ones(vol.shape)
 
-    if (numslices == 1 or numslices == 2):
+    if (numslices == 1):
         return factorVol
 
     for n in range(0, vol.shape[2]):
