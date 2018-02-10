@@ -7,6 +7,7 @@ from at_synapse_detection import dataAccess as da
 from at_synapse_detection import SynapseDetection as syn
 from at_synapse_detection import processDetections as pd
 
+
 def main():
     """
     run site 3 synapse detection
@@ -45,4 +46,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-

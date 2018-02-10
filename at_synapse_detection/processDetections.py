@@ -14,6 +14,7 @@ from at_synapse_detection import evaluate_synapse_detection as esd
 from at_synapse_detection.AnnotationJsonSchema import AnnotationFile, NumpyArray
 import pandas
 
+
 def bboxToListOfPoints(bbox):
     """
     Converts bounding box into a list of corner points [ROW COL]
@@ -31,20 +32,20 @@ def bboxToListOfPoints(bbox):
     minZ = bbox['minZ']
     maxZ = bbox['maxZ']
 
-
     # pt1 = [minY, minX] # ROW COLUMN
     # pt2 = [maxY, minX] # ROW COLUMN
     # pt3 = [maxY, maxX] # ROW COLUMN
     # pt4 = [minY, maxX] # ROW COLUMN
 
-    pt1 = [minX, minY] # X Y
-    pt2 = [minX, maxY] # X Y
-    pt3 = [maxX, maxY] # X Y
-    pt4 = [maxX, minY] # X Y
+    pt1 = [minX, minY]  # X Y
+    pt2 = [minX, maxY]  # X Y
+    pt3 = [maxX, maxY]  # X Y
+    pt4 = [maxX, minY]  # X Y
 
     listofpoints = [pt1, pt2, pt3, pt4]
 
     return listofpoints
+
 
 def createSynapseObject(detection, detection_number, resolution):
     """
@@ -84,13 +85,14 @@ def createSynapseObject(detection, detection_number, resolution):
 
     # This currently repeats the boundary along the z axis
     for n in range(0, len(zlist)):
-        subarea = {'global_path' : global_path, 'z' : zlist[n],
-                   'native_path' : native_path, 'native_z' : native_z[n]}
+        subarea = {'global_path': global_path, 'z': zlist[n],
+                   'native_path': native_path, 'native_z': native_z[n]}
         areas.append(subarea)
 
     synapse = {'id': detection_number, 'areas': areas}
 
     return synapse
+
 
 def detectionsToJSONFormat(listofdetections, resolution):
     """
@@ -109,18 +111,20 @@ def detectionsToJSONFormat(listofdetections, resolution):
     area_lists = []
     lm_minX = 0
     lm_minY = 0
-    ds_scale = 3/100
+    ds_scale = 3 / 100
 
     for n in range(0, len(listofdetections)):
         detection = listofdetections[n]
         #synapse = createSynapseObject(detection, n, resolution)
-        synapse = make_prop_into_contours(detection, ds_scale, lm_minX, lm_minY)
+        synapse = make_prop_into_contours(
+            detection, ds_scale, lm_minX, lm_minY)
 
         area_lists.append(synapse)
 
     data = {'area_lists': area_lists}
 
     return data
+
 
 def writeJSONDetectionFile(filename, output_json):
     """
@@ -133,6 +137,7 @@ def writeJSONDetectionFile(filename, output_json):
 
     with open(filename, 'w') as outfile:
         json.dump(output_json, outfile)
+
 
 def writeJSONDetectionFile2(filename, data):
     """
@@ -169,7 +174,6 @@ def createPolygonFromBBox(bbox):
     deltaY = bbox['deltaY']
     endZ = bbox['endZ']
 
-
     pt1 = [startX, startY]
     pt2 = [startX, startY + deltaY]
     pt3 = [startX + deltaX, startY + deltaY]
@@ -178,6 +182,7 @@ def createPolygonFromBBox(bbox):
     poly = geometry.Polygon((pt1, pt2, pt3, pt4))
 
     return poly
+
 
 def probMapToJSON(probmapvolume, metadata, query, n):
     """
@@ -210,6 +215,7 @@ def probMapToJSON(probmapvolume, metadata, query, n):
     data = detectionsToJSONFormat(stats, resolution)
     writeJSONDetectionFile(jsonFN, data)
 
+
 def make_prop_into_contours(prop, ds_scale, lm_minX, lm_minY):
     """
     function copied from FC; turns prop object into contour dict
@@ -241,30 +247,31 @@ def make_prop_into_contours(prop, ds_scale, lm_minX, lm_minY):
         mins = np.min(c2, axis=0)
         maxs = np.max(c2, axis=0)
         c2 = c2 - mins
-        rng = maxs-mins
-        width = rng[0]+1
-        height = rng[1]+1
+        rng = maxs - mins
+        width = rng[0] + 1
+        height = rng[1] + 1
         min_img = np.zeros((height, width), np.uint8)
         idx = np.ravel_multi_index((c2[:, 1], c2[:, 0]), (height, width))
         min_img_unravel = np.ravel(min_img)
         min_img_unravel[idx] = 255
         min_img = np.reshape(min_img_unravel, (height, width))
-        min_img_up = cv2.resize(min_img, (2*width, 2*height))
+        min_img_up = cv2.resize(min_img, (2 * width, 2 * height))
         #f, ax = plt.subplots()
         #ax.imshow(min_img_up, interpolation='nearest',
         # extent=[mins[0], maxs[0]+1, maxs[1]+1, mins[1]])
         #ax.imshow(psdvol[z, :, :], interpolation='nearest', cmap=plt.cm.gray)
-        a, cs, b = cv2.findContours(min_img_up, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        a, cs, b = cv2.findContours(
+            min_img_up, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         csf = []
         for c in cs:
 
             c = np.squeeze(c)
             #c+=.5
-            c = .5*(np.array(c, np.float64)+.5)
+            c = .5 * (np.array(c, np.float64) + .5)
             c[:, 0] += mins[0]
             c[:, 1] += mins[1]
             c = np.vstack((c, c[0, :]))
-            c = c/ds_scale
+            c = c / ds_scale
             c[:, 0] = c[:, 0] + lm_minX
             c[:, 1] = c[:, 1] + lm_minY
             #ax.plot(c[:,0],c[:,1],linewidth=3)
@@ -275,10 +282,11 @@ def make_prop_into_contours(prop, ds_scale, lm_minX, lm_minY):
             z = np.array(z)
             z = z.tolist()
 
-            d = {'z':z, 'global_path':c}
+            d = {'z': z, 'global_path': c}
             areas.append(d)
-    d = {'areas':areas, 'oid':str(prop.label), 'id':int(prop.label)}
+    d = {'areas': areas, 'oid': str(prop.label), 'id': int(prop.label)}
     return d
+
 
 def consolidateDetections(detections1, detections2):
 
@@ -308,7 +316,6 @@ def consolidateDetections(detections1, detections2):
             if overlaps:
                 overlap_matrix[k, i] = True
 
-
     #remove all annotations from LM2 which overlap with LM1
 
     anno2Overlaps = np.sum(overlap_matrix, axis=0)
@@ -318,7 +325,7 @@ def consolidateDetections(detections1, detections2):
 
     detections = detections1 + uniqueDetections.tolist()
 
-    return detections #detections1, uniqueDetections
+    return detections  # detections1, uniqueDetections
 
 
 def getMissedAnnoIds(missed_annotations):
@@ -337,6 +344,7 @@ def getMissedAnnoIds(missed_annotations):
         missedAnnoIds.append(anno['oid'])
 
     return missedAnnoIds
+
 
 def evalsyndetections(args):
     """
@@ -358,7 +366,8 @@ def evalsyndetections(args):
 
     df = pandas.read_csv(args['EM_metadata_csv'])
     # Eliminate annotations which are not synapses or are not glutamatergic
-    good_rows = (df[args['EM_not_synapse_column']] == False) & (df[args['EM_inclass_column']] == True)
+    good_rows = (df[args['EM_not_synapse_column']] == False) & (
+        df[args['EM_inclass_column']] == True)
     good_df = df[good_rows]
 
     # Find bounding cube that contains
@@ -368,15 +377,18 @@ def evalsyndetections(args):
     ann_maxY = good_df.max().maxY
     ann_minZ = good_df.min().minZ
     ann_maxZ = good_df.max().maxZ
-    good_annotations = [al for al in EM_annotations if al['id'] in good_df.index]
+    good_annotations = [
+        al for al in EM_annotations if al['id'] in good_df.index]
 
     (ann_minX, ann_minY, ann_minZ, ann_maxX, ann_maxY, ann_maxZ) = \
         esd.get_bounding_box_of_annotations(good_annotations)
 
     # Determine LM Edge Annotations
-    LM_edge = esd.get_edge_annotations(LM_annotations, ann_minX, ann_maxX, ann_minY, ann_maxY, ann_minZ, ann_maxZ)
+    LM_edge = esd.get_edge_annotations(
+        LM_annotations, ann_minX, ann_maxX, ann_minY, ann_maxY, ann_minZ, ann_maxZ)
     # Determine EM Edge Annotations
-    EM_edge = esd.get_edge_annotations(good_annotations, ann_minX, ann_maxX, ann_minY, ann_maxY, ann_minZ, ann_maxZ)
+    EM_edge = esd.get_edge_annotations(
+        good_annotations, ann_minX, ann_maxX, ann_minY, ann_maxY, ann_minZ, ann_maxZ)
 
     # Place detections in a spatial index
     LM_index = esd.get_index('LM_index')
@@ -384,21 +396,25 @@ def evalsyndetections(args):
     EM_index = esd.get_index('EM_index')
     EM_bounds = esd.insert_annotations_into_index(EM_index, good_annotations)
 
-    overlap_matrix = np.zeros((len(good_annotations), len(LM_annotations)), np.bool)
+    overlap_matrix = np.zeros(
+        (len(good_annotations), len(LM_annotations)), np.bool)
     j = 0
-    for i, alLM in enumerate(LM_annotations): #Loop over each LM detection
-        res = EM_index.intersection(LM_bounds[i]) #check to see if LM detection overlaps with any EM anno
+    for i, alLM in enumerate(LM_annotations):  # Loop over each LM detection
+        # check to see if LM detection overlaps with any EM anno
+        res = EM_index.intersection(LM_bounds[i])
         for k in res:
             alEM = good_annotations[k]
             overlaps, zsection = esd.do_annotations_overlap(alLM, alEM)
             if overlaps:
                 overlap_matrix[k, i] = True
 
-    bins = np.arange(0, 4) #3 bins. 0 overlap, 1 overlap, 1+ overlaps
+    bins = np.arange(0, 4)  # 3 bins. 0 overlap, 1 overlap, 1+ overlaps
     LM_per_EM = np.sum(overlap_matrix, axis=1)
     EM_per_LM = np.sum(overlap_matrix, axis=0)
-    LM_per_EM_counts, edges = np.histogram(LM_per_EM[EM_edge == False], bins=bins, normed=True)
-    EM_per_LM_counts, edges = np.histogram(EM_per_LM[LM_edge == False], bins=bins, normed=True)
+    LM_per_EM_counts, edges = np.histogram(
+        LM_per_EM[EM_edge == False], bins=bins, normed=True)
+    EM_per_LM_counts, edges = np.histogram(
+        EM_per_LM[LM_edge == False], bins=bins, normed=True)
     print("EM_per_LM", EM_per_LM_counts)
     print("LM_per_EM", LM_per_EM_counts)
     print('lm edge detections:', np.sum(LM_edge))
@@ -406,6 +422,11 @@ def evalsyndetections(args):
     print('LM detections:', len(LM_edge))
 
     # Sort annotations into categories
+    # True Positives (EM Detections)
+    detected_annotations = []
+    for counter, synapse in enumerate(good_annotations):
+        if (LM_per_EM[counter] != 0 and EM_edge[counter] == False):
+            detected_annotations.append(synapse)
 
     # False Negatives (EM Detections)
     missed_annotations = []
@@ -428,8 +449,8 @@ def evalsyndetections(args):
     # Collate results into a dict
     output = {'missed_annotations': missed_annotations, 'false_positives': false_positives,
               'tp_detections': tp_detections, 'good_annotations': good_annotations,
-              'overlap_matrix': overlap_matrix, 'EM_edge':EM_edge, 'LM_edge': LM_edge, 
-              'EM_per_LM': EM_per_LM_counts, 'LM_per_EM': LM_per_EM_counts }
+              'overlap_matrix': overlap_matrix, 'EM_edge': EM_edge, 'LM_edge': LM_edge,
+              'EM_per_LM': EM_per_LM_counts, 'LM_per_EM': LM_per_EM_counts, 'detected_annotations': detected_annotations}
 
     return output
 
@@ -450,7 +471,7 @@ def combineResultVolumes(listOfQueryNumbers, listOfThresholds, metadata, args):
     queryresult : dict
     """
 
-    resultVolList = [] #list of thresholded result volumes
+    resultVolList = []  # list of thresholded result volumes
 
     for n, queryNum in enumerate(listOfQueryNumbers):
         # load result volume
@@ -503,12 +524,12 @@ def printEvalToText(listofevals, listOfQueries, listOfThresholds):
 
         file.write("EM_per_LM: " + str(evalresult['EM_per_LM']) + '\n')
         file.write("LM_per_EM: " + str(evalresult['LM_per_EM']) + '\n')
-        file.write('lm edge detections: ' + str(np.sum(evalresult['LM_edge'])) + '\n')
-        file.write('em edge annotations: ' +  str(np.sum(evalresult['EM_edge'])) + '\n')
-        file.write('LM detections:' + str(len(evalresult['LM_edge'])) + '\n')        
+        file.write('lm edge detections: ' +
+                   str(np.sum(evalresult['LM_edge'])) + '\n')
+        file.write('em edge annotations: ' +
+                   str(np.sum(evalresult['EM_edge'])) + '\n')
+        file.write('LM detections:' + str(len(evalresult['LM_edge'])) + '\n')
 
         file.write('\n')
 
-
     file.close()
-

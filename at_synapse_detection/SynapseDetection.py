@@ -29,7 +29,8 @@ def getProbMap(data):
     else:
         for zInd in range(0, data.shape[2]):
             # Calculate foreground probabilities
-            data[:, :, zInd] = scipy.stats.norm.cdf(data[:, :, zInd], np.mean(data[:, :, zInd]), np.std(data[:, :, zInd]))
+            data[:, :, zInd] = scipy.stats.norm.cdf(
+                data[:, :, zInd], np.mean(data[:, :, zInd]), np.std(data[:, :, zInd]))
     return data
 
 
@@ -55,12 +56,13 @@ def convolveVolume(vol, kernelLength):
         if (kernelLength % 2 == 0):
             img = signal.convolve2d(img, kernel, 'full')
 
-            rstartInd = int(kernelLength/2)
-            rendInd = img.shape[0] - kernelLength/2 + 1
+            rstartInd = int(kernelLength / 2)
+            rendInd = img.shape[0] - kernelLength / 2 + 1
             rendInd = int(rendInd)
 
-            cstartInd = int(kernelLength/2) # Python3 division is converted to float
-            cendInd = img.shape[1] - kernelLength/2 + 1
+            # Python3 division is converted to float
+            cstartInd = int(kernelLength / 2)
+            cendInd = img.shape[1] - kernelLength / 2 + 1
             cendInd = int(cendInd)
 
             Csame = img[rstartInd:rendInd, cstartInd:cendInd]
@@ -103,18 +105,21 @@ def computeFactor(vol, numslices):
         #print(vol.shape)
         if n == 0:
             #print(n)
-            diff = np.exp(-1 * (np.power((vol[:, :, n] - vol[:, :, n + 1]), 2)))
+            diff = np.exp(-1 *
+                          (np.power((vol[:, :, n] - vol[:, :, n + 1]), 2)))
 
         # Last slice
         elif n == (vol.shape[2] - 1):
-            diff = np.exp(-1 * (np.power((vol[:, :, n] - vol[:, :, n - 1]), 2)))
+            diff = np.exp(-1 *
+                          (np.power((vol[:, :, n] - vol[:, :, n - 1]), 2)))
         # Middle slices
         else:
             if (numslices == 3):
                 diff = np.exp((-1 * (np.power((vol[:, :, n] - vol[:, :, n + 1]), 2) +
                                      np.power((vol[:, :, n] - vol[:, :, n - 1]), 2))))
             elif (numslices == 2):
-                diff = np.exp(-1 * (np.power((vol[:, :, n] - vol[:, :, n + 1]), 2)))
+                diff = np.exp(-1 *
+                              (np.power((vol[:, :, n] - vol[:, :, n + 1]), 2)))
 
         factorVol[:, :, n] = diff
 
@@ -139,6 +144,7 @@ def loadQueriesJSON(fileName):
 
     return listOfQueries
 
+
 def createLookupTables(inputVol):
     """
     Create Look Up tables
@@ -155,9 +161,11 @@ def createLookupTables(inputVol):
     #print(len(inputVol))
     for volItr in range(0, len(inputVol)):
         for z in range(0, inputVol[0].shape[2]):
-            inputVol[volItr][:, :, z] = np.cumsum(np.cumsum(inputVol[volItr][:, :, z], 1), 0)
+            inputVol[volItr][:, :, z] = np.cumsum(
+                np.cumsum(inputVol[volItr][:, :, z], 1), 0)
 
     return inputVol
+
 
 def searchAdjacentChannel(adjacentVolList, search_win, cInd, rInd, zInd):
     """
@@ -182,7 +190,8 @@ def searchAdjacentChannel(adjacentVolList, search_win, cInd, rInd, zInd):
     if (zInd == 0):
         zrange = [0, 1]
     elif (zInd == (adjacentVolList[0].shape[2] - 1)):
-        zrange = range((adjacentVolList[0].shape[2] - 2), adjacentVolList[0].shape[2])
+        zrange = range(
+            (adjacentVolList[0].shape[2] - 2), adjacentVolList[0].shape[2])
     else:
         zrange = range(zInd - 1, zInd + 2)
 
@@ -198,9 +207,11 @@ def searchAdjacentChannel(adjacentVolList, search_win, cInd, rInd, zInd):
                         adjacentVolList[volItr][int(rstart + search_win), int(cstart + search_win), zItr] + \
                         adjacentVolList[volItr][int(rstart), int(cstart), zItr] - \
                         adjacentVolList[volItr][int(rstart + search_win), int(cstart), zItr] - \
-                        adjacentVolList[volItr][int(rstart), int(cstart + search_win), zItr]
+                        adjacentVolList[volItr][int(rstart), int(
+                            cstart + search_win), zItr]
 
-                    searchgrid[ind, volItr] = sumIF1 / (search_win * search_win)
+                    searchgrid[ind, volItr] = sumIF1 / \
+                        (search_win * search_win)
 
                 ind = ind + 1
 
@@ -232,19 +243,19 @@ def searchColocalizeChannel(baseVolList, search_win, cInd, rInd, zInd):
 
     """
     localizationGrid = np.zeros(len(baseVolList) - 1)
-    rstart = rInd - search_win/2
-    cstart = cInd - search_win/2
+    rstart = rInd - search_win / 2
+    cstart = cInd - search_win / 2
 
     for volItr in range(1, len(baseVolList)):
-        sumIF1 = baseVolList[volItr][int(rstart+search_win), int(cstart+search_win), int(zInd)] + \
-            baseVolList[volItr][int(rstart), int(cstart), int(zInd)] - baseVolList[volItr][int(rstart+search_win), int(cstart), int(zInd)] - \
-            baseVolList[volItr][int(rstart), int(cstart + search_win), int(zInd)]
+        sumIF1 = baseVolList[volItr][int(rstart + search_win), int(cstart + search_win), int(zInd)] + \
+            baseVolList[volItr][int(rstart), int(cstart), int(zInd)] - baseVolList[volItr][int(rstart + search_win), int(cstart), int(zInd)] - \
+            baseVolList[volItr][int(rstart), int(
+                cstart + search_win), int(zInd)]
 
-        localizationGrid[volItr-1] = sumIF1/(search_win * search_win)
+        localizationGrid[volItr - 1] = sumIF1 / (search_win * search_win)
 
     output = np.prod(localizationGrid)
     return output
-
 
 
 def combinePrePostVolumes(baseVolList, adjacentVolList, edge_win, search_win):
@@ -292,18 +303,24 @@ def combinePrePostVolumes(baseVolList, adjacentVolList, edge_win, search_win):
                     continue
 
                 if len(adjacentVolList) > 0:
-                    adjResult = searchAdjacentChannel(adjacentVolList, search_win, cInd, rInd, zInd)
-                    outputVol[rInd, cInd, zInd] = baseVol[rInd, cInd, zInd] * adjResult
+                    adjResult = searchAdjacentChannel(
+                        adjacentVolList, search_win, cInd, rInd, zInd)
+                    outputVol[rInd, cInd, zInd] = baseVol[rInd,
+                                                          cInd, zInd] * adjResult
 
                     if len(baseVolList) > 1:
-                        coresult = searchColocalizeChannel(baseVolList, search_win, cInd, rInd, zInd)
-                        outputVol[rInd, cInd, zInd] = baseVol[rInd, cInd, zInd] * coresult
+                        coresult = searchColocalizeChannel(
+                            baseVolList, search_win, cInd, rInd, zInd)
+                        outputVol[rInd, cInd, zInd] = baseVol[rInd,
+                                                              cInd, zInd] * coresult
                 else:
-                    coresult = searchColocalizeChannel(baseVolList, search_win, cInd, rInd, zInd)
-                    outputVol[rInd, cInd, zInd] = baseVol[rInd, cInd, zInd] * coresult
-
+                    coresult = searchColocalizeChannel(
+                        baseVolList, search_win, cInd, rInd, zInd)
+                    outputVol[rInd, cInd, zInd] = baseVol[rInd,
+                                                          cInd, zInd] * coresult
 
     return outputVol
+
 
 def getSynapseDetections(synapticVolumes, query, blobsize=2, edge_win=3):
     """
@@ -329,8 +346,7 @@ def getSynapseDetections(synapticVolumes, query, blobsize=2, edge_win=3):
     #Check to see if user supplied blobsize
     if 'punctumSize' in query.keys():
         blobsize = query['punctumSize']
-        edge_win = int(np.ceil(blobsize*1.5))
-
+        edge_win = int(np.ceil(blobsize * 1.5))
 
     # Data
     presynapticVolumes = synapticVolumes['presynaptic']
@@ -342,29 +358,34 @@ def getSynapseDetections(synapticVolumes, query, blobsize=2, edge_win=3):
 
     for n in range(0, len(presynapticVolumes)):
 
-        presynapticVolumes[n] = getProbMap(presynapticVolumes[n]) # Step 1
-        presynapticVolumes[n] = convolveVolume(presynapticVolumes[n], blobsize) # Step 2
+        presynapticVolumes[n] = getProbMap(presynapticVolumes[n])  # Step 1
+        presynapticVolumes[n] = convolveVolume(
+            presynapticVolumes[n], blobsize)  # Step 2
 
         if preIF_z[n] > 1:
-            factorVol = computeFactor(presynapticVolumes[n], int(preIF_z[n])) # Step 3
+            factorVol = computeFactor(
+                presynapticVolumes[n], int(preIF_z[n]))  # Step 3
             presynapticVolumes[n] = presynapticVolumes[n] * factorVol
 
     for n in range(0, len(postsynapticVolumes)):
 
-        postsynapticVolumes[n] = getProbMap(postsynapticVolumes[n]) # Step 1
-        postsynapticVolumes[n] = convolveVolume(postsynapticVolumes[n], blobsize) # Step 2
+        postsynapticVolumes[n] = getProbMap(postsynapticVolumes[n])  # Step 1
+        postsynapticVolumes[n] = convolveVolume(
+            postsynapticVolumes[n], blobsize)  # Step 2
 
         if postIF_z[n] > 1:
-            factorVol = computeFactor(postsynapticVolumes[n], int(postIF_z[n])) # Step 3
+            factorVol = computeFactor(
+                postsynapticVolumes[n], int(postIF_z[n]))  # Step 3
             postsynapticVolumes[n] = postsynapticVolumes[n] * factorVol
 
-
     if len(postsynapticVolumes) == 0:
-        resultVol = combinePrePostVolumes(presynapticVolumes, postsynapticVolumes, edge_win, blobsize)
+        resultVol = combinePrePostVolumes(
+            presynapticVolumes, postsynapticVolumes, edge_win, blobsize)
     else:
-        resultVol = combinePrePostVolumes(postsynapticVolumes, presynapticVolumes, edge_win, blobsize)
+        resultVol = combinePrePostVolumes(
+            postsynapticVolumes, presynapticVolumes, edge_win, blobsize)
 
-    return resultVol;
+    return resultVol
 
 
 def loadMetadata(fn):
@@ -380,6 +401,7 @@ def loadMetadata(fn):
     """
     data = json.load(open(fn))
     return data
+
 
 def saveresultvol(vol, datalocation, n):
     """
