@@ -18,6 +18,8 @@ def main():
     metadataFN = 'site3_metadata.json'
     metadata = syn.loadMetadata(metadataFN)
     outputJSONlocation = metadata['outputJSONlocation']
+
+    metadata['outputNPYlocation'] = '/Users/anish/Documents/Connectome/SynapseAnalysis/data/M247514_Rorb_1/Site3Align2/results/results_npy_norm/'
     queryFN = metadata['querylocation']
     evalparam = metadata['evalparam']
 

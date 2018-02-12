@@ -5,10 +5,43 @@ import os
 import math
 import numpy as np
 from scipy.stats import norm
+from scipy.stats import gamma
 from scipy import signal
 import scipy.ndimage as ndimage
 from at_synapse_detection import synaptogram
 from at_synapse_detection import dataAccess as da
+
+# def calculateGammaParams(data):
+#     mean = np.mean(data)
+#     std = np.std(data)
+#     shape = (mean/std)**2
+#     scale = (std**2)/mean
+#     return (shape, 0, scale)
+
+
+# def getProbMap_gamma(data):
+#     """
+#     Returns probability map of input image
+#     Parameters
+#     ----------
+#     data : 3D numpy - input volume
+
+#     Returns
+#     ----------
+#     data : 3D numpy
+#         output volume with values scaled between 0 to 1
+#     """
+
+#     if len(data.shape) == 2:
+#         data = scipy.stats.norm.cdf(data, np.mean(data), np.std(data))
+#     else:
+#         for zInd in range(0, data.shape[2]):
+#             # Calculate foreground probabilities
+#             eshape, eloc, escale = calculateGammaParams(data[:, :, zInd].flatten())
+#             output = gamma.cdf(data[:, :, zInd], eshape, eloc, escale)
+#             data[:, :, zInd] = output
+#     print('Prob Calculated')
+#     return data
 
 
 def getProbMap(data):

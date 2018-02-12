@@ -23,8 +23,8 @@ def main():
         listOfThresholds.append(query['thresh'])
 
     listOfQueryNumbers = list(range(0, len(listOfQueries)))
-    listOfThresholds = [0.9]
-    listOfQueryNumbers = [2]
+    listOfThresholds = [0.8, 0.7, 0.7] 
+    listOfQueryNumbers = [0, 2, 4]
     print(listOfQueries[2])
     queryresult = pd.combineResultVolumes(
         listOfQueryNumbers, listOfThresholds, metadata, evalargs)
@@ -44,16 +44,16 @@ def main():
 
 
     # Detected synapses (True Positives)
-    # detected_annotations = queryresult['detected_annotations']
-    # synaptogram_args['outputpath'] = os.path.join(outputpath, 'true_positive_detections')
-    # for counter, synapse in enumerate(detected_annotations):
-    #     synaptogram.synapseAnnoToSynaptogram(synapse, synaptogram_args)
+    detected_annotations = queryresult['detected_annotations']
+    synaptogram_args['outputpath'] = os.path.join(outputpath, 'true_positive_detections')
+    for counter, synapse in enumerate(detected_annotations):
+        synaptogram.synapseAnnoToSynaptogram(synapse, synaptogram_args)
 
     # False negatives
-    # missed_annotations = queryresult['missed_annotations']
-    # synaptogram_args['outputpath'] = os.path.join(outputpath, 'false_negative')
-    # for counter, synapse in enumerate(missed_annotations):
-    # synaptogram.synapseAnnoToSynaptogram(synapse, synaptogram_args)
+    missed_annotations = queryresult['missed_annotations']
+    synaptogram_args['outputpath'] = os.path.join(outputpath, 'false_negative')
+    for counter, synapse in enumerate(missed_annotations):
+        synaptogram.synapseAnnoToSynaptogram(synapse, synaptogram_args)
 
     # False positive detections
     false_positives = queryresult['false_positives']

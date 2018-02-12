@@ -27,6 +27,10 @@ conda install scipy
 conda install scikit-image
 conda install shapely
 conda install --channel https://conda.anaconda.org/menpo opencv3
+conda install pandas
+conda install xlsxwriter
+conda install pillow
+conda install xlrd
 ```
 
 These two repositories are needed for Allen Institute data: 
@@ -34,8 +38,15 @@ These two repositories are needed for Allen Institute data:
 git clone https://github.com/AllenInstitute/argschema.git
 git clone https://github.com/fcollman/render-python.git
 ```
+Navigate to these directories and install (`python setup.py install`)
+
 
 Clone the repository: 
 ```
 git clone https://github.com/aksimhal/SynapseAnalysis.git
 ```
+
+Install in developer mode since the repository is in active development. 
+`python setup.py develop`
+
+
