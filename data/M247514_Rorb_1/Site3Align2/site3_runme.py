@@ -13,7 +13,7 @@ def main():
     run site 3 synapse detection
     """
     # Load metadata
-    metadata_fn = 'site3_metadata.json'
+    metadata_fn = '/Users/anish/Documents/Connectome/SynapseAnalysis/data/M247514_Rorb_1/Site3Align2/site3_metadata.json'
     #metadata_fn = 'site3_metadata_TdTomato.json'
     metadata = syn.loadMetadata(metadata_fn)
 

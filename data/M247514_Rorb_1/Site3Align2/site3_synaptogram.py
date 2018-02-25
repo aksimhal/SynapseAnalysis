@@ -12,27 +12,26 @@ def main():
     Site3 Synaptograms
     """
 
-    metadata_fn = 'site3_metadata.json'
+    metadata_fn = '/Users/anish/Documents/Connectome/SynapseAnalysis/data/M247514_Rorb_1/Site3Align2/site3_metadata_dev.json'
     metadata = syn.loadMetadata(metadata_fn)
     query_fn = metadata['querylocation']
     listOfQueries = syn.loadQueriesJSON(query_fn)
     evalargs = metadata['evalparam']
 
-    listOfThresholds = []
-    for query in listOfQueries:
-        listOfThresholds.append(query['thresh'])
+    # listOfThresholds = []
+    # for query in listOfQueries:
+    #     listOfThresholds.append(query['thresh'])
 
-    listOfQueryNumbers = list(range(0, len(listOfQueries)))
+    # listOfQueryNumbers = list(range(0, len(listOfQueries)))
     listOfThresholds = [0.8, 0.7, 0.7] 
     listOfQueryNumbers = [0, 2, 4]
-    print(listOfQueries[2])
+
     queryresult = pd.combineResultVolumes(
         listOfQueryNumbers, listOfThresholds, metadata, evalargs)
 
     data_location = metadata['datalocation']
     outputpath = '/Users/anish/Documents/Connectome/Synaptome-Duke/data/collman17/Site3Align2Stacks/synaptograms/'
-    stack_list = ['labels', 'PSD95', 'synapsin',
-                  'VGlut1', 'GluN1', 'GABA', 'Gephyrin', 'TdTomato']
+    stack_list = ['PSD95', 'synapsin', 'VGlut1', 'GluN1', 'GABA', 'Gephyrin', 'TdTomato']
     text_x_offset = 0
     text_y_offset = 5
     win_xy = 4

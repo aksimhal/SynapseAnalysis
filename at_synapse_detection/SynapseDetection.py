@@ -159,6 +159,59 @@ def computeFactor(vol, numslices):
     return factorVol
 
 
+# def computeFactor_grid(vol, numslices):
+#     """
+#     Returns convolved volume
+#     Parameters
+#     ----------
+#     vol : 3D numpy volume
+#     numslices: int - number of slices to span
+#         note from anish: numslices can only be 2 or 3.
+#         todo - add more slices
+#     Returns
+#     ----------
+#     factorVol : 3D numpy volume
+#     """
+
+#     factorVol = np.ones(vol.shape)
+#     max_filt_vol = np.ones(vol.shape)
+
+#     if (numslices == 1):
+#         return factorVol
+
+#     for n in range(0, vol.shape[2]): 
+#         max_filt_vol[:, :, n] = scipy.ndimage.filters.maximum_filter(vol[:, :, n], size=(3, 3))
+
+
+#     for n in range(0, vol.shape[2]):
+
+#         # Edge cases
+#         # First Slice
+#         #print(vol.shape)
+#         if n == 0:
+#             #print(n)
+#             diff = np.exp(-1 *
+#                           (np.power((vol[:, :, n] - max_filt_vol[:, :, n + 1]), 2)))
+
+#         # Last slice
+#         elif n == (vol.shape[2] - 1):
+#             diff = np.exp(-1 *
+#                           (np.power((vol[:, :, n] - max_filt_vol[:, :, n - 1]), 2)))
+#         # Middle slices
+#         else:
+#             if (numslices == 3):
+#                 diff = np.exp((-1 * (np.power((vol[:, :, n] - max_filt_vol[:, :, n + 1]), 2) +
+#                                      np.power((vol[:, :, n] - max_filt_vol[:, :, n - 1]), 2))))
+#             elif (numslices == 2):
+#                 diff = np.exp(-1 *
+#                               (np.power((vol[:, :, n] - max_filt_vol[:, :, n + 1]), 2)))
+
+#         factorVol[:, :, n] = diff
+
+#     return factorVol
+
+
+
 def loadQueriesJSON(fileName):
     """
     Load query file (in JSON format).
@@ -445,6 +498,8 @@ def saveresultvol(vol, datalocation, n):
     datalocation: str
     n : int
     """
+    if not os.path.isdir(datalocation):
+        os.makedirs(datalocation)
 
     fn = os.path.join(datalocation, 'resultVol')
     fn = fn + str(n) + '.npy'

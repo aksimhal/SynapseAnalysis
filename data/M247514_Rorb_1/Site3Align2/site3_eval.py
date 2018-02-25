@@ -15,11 +15,10 @@ def main():
     """
 
     # Load metadata
-    metadataFN = 'site3_metadata.json'
+    metadataFN = 'site3_metadata_dev.json'
     metadata = syn.loadMetadata(metadataFN)
     outputJSONlocation = metadata['outputJSONlocation']
 
-    metadata['outputNPYlocation'] = '/Users/anish/Documents/Connectome/SynapseAnalysis/data/M247514_Rorb_1/Site3Align2/results/results_npy_norm/'
     queryFN = metadata['querylocation']
     evalparam = metadata['evalparam']
 
@@ -47,7 +46,7 @@ def main():
 
     # Combine Queries
     evaluation_parameters = metadata['evalparam']
-    metadata['datalocation'] = '/Users/anish/Documents/Connectome/Synaptome-Duke/data/collman17/Site3Align2Stacks/originalresult'
+
     pd.combineResultVolumes(list(range(0, len(listOfQueries))),
                             listOfThresholds, metadata, evaluation_parameters)
 
