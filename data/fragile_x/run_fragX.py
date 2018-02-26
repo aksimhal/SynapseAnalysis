@@ -7,7 +7,7 @@ from at_synapse_detection import dataAccess as da
 from at_synapse_detection import SynapseDetection as syn
 from at_synapse_detection import antibodyAnalysis as aa 
 from at_synapse_detection import SynapseAnalysis as sa
-
+import socket
 
 def run_synapses(query_fn, data_location_base): 
 
@@ -46,18 +46,23 @@ def main():
     
     query_fn = '2ss_queries.json'
     datalocation = '/Users/anish/Documents/yi_mice/2ss_stacks/'
+    hostname = socket.gethostname()
+    if hostname == 'Galicia': 
+        datalocation = '/data5TB/yi_mice/2ss_stacks'
+
     mouse2_df = run_synapses(query_fn, datalocation)
 
     query_fn = '3ss_queries.json'
     datalocation = '/Users/anish/Documents/yi_mice/3ss_stacks/'
+    if hostname == 'Galicia': 
+        datalocation = '/data5TB/yi_mice/3ss_stacks'
+
     mouse3_df = run_synapses(query_fn, datalocation)
     
     sheet_name = 'FragileX Mouse'
     fn = 'fragileX_experiment.xlsx'
     df_list = [mouse2_df, mouse3_df]
     aa.write_dfs_to_excel(df_list, sheet_name, fn)
-
-
 
 
 

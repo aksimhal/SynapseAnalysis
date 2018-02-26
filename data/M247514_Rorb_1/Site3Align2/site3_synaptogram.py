@@ -2,9 +2,40 @@
 Site3 Synaptograms
 """
 import os
+import numpy as np
+import scipy
 from at_synapse_detection import synaptogram
 from at_synapse_detection import SynapseDetection as syn
 from at_synapse_detection import processDetections as pd
+
+def generateResultTiffStacks(listOfQueryNumbers, listOfThresholds, data_location, outputNPYlocation): 
+    """
+    """
+    resultVolList = []  # list of thresholded result volumes
+    for n, queryNum in enumerate(listOfQueryNumbers):
+        # load result volume
+        fn = os.path.join(outputNPYlocation, 'resultVol')
+        fn = fn + str(queryNum) + '.npy'
+        resultVol_n = np.load(fn)
+        resultVol_n = resultVol_n > listOfThresholds[n]
+        resultVolList.append(resultVol_n)
+
+    resultVol = resultVolList[0]
+    for volItr in range(1, len(resultVolList)):
+        resultVol = resultVol + resultVolList[volItr]
+
+    folderpath = os.path.join(data_location, 'results')
+    if not os.path.isdir(folderpath):
+        os.makedirs(folderpath)
+
+
+    for z in range(0, resultVol.shape[2]): 
+        fn = os.path.join(folderpath, str(z).zfill(5))
+        fn = fn + '.tiff'
+        scipy.misc.imsave(fn, resultVol[:, :, z])
+
+
+
 
 
 def main():
@@ -31,11 +62,13 @@ def main():
 
     data_location = metadata['datalocation']
     outputpath = '/Users/anish/Documents/Connectome/Synaptome-Duke/data/collman17/Site3Align2Stacks/synaptograms/'
-    stack_list = ['PSD95', 'synapsin', 'VGlut1', 'GluN1', 'GABA', 'Gephyrin', 'TdTomato']
+    stack_list = ['results', 'PSD95', 'synapsin', 'VGlut1', 'GluN1', 'GABA', 'Gephyrin', 'TdTomato']
     text_x_offset = 0
     text_y_offset = 5
     win_xy = 4
     win_z = 1
+
+    generateResultTiffStacks(listOfQueryNumbers, listOfThresholds, data_location, metadata['outputNPYlocation'])
 
     synaptogram_args = {'win_xy': win_xy, 'win_z': win_z, 'data_location': data_location,
                         'stack_list': stack_list, 'text_x_offset': text_x_offset,
@@ -43,10 +76,10 @@ def main():
 
 
     # Detected synapses (True Positives)
-    detected_annotations = queryresult['detected_annotations']
-    synaptogram_args['outputpath'] = os.path.join(outputpath, 'true_positive_detections')
-    for counter, synapse in enumerate(detected_annotations):
-        synaptogram.synapseAnnoToSynaptogram(synapse, synaptogram_args)
+    # detected_annotations = queryresult['detected_annotations']
+    # synaptogram_args['outputpath'] = os.path.join(outputpath, 'true_positive_detections')
+    # for counter, synapse in enumerate(detected_annotations):
+    #     synaptogram.synapseAnnoToSynaptogram(synapse, synaptogram_args)
 
     # False negatives
     missed_annotations = queryresult['missed_annotations']
