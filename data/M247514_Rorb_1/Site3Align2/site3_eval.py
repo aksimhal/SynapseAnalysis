@@ -15,7 +15,7 @@ def main():
     """
 
     # Load metadata
-    metadataFN = 'site3_metadata_dev.json'
+    metadataFN = 'site3_metadata.json'
     metadata = syn.loadMetadata(metadataFN)
     outputJSONlocation = metadata['outputJSONlocation']
 
@@ -32,10 +32,11 @@ def main():
     # Evaluate each query individually
     for n, query in enumerate(listOfQueries):
         listOfThresholds.append(query['thresh'])
-        print(query)
-
+        
         for thresh in thresh_list:
             listOfThresholds_to_text.append(thresh)
+            query['thresh'] = thresh
+            print(query)
             listOfQueries_to_text.append(query)
             queryresult = pd.combineResultVolumes(
                 [n], [thresh], metadata, evalparam)

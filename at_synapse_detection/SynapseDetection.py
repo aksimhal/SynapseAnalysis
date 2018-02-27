@@ -389,21 +389,15 @@ def combinePrePostVolumes(baseVolList, adjacentVolList, edge_win, search_win):
                     continue
 
                 if len(adjacentVolList) > 0:
-                    adjResult = searchAdjacentChannel(
-                        adjacentVolList, search_win, cInd, rInd, zInd)
-                    outputVol[rInd, cInd, zInd] = baseVol[rInd,
-                                                          cInd, zInd] * adjResult
+                    adjResult = searchAdjacentChannel(adjacentVolList, search_win, cInd, rInd, zInd)
+                    outputVol[rInd, cInd, zInd] = baseVol[rInd,cInd, zInd] * adjResult
 
                     if len(baseVolList) > 1:
-                        coresult = searchColocalizeChannel(
-                            baseVolList, search_win, cInd, rInd, zInd)
-                        outputVol[rInd, cInd, zInd] = baseVol[rInd,
-                                                              cInd, zInd] * coresult
+                        coresult = searchColocalizeChannel(baseVolList, search_win, cInd, rInd, zInd)
+                        outputVol[rInd, cInd, zInd] = baseVol[rInd,cInd, zInd] * coresult * adjResult
                 else:
-                    coresult = searchColocalizeChannel(
-                        baseVolList, search_win, cInd, rInd, zInd)
-                    outputVol[rInd, cInd, zInd] = baseVol[rInd,
-                                                          cInd, zInd] * coresult
+                    coresult = searchColocalizeChannel(baseVolList, search_win, cInd, rInd, zInd)
+                    outputVol[rInd, cInd, zInd] = baseVol[rInd,cInd, zInd] * coresult
 
     return outputVol
 

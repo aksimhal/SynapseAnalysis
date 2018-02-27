@@ -498,8 +498,8 @@ def getSynaptogramFromFile(bboxCoordinates, win_xy, win_z, stackList, filepath):
             else:
                 maxIntensity = 5000
 
-            cutout = getImageProbMapCutoutFromFile(
-                stack, sliceInd, startX, startY, deltaX, deltaY, filepath)
+            cutout = getImageRawCutoutFromFile(
+                stack, sliceInd, startX, startY, deltaX, deltaY, filepath) > 1000
 
             img[ifpos:(ifpos + deltaY), slicepos:(slicepos + deltaX)] = cutout
 
@@ -509,6 +509,32 @@ def getSynaptogramFromFile(bboxCoordinates, win_xy, win_z, stackList, filepath):
         slicepos = slicepos + deltaX
 
     return img
+
+def getImageRawCutoutFromFile(channelname, sliceInd, startX, startY, deltaX, deltaY, filepath):
+    """
+    Load cutout of a slice of a tiff image
+
+    Parameters
+    -----------
+    channelname : str
+    sliceInd : ind
+    startX : ind
+    startY : ind
+    deltaX : ind
+    deltaY : ind
+    filepath : str
+
+    Returns
+    -----------
+    cutout: 2D numpy array
+    """
+
+    folderpath = os.path.join(filepath, channelname)
+    img = da.imreadtiffSingleSlice(folderpath, sliceInd)
+    img.astype(np.float64)
+    #probimg = syn.getProbMap(img)
+    cutout = img[startY:(startY + deltaY), startX:(startX + deltaX)]
+    return cutout
 
 
 def getImageProbMapCutoutFromFile(channelname, sliceInd, startX, startY, deltaX, deltaY, filepath):

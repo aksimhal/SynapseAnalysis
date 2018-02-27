@@ -24,7 +24,9 @@ def run_synapses(query_fn, data_location_base):
 
         for n, query in enumerate(listOfQueries):
             print(query)
-            foldernames.append(region_name + '-Q' + str(n))
+            foldername = region_name + '-Q' + str(n)
+            foldernames.append(foldername)
+            print(foldername)
             # Load the data
             
             synaptic_volumes = da.load_tiff_from_query(query, data_location)
@@ -36,7 +38,7 @@ def run_synapses(query_fn, data_location_base):
             result_list.append(queryresult)
 
     df = sa.create_synapse_df(result_list, foldernames)
-
+    print(df)
     return df
 
 def main():
