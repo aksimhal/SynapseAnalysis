@@ -81,6 +81,69 @@ def imreadtiffSingleSlice(folderpath, sliceInd):
 
     return output
 
+def load_tiff_from_astro_query(query, base_dir=None):
+    """
+    Load tiff stacks associated with a query. 
+
+    Parameters
+    ----------
+    query : dict
+        dict object containing filenames associated with pre/post synaptic markers
+    base_dir : str - location of the data 
+
+    Returns
+    ----------
+    synaptic_volumes : dict
+        dict with two (pre/post) lists of synaptic volumes
+    """
+    #Glial volumes 
+    glialvolumes = [] 
+    glialIF = query['glialIF']
+    # Loop over every presynaptic channel
+    for n in range(0, len(glialIF)):
+        print(glialIF[n])
+        if base_dir == None: 
+            volume = imreadtiff(glialIF[n])
+        else: 
+            fn = os.path.join(base_dir, glialIF[n])
+            volume = imreadtiff(fn)
+        glialvolumes.append(volume)
+
+    #presynaptic volumes
+    presynapticvolumes = []
+    preIF = query['preIF']
+
+    # Loop over every presynaptic channel
+    for n in range(0, len(preIF)):
+        print(preIF[n])
+        if base_dir == None: 
+            volume = imreadtiff(preIF[n])
+        else: 
+            fn = os.path.join(base_dir, preIF[n])
+            volume = imreadtiff(fn)
+        presynapticvolumes.append(volume)
+
+    #postsynaptic volumes
+    postsynapticvolumes = []
+    postIF = query['postIF']
+
+    # Loop over every postsynaptic channel
+    for n in range(0, len(postIF)):
+        print(postIF[n])
+        if base_dir == None: 
+            volume = imreadtiff(postIF[n])
+        else: 
+            fn = os.path.join(base_dir, postIF[n])
+            volume = imreadtiff(fn)
+        postsynapticvolumes.append(volume)
+
+    synaptic_volumes = {'presynaptic': presynapticvolumes,
+                       'postsynaptic': postsynapticvolumes, 
+                       'glialvolumes': glialvolumes}
+
+    return synaptic_volumes
+
+
 def load_tiff_from_query(query, base_dir=None):
     """
     Load tiff stacks associated with a query. 

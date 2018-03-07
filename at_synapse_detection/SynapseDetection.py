@@ -401,6 +401,66 @@ def combinePrePostVolumes(baseVolList, adjacentVolList, edge_win, search_win):
 
     return outputVol
 
+def combinePrePostVolumes_astro(baseVolList, adjacentVolList, glialvolumes, edge_win, search_win):
+    """
+    Combines Volumes
+    Parameters
+    ----------
+    baseVol : 3D numpy array
+    adjacentVolList : Adjacent volumes list. pass empty array if no
+                      adjacent synaptic volumes are present in the dataset
+    baseThresh : float - minimum probability value to consider
+    edge_win : int - edge to ignore
+    search_win - search_win must be even
+
+    Returns
+    ----------
+    outputVol : 3D Numpy Array - Final Probability Map
+    """
+    # Allocate memory
+    outputVol = np.zeros(baseVolList[0].shape)
+
+    # If there are multiple volumes associated with the same synaptic side
+    if len(baseVolList) > 1:
+        baseVolList[1:] = createLookupTables(baseVolList[1:])
+
+    # Create lookup tables
+    if len(adjacentVolList) > 0:
+        adjacentVolList = createLookupTables(adjacentVolList)
+
+    #print('starting to loop through each slice')
+    baseVol = baseVolList[0]
+    rStartEdge = edge_win
+    rEndEdge = baseVol.shape[0] - edge_win
+    cStartEdge = edge_win
+    cEndEdge = baseVol.shape[1] - edge_win
+
+    # For each z slice
+    for zInd in range(0, baseVol.shape[2]):
+        print("starting z ind: " + str(zInd))
+
+        for rInd in range(rStartEdge, rEndEdge):
+            for cInd in range(cStartEdge, cEndEdge):
+
+                if (baseVol[rInd, cInd, zInd] < 0.5):
+                    continue
+
+                if len(adjacentVolList) > 0:
+                    adjResult = searchAdjacentChannel(adjacentVolList, search_win, cInd, rInd, zInd)
+                    adjResult2 = searchAdjacentChannel(glialvolumes, search_win, cInd, rInd, zInd)
+                    outputVol[rInd, cInd, zInd] = baseVol[rInd,cInd, zInd] * adjResult * adjResult2
+     
+                    if len(baseVolList) > 1:
+                        coresult = searchColocalizeChannel(baseVolList, search_win, cInd, rInd, zInd)
+                        outputVol[rInd, cInd, zInd] = baseVol[rInd,cInd, zInd] * coresult * adjResult * adjResult2
+                        
+                else:
+                    coresult = searchColocalizeChannel(baseVolList, search_win, cInd, rInd, zInd)
+                    outputVol[rInd, cInd, zInd] = baseVol[rInd,cInd, zInd] * coresult
+
+    return outputVol
+
+
 
 def getSynapseDetections(synapticVolumes, query, blobsize=2, edge_win=3):
     """
@@ -457,6 +517,85 @@ def getSynapseDetections(synapticVolumes, query, blobsize=2, edge_win=3):
             factorVol = computeFactor(
                 postsynapticVolumes[n], int(postIF_z[n]))  # Step 3
             postsynapticVolumes[n] = postsynapticVolumes[n] * factorVol
+
+    if len(postsynapticVolumes) == 0:
+        resultVol = combinePrePostVolumes(
+            presynapticVolumes, postsynapticVolumes, edge_win, blobsize)
+    else:
+        resultVol = combinePrePostVolumes(
+            postsynapticVolumes, presynapticVolumes, edge_win, blobsize)
+
+    return resultVol
+
+def getSynapseDetections_astro(synapticVolumes, query, blobsize=2, edge_win=3):
+    """
+    This function calls the functions needed to run probabilistic synapse detection
+
+    Parameters
+    ----------
+    synapticVolumes : dict
+        has two keys (presynaptic,postsynaptic) which contain lists of 3D numpy arrays
+    query : dict
+        contains the minumum slice information for each channel
+    blobsize : int
+        Minimum 2D Blob Size (default 2)
+    edge_win: int
+        Edge window (default is 1.5*blobsize)
+
+
+    Returns
+    ----------
+    resultVol : 3D numpy array - final probability map
+    """
+
+    #Check to see if user supplied blobsize
+    if 'punctumSize' in query.keys():
+        blobsize = query['punctumSize']
+        edge_win = int(np.ceil(blobsize * 1.5))
+
+    # Data
+    presynapticVolumes = synapticVolumes['presynaptic']
+    postsynapticVolumes = synapticVolumes['postsynaptic']
+    glialVolumes = synapticVolumes['glialvolumes']
+
+    # Number of slices each blob should span
+    preIF_z = query['preIF_z']
+    postIF_z = query['postIF_z']
+    glialIF_z = query['glialIF_z']
+
+    for n in range(0, len(presynapticVolumes)):
+
+        presynapticVolumes[n] = getProbMap(presynapticVolumes[n])  # Step 1
+        presynapticVolumes[n] = convolveVolume(
+            presynapticVolumes[n], blobsize)  # Step 2
+
+        if preIF_z[n] > 1:
+            factorVol = computeFactor(
+                presynapticVolumes[n], int(preIF_z[n]))  # Step 3
+            presynapticVolumes[n] = presynapticVolumes[n] * factorVol
+
+    for n in range(0, len(postsynapticVolumes)):
+
+        postsynapticVolumes[n] = getProbMap(postsynapticVolumes[n])  # Step 1
+        postsynapticVolumes[n] = convolveVolume(
+            postsynapticVolumes[n], blobsize)  # Step 2
+
+        if postIF_z[n] > 1:
+            factorVol = computeFactor(
+                postsynapticVolumes[n], int(postIF_z[n]))  # Step 3
+            postsynapticVolumes[n] = postsynapticVolumes[n] * factorVol
+
+    for n in range(0, len(glialVolumes)):
+
+        glialVolumes[n] = getProbMap(glialVolumes[n])  # Step 1
+        glialVolumes[n] = convolveVolume(
+            glialVolumes[n], blobsize)  # Step 2
+
+        if glialIF_z[n] > 1:
+            factorVol = computeFactor(
+                glialVolumes[n], int(glialIF_z[n]))  # Step 3
+            glialVolumes[n] = glialVolumes[n] * factorVol
+
 
     if len(postsynapticVolumes) == 0:
         resultVol = combinePrePostVolumes(
