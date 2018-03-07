@@ -1,5 +1,5 @@
 """
-run fragilex synapse detections
+run fragilex synapse detections for YFP
 """
 import os
 import pandas as pd
@@ -14,8 +14,8 @@ def main():
     """
     run synapse detection
     """
-    outputFoldername = 'results'
-    query_fn = '2ss_queries.json'
+    outputFoldername = 'results_YFP'
+    query_fn = '2ss_YFP_queries.json'
     datalocation = '/Users/anish/Documents/yi_mice/2ss_stacks/'
     hostname = socket.gethostname()
     if hostname == 'Galicia': 
@@ -23,15 +23,15 @@ def main():
 
     mouse2_df = sa.run_synapses(query_fn, datalocation, outputFoldername)
 
-    query_fn = '3ss_queries.json'
+    query_fn = '3ss_YFP_queries.json'
     datalocation = '/Users/anish/Documents/yi_mice/3ss_stacks/'
     if hostname == 'Galicia': 
         datalocation = '/data5TB/yi_mice/3ss_stacks'
 
     mouse3_df = sa.run_synapses(query_fn, datalocation, outputFoldername)
     
-    sheet_name = 'FragileX Mouse'
-    fn = 'fragileX_experiment.xlsx'
+    sheet_name = 'FragileX YFP'
+    fn = 'fragileX_YFP_experiment.xlsx'
     df_list = [mouse2_df, mouse3_df]
     aa.write_dfs_to_excel(df_list, sheet_name, fn)
 

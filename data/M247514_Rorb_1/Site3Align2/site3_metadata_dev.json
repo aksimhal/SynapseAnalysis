@@ -1,0 +1,31 @@
+{
+    "resolution": {
+        "res_xy_nm": 100,
+        "res_z_nm": 50
+    },
+    "render_args": {
+        "host": "http://152.3.214.113",
+        "port": 8080,
+        "owner": "Anish",
+        "project": "M247514_Rorb_1",
+        "client_scripts": "/home/anish/Connectome/render/render-ws-java-client/src/main/scripts"
+    },
+    "querylocation": "/Users/anish/Documents/Connectome/SynapseAnalysis/data/M247514_Rorb_1/Site3Align2/site3_queriesDEV.json",
+    "outputNPYlocation": "/Users/anish/Documents/Connectome/SynapseAnalysis/data/M247514_Rorb_1/Site3Align2/results_dev/results_npy/",
+    "datalocation": "/Users/anish/Documents/Connectome/Synaptome-Duke/data/collman17/Site3Align2Stacks/",
+    "offset": {
+        "rowOffset_nm": 0,
+        "colOffset_nm": 0,
+        "zOffset_nm": 0
+    },
+    "outputJSONlocation": "/Users/anish/Documents/Connectome/SynapseAnalysis/data/M247514_Rorb_1/Site3Align2/results/",
+    "evalparam": {
+        "EM_annotation_json": "json_annotations/m247514_Site3Annotation_MN_global_v2.json",
+        "LM_annotation_json": "results/resultVol0.json",
+        "EM_metadata_csv": "MNSite3Synaptograms_v2.csv",
+        "LM_metadata_file": "site3_metadata.json",
+        "EM_inclass_column": "glutsynapse",
+        "EM_not_synapse_column": "ConsensusNotSynapse",
+        "output_json": "results/Anish_evaluation_output.json"
+    }
+}

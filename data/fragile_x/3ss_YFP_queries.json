@@ -5,10 +5,12 @@
                 "3ss_Synap.tif"
             ],
             "postIF": [
-                "3ss_PSD.tif"
+                "3ss_PSD.tif",
+                "3ss_YFP.tif"
             ],
             "punctumSize": 2,
             "postIF_z": [
+                2,
                 2
             ],
             "preIF_z": [
@@ -21,10 +23,12 @@
                 "3ss_VGluT1.tif"
             ],
             "postIF": [
-                "3ss_PSD.tif"
+                "3ss_PSD.tif",
+                "3ss_YFP.tif"
             ],
             "punctumSize": 2,
             "postIF_z": [
+                2,
                 2
             ],
             "preIF_z": [
@@ -38,10 +42,12 @@
                 "3ss_VGluT2.tif"
             ],
             "postIF": [
-                "3ss_PSD.tif"
+                "3ss_PSD.tif",
+                "3ss_YFP.tif"
             ],
             "punctumSize": 2,
             "postIF_z": [
+                2,
                 2
             ],
             "preIF_z": [
@@ -56,10 +62,12 @@
                 "3ss_VGluT2.tif"
             ],
             "postIF": [
-                "3ss_PSD.tif"
+                "3ss_PSD.tif",
+                "3ss_YFP.tif"
             ],
             "punctumSize": 2,
             "postIF_z": [
+                2,
                 2
             ],
             "preIF_z": [
@@ -74,49 +82,13 @@
                 "3ss_GAD.tif"
             ],
             "postIF": [
-                "3ss_Geph.tif"
+                "3ss_Geph.tif",
+                "3ss_YFP.tif"
             ],
             "punctumSize": 2,
             "postIF_z": [
-                1
-            ],
-            "preIF_z": [
-                2,
+                1,
                 2
-            ]
-        },
-        {
-            "preIF": [
-                "3ss_Synap.tif",
-                "3ss_VGluT1.tif"
-            ],
-            "postIF": [
-                "3ss_PSD.tif",
-                "3ss_Geph.tif"
-            ],
-            "punctumSize": 2,
-            "postIF_z": [
-                2,
-                1
-            ],
-            "preIF_z": [
-                2,
-                2
-            ]
-        },
-        {
-            "preIF": [
-                "3ss_Synap.tif",
-                "3ss_VGluT2.tif"
-            ],
-            "postIF": [
-                "3ss_PSD.tif",
-                "3ss_Geph.tif"
-            ],
-            "punctumSize": 2,
-            "postIF_z": [
-                2,
-                1
             ],
             "preIF_z": [
                 2,

@@ -483,18 +483,19 @@ def loadMetadata(fn):
     return data
 
 
-def saveresultvol(vol, datalocation, n):
+def saveresultvol(vol, datalocation, filename, n):
     """
     save result volume
     Parameters
     -------------
     vol : numpy 3D array
-    datalocation: str
+    datalocation : str
+    filename : str
     n : int
     """
     if not os.path.isdir(datalocation):
         os.makedirs(datalocation)
 
-    fn = os.path.join(datalocation, 'resultVol')
+    fn = os.path.join(datalocation, filename)
     fn = fn + str(n) + '.npy'
     np.save(fn, vol)

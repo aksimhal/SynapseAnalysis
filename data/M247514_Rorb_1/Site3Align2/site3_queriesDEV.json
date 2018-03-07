@@ -1,0 +1,1 @@
+{"listOfQueries": [{"preIF": [], "preIF_z": [], "postIF": ["GluN1"], "postIF_z": [1], "thresh": 0.8}, {"preIF": [], "preIF_z": [], "postIF": ["GluN1"], "postIF_z": [2], "thresh": 0.8}, {"preIF": [], "preIF_z": [], "postIF": ["GluN1"], "postIF_z": [3], "thresh": 0.8}]}

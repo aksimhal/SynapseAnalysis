@@ -5,6 +5,7 @@ import pandas as pd
 from skimage import measure
 from at_synapse_detection import SynapseDetection as syn
 from at_synapse_detection import dataAccess as da
+from at_synapse_detection import antibodyAnalysis as aa 
 
 class SynapseAnalysis: 
     """
@@ -54,3 +55,41 @@ def create_synapse_df(result_list, row_labels):
 
 
 
+def run_synapses(query_fn, data_location_base, outputFoldername): 
+    """
+    """
+
+    listOfQueries = syn.loadQueriesJSON(query_fn)
+    resolution = {'res_xy_nm': 100, 'res_z_nm': 70}
+    region_name_base = 'F00'
+    thresh = 0.9
+
+    foldernames = []
+    result_list = []
+    for region_num in range(0, 4): 
+        region_name = region_name_base + str(region_num)
+        data_location = os.path.join(data_location_base, region_name)
+
+        for n, query in enumerate(listOfQueries):
+            print(query)
+            foldername = region_name + '-Q' + str(n)
+            foldernames.append(foldername)
+            print(foldername)
+            # Load the data
+            
+            synaptic_volumes = da.load_tiff_from_query(query, data_location)
+            volume_um3 = aa.getdatavolume(synaptic_volumes, resolution)
+
+            # Run Synapse Detection
+            resultvol = syn.getSynapseDetections(synaptic_volumes, query)
+
+            # Save the probability map to file, if you want
+            outputNPYlocation = os.path.join(data_location_base, outputFoldername, region_name)
+            syn.saveresultvol(resultvol, outputNPYlocation, 'query_', n)
+
+            queryresult = compute_measurements(resultvol, query, volume_um3, thresh)
+            result_list.append(queryresult)
+
+    df = create_synapse_df(result_list, foldernames)
+    print(df)
+    return df
