@@ -44,6 +44,31 @@ from at_synapse_detection import dataAccess as da
 #     return data
 
 
+def getProbMap_rayleigh(data):
+    """
+    Returns probability map of input image
+    Parameters
+    ----------
+    data : 3D numpy - input volume
+
+    Returns
+    ----------
+    data : 3D numpy
+        output volume with values scaled between 0 to 1
+    """
+
+    for zInd in range(0, data.shape[2]):
+
+        # The maximum likelihood estimate has a simple form
+        phat = np.sqrt(0.5 * np.mean(np.power(data[:, :, zInd], 2)))
+        output = 1 - np.exp(-1*np.power(data[:, :, zInd], 2) / (2*np.power(phat, 2))) 
+
+        # Calculate foreground probabilities
+        data[:, :, zInd] = output
+
+    return data
+
+
 def getProbMap(data):
     """
     Returns probability map of input image

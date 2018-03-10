@@ -108,3 +108,5 @@ ENV/
 *.npy
 
 *.xlsx
+
+*.txt

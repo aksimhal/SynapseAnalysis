@@ -7,118 +7,6 @@ from at_synapse_detection import dataAccess as da
 from at_synapse_detection import antibodyAnalysis as aa
 
 
-
-def write_dfs_to_excel(df_list, sheets, file_name, spaces=1):
-    """
-    Write multiple dataframes to an excel file
-    source:https://stackoverflow.com/questions/32957441/\
-                   putting-many-python-pandas-dataframes-to-one-excel-worksheet
-
-    Parameters 
-    --------------
-    df_list : list of dataframes 
-    sheets : str - name of sheet in excel 
-    file_name : str
-    spaces : int - number of rows to skip, default = 1
-
-    """
-
-    writer = pd.ExcelWriter(file_name, engine='xlsxwriter')
-    row = 0
-    for dataframe in df_list:
-        dataframe.to_excel(writer, sheet_name=sheets, startrow=row, startcol=0)
-        row = row + len(dataframe.index) + spaces + 1
-    writer.save()
-
-
-def find_target_measure(measure, target_ab_name):
-    """Find target antibody measurement object
-
-    Paramters 
-    -----------
-    measure : AntibodyAnalysis
-    target_ab_name : str
-
-    Return
-    ------------
-    target_measure : ABMeasures
-    """
-    for n in measure.postsynaptic_list:
-        if n.name == target_ab_name:
-            target_measure = n
-
-    for n in measure.presynaptic_list:
-        if n.name == target_ab_name:
-            target_measure = n
-
-    return target_measure
-
-def find_conjugate_name(measure, target_ab_name):
-    """Find conjugate antibody name
-
-    Paramters 
-    -----------
-    measure : AntibodyAnalysis
-    target_ab_name : str
-
-    Return
-    ------------
-    conjugate_name : str
-    """
-    for n in measure.postsynaptic_list:
-        if n.name != target_ab_name:
-            conjugate_name = n.name
-
-    for n in measure.presynaptic_list:
-        if n.name != target_ab_name:
-            conjugate_name = n.name
-
-    return conjugate_name
-
-
-def create_pairwise_df(measure1, measure2, target_antibody_name1, target_antibody_name2):
-    """Create a dataframe for pairwise comparisons
-
-    Paramters
-    ------------
-    measure1 : AntibodyAnalysis
-    measure2 : AntibodyAnalysis
-    target_antibody_name1 : str
-    target_antibody_name2 : str
-
-    Return
-    ------------
-    df : dataframe
-    """
-
-    columnlabels = ['Target AB', 'Conjugate AB', 'Puncta Density',
-                    'Puncta Volume', 'Puncta STD', 'Synapse Density', 'TSR']
-    df = pd.DataFrame(np.nan, index=['AB1','AB2'], columns=columnlabels)
-
-    df.iloc[0, 0] = target_antibody_name1
-    df.iloc[1, 0] = target_antibody_name2
-
-    conjugate_ab_name = find_conjugate_name(measure1, target_antibody_name1)
-    df.iloc[0, 1] = conjugate_ab_name
-    target_measure = find_target_measure(measure1, target_antibody_name1)
-    df.iloc[0, 2] = target_measure.puncta_density
-    df.iloc[0, 3] = target_measure.puncta_size
-    df.iloc[0, 4] = target_measure.puncta_std
-    df.iloc[0, 5] = measure1.synapse_density
-    df.iloc[0, 6] = measure1.specificity_ratio
-
-    target_measure = find_target_measure(measure2, target_antibody_name2)
-    conjugate_ab_name = find_conjugate_name(measure2, target_antibody_name2)
-    df.iloc[1, 1] = conjugate_ab_name
-    df.iloc[1, 2] = target_measure.puncta_density
-    df.iloc[1, 3] = target_measure.puncta_size
-    df.iloc[1, 4] = target_measure.puncta_std
-    df.iloc[1, 5] = measure2.synapse_density
-    df.iloc[1, 6] = measure2.specificity_ratio
-
-    return df
-
-
 def psd95_pairwise():
     """
     PSD95 pairwise comparisons
@@ -148,10 +36,10 @@ def psd95_pairwise():
     measure_list = run_pairwise(query1, query2, target_antibody_name1,
                                 target_antibody_name2, base_dir, thresh, resolution)
 
-    df = create_pairwise_df(measure_list[0], measure_list[1],
+    df = aa.create_pairwise_df(measure_list[0], measure_list[1],
                             target_antibody_name1, target_antibody_name2)
     
-    print('PSD--95 dataframe: ')
+    print('PSD-95 dataframe: ')
     print(df)
     
 
@@ -214,7 +102,7 @@ def synapsin_pairwise():
     measure_list = run_pairwise(query1, query2, target_antibody_name1,
                                 target_antibody_name2, base_dir, thresh, resolution)
 
-    df = create_pairwise_df(measure_list[0], measure_list[1],
+    df = aa.create_pairwise_df(measure_list[0], measure_list[1],
                             target_antibody_name1, target_antibody_name2)
     
     print('Synapsin dataframe: ')
@@ -249,7 +137,7 @@ def gephyrin_pairwise():
     measure_list = run_pairwise(query1, query2, target_antibody_name1,
                                 target_antibody_name2, base_dir, thresh, resolution)
 
-    df = create_pairwise_df(measure_list[0], measure_list[1],
+    df = aa.create_pairwise_df(measure_list[0], measure_list[1],
                             target_antibody_name1, target_antibody_name2)
     
     print('Gephyrin dataframe: ')
@@ -286,7 +174,7 @@ def vglut1_pairwise():
     measure_list = run_pairwise(query1, query2, target_antibody_name1,
                                 target_antibody_name2, base_dir, thresh, resolution)
 
-    df = create_pairwise_df(measure_list[0], measure_list[1],
+    df = aa.create_pairwise_df(measure_list[0], measure_list[1],
                             target_antibody_name1, target_antibody_name2)
     
     print('VGLUT1 dataframe: ')
@@ -324,7 +212,7 @@ def cav31_pairwise():
     measure_list = run_pairwise(query1, query2, target_antibody_name1,
                                 target_antibody_name2, base_dir, thresh, resolution)
 
-    df = create_pairwise_df(measure_list[0], measure_list[1],
+    df = aa.create_pairwise_df(measure_list[0], measure_list[1],
                             target_antibody_name1, target_antibody_name2)
     
     print('CAV31 dataframe: ')
@@ -346,7 +234,7 @@ def main():
     sheet_name = 'Pairwise'
     fn = 'pairwise_comparisons.xlsx'
     df_list = [synapsin_df, vglut1_df, psd_df, gephyrin_df, cav31_df]
-    write_dfs_to_excel(df_list, sheet_name, fn)
+    aa.write_dfs_to_excel(df_list, sheet_name, fn)
 
 
 

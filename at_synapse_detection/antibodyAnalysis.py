@@ -250,6 +250,87 @@ def run_ab_analysis(synaptic_volumes, query, thresh, resolution, target_antibody
 
     return antibody_measure
 
+def run_ab_analysis_rayleigh(synaptic_volumes, query, thresh, resolution, target_antibody_name):
+    """
+    Run AB Analysis
+
+    MEASURES
+    - Puncta Density
+    - Average punctum size
+    - Standard deviation of the size
+    - Synapse density
+    - Target Specificity Ratio (tsr)
+
+    Parameters
+    -----------
+    synaptic_volumes : dict
+    query : dict
+    thresh : float
+    resolution : dict
+
+    Returns
+    -----------
+    antibody_measure : AntibodyAnalysis()
+    """
+
+    antibody_measure = AntibodyAnalysis(query)
+
+    # Get data volume
+    antibody_measure.volume_um3 = getdatavolume(synaptic_volumes, resolution)
+    print('data volume: ', antibody_measure.volume_um3)
+
+    #Check to see if user supplied blobsize
+    if 'punctumSize' in query.keys():
+        blobsize = query['punctumSize']
+        edge_win = int(np.ceil(blobsize*1.5))
+
+    # Data
+    presynaptic_volumes = synaptic_volumes['presynaptic']
+    postsynaptic_volumes = synaptic_volumes['postsynaptic']
+
+    # Number of slices each blob should span
+    preIF_z = query['preIF_z']
+    postIF_z = query['postIF_z']
+
+    for n in range(0, len(presynaptic_volumes)):
+        presynaptic_volumes[n] = syn.getProbMap_rayleigh(presynaptic_volumes[n]) # Step 1
+        presynaptic_volumes[n] = syn.convolveVolume(presynaptic_volumes[n], blobsize) # Step 2
+        if preIF_z[n] > 1:
+            factor_vol = syn.computeFactor(presynaptic_volumes[n], int(preIF_z[n])) # Step 3
+            presynaptic_volumes[n] = presynaptic_volumes[n] * factor_vol
+
+    # Compute single channel measurements
+    antibody_measure = single_channel_measurements(presynaptic_volumes, antibody_measure, thresh, 'presynaptic')
+    print('Computed presynaptic single channel measurements')
+
+
+    for n in range(0, len(postsynaptic_volumes)):
+        postsynaptic_volumes[n] = syn.getProbMap_rayleigh(postsynaptic_volumes[n]) # Step 1
+        postsynaptic_volumes[n] = syn.convolveVolume(postsynaptic_volumes[n], blobsize) # Step 2
+        if postIF_z[n] > 1:
+            factor_vol = syn.computeFactor(postsynaptic_volumes[n], int(postIF_z[n])) # Step 3
+            postsynaptic_volumes[n] = postsynaptic_volumes[n] * factor_vol
+
+    # Compute single channel measurements
+    antibody_measure = single_channel_measurements(postsynaptic_volumes, antibody_measure, thresh, 'postsynaptic')
+    print('Computed postsynaptic single channel measurements')
+
+
+
+    if len(postsynaptic_volumes) == 0:
+        resultVol = syn.combinePrePostVolumes(presynaptic_volumes, postsynaptic_volumes, edge_win, blobsize)
+    else:
+        resultVol = syn.combinePrePostVolumes(postsynaptic_volumes, presynaptic_volumes, edge_win, blobsize)
+
+    # Compute whole statistics
+    label_vol = measure.label(resultVol > thresh)
+    stats = measure.regionprops(label_vol)
+    antibody_measure.synapse_density = len(stats) / antibody_measure.volume_um3
+    antibody_measure.synapse_count = len(stats)
+
+    antibody_measure = calculuate_target_ratio(antibody_measure, target_antibody_name)
+
+    return antibody_measure
 
 
 def write_dfs_to_excel(df_list, sheets, file_name, spaces=1):
@@ -328,6 +409,41 @@ def calculate_measure_lists(query_list, folder_names, base_dir, thresh,
         target_antibody_name = target_filenames[n]
         synaptic_volumes = da.load_tiff_from_query(query, data_location)
         measure = run_ab_analysis(synaptic_volumes, query, thresh, resolution, target_antibody_name)
+
+        measure_list.append(measure)
+
+    return measure_list
+
+def calculate_measure_lists_rayleigh(query_list, folder_names, base_dir, thresh,
+                                 resolution, target_filenames):
+    """compare multiple antibody clones
+
+    Paramters
+    ---------------
+    query_list : list
+    folder_names : list
+    base_dir : str
+    thresh : float
+    resolution : dict
+    target_filename : list
+
+    Return
+    ----------------
+    measure_list : list
+    """
+
+    measure_list = []
+    for n, query in enumerate(query_list):
+        #query = query_list[n]
+
+        if folder_names == None:
+            data_location = base_dir
+        else:
+            foldername = folder_names[n]
+            data_location = os.path.join(base_dir, foldername)
+        target_antibody_name = target_filenames[n]
+        synaptic_volumes = da.load_tiff_from_query(query, data_location)
+        measure = run_ab_analysis_rayleigh(synaptic_volumes, query, thresh, resolution, target_antibody_name)
 
         measure_list.append(measure)
 
@@ -430,3 +546,97 @@ def find_filename(str_to_match, foldername, base_dir):
     return matched_filename
 
 
+def create_pairwise_df(measure1, measure2, target_antibody_name1, target_antibody_name2):
+    """Create a dataframe for pairwise comparisons
+
+    Paramters
+    ------------
+    measure1 : AntibodyAnalysis
+    measure2 : AntibodyAnalysis
+    target_antibody_name1 : str
+    target_antibody_name2 : str
+
+    Return
+    ------------
+    df : dataframe
+    """
+
+    columnlabels = ['Target AB', 'Conjugate AB', 'Puncta Density',
+                    'Puncta Volume', 'Puncta STD', 'Synapse Density', 'TSR']
+    df = pd.DataFrame(np.nan, index=['AB1','AB2'], columns=columnlabels)
+
+    df.iloc[0, 0] = target_antibody_name1
+    df.iloc[1, 0] = target_antibody_name2
+
+    conjugate_ab_name = find_conjugate_name(measure1, target_antibody_name1)
+    df.iloc[0, 1] = conjugate_ab_name
+    target_measure = find_target_measure(measure1, target_antibody_name1)
+    df.iloc[0, 2] = target_measure.puncta_density
+    df.iloc[0, 3] = target_measure.puncta_size
+    df.iloc[0, 4] = target_measure.puncta_std
+    df.iloc[0, 5] = measure1.synapse_density
+    df.iloc[0, 6] = measure1.specificity_ratio
+
+    target_measure = find_target_measure(measure2, target_antibody_name2)
+    conjugate_ab_name = find_conjugate_name(measure2, target_antibody_name2)
+    df.iloc[1, 1] = conjugate_ab_name
+    df.iloc[1, 2] = target_measure.puncta_density
+    df.iloc[1, 3] = target_measure.puncta_size
+    df.iloc[1, 4] = target_measure.puncta_std
+    df.iloc[1, 5] = measure2.synapse_density
+    df.iloc[1, 6] = measure2.specificity_ratio
+
+    return df
+
+
+
+def find_conjugate_name(measure, target_ab_name):
+    """Find conjugate antibody name
+
+    Paramters 
+    -----------
+    measure : AntibodyAnalysis
+    target_ab_name : str
+
+    Return
+    ------------
+    conjugate_name : str
+    """
+    for n in measure.postsynaptic_list:
+        if n.name != target_ab_name:
+            conjugate_name = n.name
+
+    for n in measure.presynaptic_list:
+        if n.name != target_ab_name:
+            conjugate_name = n.name
+
+    return conjugate_name
+
+
+def run_pairwise(query1, query2, target_antibody_name1, target_antibody_name2,
+                 base_dir, thresh, resolution):
+    """
+    Run pairwise
+
+    Parameters
+    -------------
+    query1 : dict
+    query2 : dict
+    target_antibody_name1 : str
+    target_antibody_name2 : str
+    base_dir : str
+    thresh : float
+    resultion : dict 
+
+    Return
+    -------------
+    [measure1, measure2] : list of AntibodyAnalysis objects
+    """
+
+    synaptic_volumes1 = da.load_tiff_from_query(query1, base_dir)
+    measure1 = run_ab_analysis(synaptic_volumes1, query1, thresh, resolution, target_antibody_name1)
+
+    synaptic_volumes2 = da.load_tiff_from_query(query2, base_dir)
+    measure2 = run_ab_analysis(synaptic_volumes2, query2, thresh, resolution, target_antibody_name2)
+
+    return [measure1, measure2]

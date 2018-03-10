@@ -29,8 +29,8 @@ def gephyrin_multipleclones():
     for n in range(0, len(target_filenames)):
         target_name = target_filenames[n]
         conjugate_name = conjugate_filenames[n]
-        query = {'preIF': [conjugate_name], 'preIF_z': [2],
-                 'postIF': [target_name], 'postIF_z': [2],
+        query = {'preIF': [conjugate_name], 'preIF_z': [1],
+                 'postIF': [target_name], 'postIF_z': [1],
                  'punctumSize': 2}
         query_list.append(query)
 
@@ -41,8 +41,6 @@ def gephyrin_multipleclones():
     print(df)
 
     return df
-
-
 
 
 
@@ -66,8 +64,8 @@ def collybistin_multipleclones():
         conjugate_filenames.append(conjugate_name)
         target_filenames.append(target_name)
 
-        query = {'preIF': [conjugate_name], 'preIF_z': [2],
-                'postIF': [target_name], 'postIF_z': [2],
+        query = {'preIF': [conjugate_name], 'preIF_z': [1],
+                'postIF': [target_name], 'postIF_z': [1],
                 'punctumSize': 2}
 
         query_list.append(query)
@@ -100,7 +98,7 @@ def VGAT_lowicryl_multipleclones():
         conjugate_filenames.append(conjugate_name)
         target_filenames.append(target_name)
 
-        query = {'preIF': [target_name, conjugate_name], 'preIF_z': [2, 2],
+        query = {'preIF': [target_name, conjugate_name], 'preIF_z': [1, 1],
                 'postIF': [], 'postIF_z': [],
                 'punctumSize': 2}
 
@@ -134,7 +132,7 @@ def VGAT_LRWhite_multipleclones():
         conjugate_filenames.append(conjugate_name)
         target_filenames.append(target_name)
 
-        query = {'preIF': [target_name, conjugate_name], 'preIF_z': [2, 2],
+        query = {'preIF': [target_name, conjugate_name], 'preIF_z': [1, 1],
                 'postIF': [], 'postIF_z': [],
                 'punctumSize': 2}
 
@@ -171,7 +169,7 @@ def homer_multipleclones():
         target_filenames.append(target_name)
 
         query = {'preIF': [], 'preIF_z': [],
-                'postIF': [target_name, conjugate_name], 'postIF_z': [2, 2],
+                'postIF': [target_name, conjugate_name], 'postIF_z': [1, 1],
                 'punctumSize': 2}
 
         query_list.append(query)
@@ -206,46 +204,6 @@ def irsp53_lowicryl_multipleclones():
         target_filenames.append(target_name)
 
         query = {'preIF': [], 'preIF_z': [],
-                'postIF': [target_name, conjugate_name], 'postIF_z': [2, 2],
-                'punctumSize': 2}
-
-        query_list.append(query)
-
-    measure_list = aa.calculate_measure_lists(query_list, folder_names, base_dir,
-                                        thresh, resolution, target_filenames)
-
-    df = aa.create_df(measure_list, folder_names, target_filenames, conjugate_filenames)
-    print(df)
-
-    return df
-
-def irsp53_lowicryl_multipleclones3():
-    """ irsp53_lowicryl_multipleclones
-    """
-
-    base_dir = '/Users/anish/Documents/Connectome/Synaptome-Duke/data/antibodyanalysis/L117-IRSP53/Lowicryl/'
-    folder_names = aa.getListOfFolders(base_dir)
-    resolution = {'res_xy_nm': 100, 'res_z_nm': 70}
-    thresh = 0.9
-    conjugate_filename_str = 'PSD'
-    target_filename_str = 'L117'
-    target_filename_str_VGluT1A = 'VGluT1A'
-
-    conjugate_filenames = []
-    target_filenames = []
-
-    query_list = []
-    for foldername in folder_names:
-        target_name = aa.find_filename(target_filename_str, foldername, base_dir)
-        
-        target_name2 = aa.find_filename(target_filename_str_VGluT1A, foldername, base_dir)
-
-        conjugate_name = aa.find_filename(conjugate_filename_str, foldername, base_dir)
-
-        conjugate_filenames.append(conjugate_name)
-        target_filenames.append(target_name)
-
-        query = {'preIF': [target_name2], 'preIF_z': [1],
                 'postIF': [target_name, conjugate_name], 'postIF_z': [1, 1],
                 'punctumSize': 2}
 
@@ -258,6 +216,7 @@ def irsp53_lowicryl_multipleclones3():
     print(df)
 
     return df
+
 
 
 def bassoon_L170920_multipleclones():
@@ -294,136 +253,27 @@ def bassoon_L170920_multipleclones():
 
     return df
 
-def bassoon_L170921_psd_multipleclones():
-    """ bassoon_L170921_multipleclones
-    """
-
-    base_dir = '/Users/anish/Documents/Connectome/Synaptome-Duke/data/antibodyanalysis/L170921-Bassoon/'
-    folder_names = aa.getListOfFolders(base_dir)
-    resolution = {'res_xy_nm': 100, 'res_z_nm': 70}
-    thresh = 0.9
-    conjugate_filename_str = 'PSD'
-    target_filename_str = 'L124'
-    conjugate_filenames = []
-    target_filenames = []
-    query_list = []
-    for foldername in folder_names:
-        target_name = aa.find_filename(target_filename_str, foldername, base_dir)
-        conjugate_name = aa.find_filename(conjugate_filename_str, foldername, base_dir)
-
-        conjugate_filenames.append(conjugate_name)
-        target_filenames.append(target_name)
-
-        query = {'preIF': [target_name], 'preIF_z': [2],
-                'postIF': [conjugate_name], 'postIF_z': [2],
-                'punctumSize': 2}
-
-        query_list.append(query)
-
-    measure_list = aa.calculate_measure_lists(query_list, folder_names, base_dir,
-                                        thresh, resolution, target_filenames)
-
-    df = aa.create_df(measure_list, folder_names, target_filenames, conjugate_filenames)
-    print(df)
-
-    return df
-
-def bassoon_L170921_vglut1_multipleclones():
-    """ bassoon_L170921_multipleclones
-    """
-
-    base_dir = '/Users/anish/Documents/Connectome/Synaptome-Duke/data/antibodyanalysis/L170921-Bassoon/'
-    folder_names = aa.getListOfFolders(base_dir)
-    resolution = {'res_xy_nm': 100, 'res_z_nm': 70}
-    thresh = 0.9
-    conjugate_filename_str = 'VGluT1'
-    target_filename_str = 'L124'
-    conjugate_filenames = []
-    target_filenames = []
-    query_list = []
-    for foldername in folder_names:
-        target_name = aa.find_filename(target_filename_str, foldername, base_dir)
-        conjugate_name = aa.find_filename(conjugate_filename_str, foldername, base_dir)
-
-        conjugate_filenames.append(conjugate_name)
-        target_filenames.append(target_name)
-
-        query = {'preIF': [target_name, conjugate_name], 'preIF_z': [2, 2],
-                'postIF': [], 'postIF_z': [],
-                'punctumSize': 2}
-
-        query_list.append(query)
-
-    measure_list = aa.calculate_measure_lists(query_list, folder_names, base_dir,
-                                        thresh, resolution, target_filenames)
-
-    df = aa.create_df(measure_list, folder_names, target_filenames, conjugate_filenames)
-    print(df)
-
-    return df
-
-
-def bassoon_L170921_multipleclones3():
-    """ bassoon_L170921_multipleclones
-    """
-
-    base_dir = '/Users/anish/Documents/Connectome/Synaptome-Duke/data/antibodyanalysis/L170921-Bassoon/'
-    folder_names = aa.getListOfFolders(base_dir)
-    resolution = {'res_xy_nm': 100, 'res_z_nm': 70}
-    thresh = 0.9
-    conjugate_filename_str = 'PSD'
-
-    conjugate_filename_str2 = 'VGluT1'
-
-    target_filename_str = 'L124'
-    conjugate_filenames = []
-    target_filenames = []
-    query_list = []
-    for foldername in folder_names:
-        target_name = aa.find_filename(target_filename_str, foldername, base_dir)
-        conjugate_name = aa.find_filename(conjugate_filename_str, foldername, base_dir)
-
-        conjugate_name2 = aa.find_filename(conjugate_filename_str2, foldername, base_dir)
-
-        conjugate_filenames.append(conjugate_name)
-        target_filenames.append(target_name)
-
-        query = {'preIF': [target_name, conjugate_name2], 'preIF_z': [1, 1],
-                'postIF': [conjugate_name], 'postIF_z': [1],
-                'punctumSize': 2}
-
-        query_list.append(query)
-
-    measure_list = aa.calculate_measure_lists(query_list, folder_names, base_dir,
-                                        thresh, resolution, target_filenames)
-
-    df = aa.create_df(measure_list, folder_names, target_filenames, conjugate_filenames)
-    print(df)
-
-    return df
 
 
 
 def main():
     """ Run concentration comparisons """
 
-    bassoon_psd_21_df = bassoon_L170921_psd_multipleclones()
-    bassoon_vglut1_21_df = bassoon_L170921_vglut1_multipleclones()
 
-    bassoon_20 = bassoon_L170920_multipleclones()
+
+    bassoon_20_df = bassoon_L170920_multipleclones()
     irsp53_df = irsp53_lowicryl_multipleclones()
     homer_df = homer_multipleclones()
     vgat_df = VGAT_LRWhite_multipleclones()
     collybistin_df = collybistin_multipleclones()
     gephyrin_df = gephyrin_multipleclones()
 
-    irsp53_3_df = irsp53_lowicryl_multipleclones3()
-    basson_3_21_df = bassoon_L170921_multipleclones3()
+   
 
-    sheet_name = 'Multipleclones'
-    fn = 'multipleclones.xlsx'
+    sheet_name = 'Multipleclones_singslice'
+    fn = 'multipleclones_singleslice.xlsx'
     df_list = [gephyrin_df, homer_df, irsp53_df, vgat_df, collybistin_df,
-               bassoon_20, bassoon_vglut1_21_df, bassoon_psd_21_df, basson_3_21_df, irsp53_3_df]
+               bassoon_20_df ]
                
     aa.write_dfs_to_excel(df_list, sheet_name, fn)
 

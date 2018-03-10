@@ -148,13 +148,12 @@ def nr1_concentrations():
         target_filenames.append(target_antibody_name)
         conjugate_filenames.append(conjugate_antibody_name)
 
-    measure_list = aa.calculate_measure_lists(query_list, folder_names, base_dir, 
+    measure_list = aa.calculate_measure_lists_rayleigh(query_list, folder_names, base_dir, 
                                         thresh, resolution, target_filenames)
 
     df = aa.create_df(measure_list, folder_names, target_filenames, conjugate_filenames)
 
     print(df)
-
     return df
 
 
@@ -170,6 +169,7 @@ def main():
     sheet_name = 'Concentration'
     fn = 'concentration_comparisons.xlsx'
     df_list = [synapsin_df, glur1_df, glur2_df, glur3_df, nr1_df]
+    #df_list = [nr1_df]
     aa.write_dfs_to_excel(df_list, sheet_name, fn)
 
 
