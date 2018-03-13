@@ -623,11 +623,11 @@ def getSynapseDetections_astro(synapticVolumes, query, blobsize=2, edge_win=3):
 
 
     if len(postsynapticVolumes) == 0:
-        resultVol = combinePrePostVolumes(
-            presynapticVolumes, postsynapticVolumes, edge_win, blobsize)
+        resultVol = combinePrePostVolumes_astro(
+            presynapticVolumes, postsynapticVolumes, glialVolumes, edge_win, blobsize)
     else:
-        resultVol = combinePrePostVolumes(
-            postsynapticVolumes, presynapticVolumes, edge_win, blobsize)
+        resultVol = combinePrePostVolumes_astro(
+            postsynapticVolumes, presynapticVolumes, glialVolumes, edge_win, blobsize)
 
     return resultVol
 

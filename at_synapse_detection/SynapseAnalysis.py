@@ -120,7 +120,7 @@ def run_synapses_astro(query_fn, data_location_base, outputFoldername):
             volume_um3 = aa.getdatavolume(synaptic_volumes, resolution)
 
             # Run Synapse Detection
-            resultvol = syn.getSynapseDetections(synaptic_volumes, query)
+            resultvol = syn.getSynapseDetections_astro(synaptic_volumes, query)
 
             # Save the probability map to file, if you want
             outputNPYlocation = os.path.join(data_location_base, outputFoldername, region_name)
