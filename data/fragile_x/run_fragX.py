@@ -35,7 +35,10 @@ def main():
     hostname = socket.gethostname()
     if hostname == 'Galicia':
         datalocation = '/data5TB/yi_mice/' + str(mouse_number) + 'ss_stacks'
-
+    print('Query Filename: ', query_fn)
+    print('Data Location: ', datalocation)
+    print('OutputFoldername: ', outputFoldername)
+    print('Sheetname: ', sheet_name)
     mouse_df = sa.run_synapses(query_fn, datalocation, outputFoldername)
 
     #sheet_name = 'FragileX Mouse'
