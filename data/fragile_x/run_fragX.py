@@ -29,7 +29,7 @@ def main():
     mouse_project_str = sys.argv[2]
     sheet_name = sys.argv[3]
 
-    outputFoldername = 'results'
+    outputFoldername = 'results_' + sheet_name 
     query_fn = mouse_project_str + '_queries.json'
     datalocation = '/Users/anish/Documents/yi_mice/' + str(mouse_number) + 'ss_stacks/'
     hostname = socket.gethostname()
