@@ -452,6 +452,7 @@ def combinePrePostVolumes_astro(baseVolList, adjacentVolList, glialvolumes, edge
     # Create lookup tables
     if len(adjacentVolList) > 0:
         adjacentVolList = createLookupTables(adjacentVolList)
+        glialvolumes = createLookupTables(glialvolumes)
 
     #print('starting to loop through each slice')
     baseVol = baseVolList[0]
@@ -464,6 +465,10 @@ def combinePrePostVolumes_astro(baseVolList, adjacentVolList, glialvolumes, edge
     for zInd in range(0, baseVol.shape[2]):
         print("starting z ind: " + str(zInd))
 
+        # if zInd > 2: 
+        #     return outputVol
+
+            
         for rInd in range(rStartEdge, rEndEdge):
             for cInd in range(cStartEdge, cEndEdge):
 
@@ -473,11 +478,13 @@ def combinePrePostVolumes_astro(baseVolList, adjacentVolList, glialvolumes, edge
                 if len(adjacentVolList) > 0:
                     adjResult = searchAdjacentChannel(adjacentVolList, search_win, cInd, rInd, zInd)
                     adjResult2 = searchAdjacentChannel(glialvolumes, search_win, cInd, rInd, zInd)
+                    #outputVol[rInd, cInd, zInd] = adjResult2
                     outputVol[rInd, cInd, zInd] = baseVol[rInd,cInd, zInd] * adjResult * adjResult2
-     
+
+
                     if len(baseVolList) > 1:
                         coresult = searchColocalizeChannel(baseVolList, search_win, cInd, rInd, zInd)
-                        outputVol[rInd, cInd, zInd] = baseVol[rInd,cInd, zInd] * coresult * adjResult * adjResult2
+                        #outputVol[rInd, cInd, zInd] = baseVol[rInd,cInd, zInd] * coresult * adjResult * adjResult2
                         
                 else:
                     coresult = searchColocalizeChannel(baseVolList, search_win, cInd, rInd, zInd)

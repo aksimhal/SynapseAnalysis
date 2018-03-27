@@ -2,10 +2,11 @@
 run fragilex synapse detections
 """
 import os
+import sys
 import pandas as pd
 from at_synapse_detection import dataAccess as da
 from at_synapse_detection import SynapseDetection as syn
-from at_synapse_detection import antibodyAnalysis as aa 
+from at_synapse_detection import antibodyAnalysis as aa
 from at_synapse_detection import SynapseAnalysis as sa
 import socket
 
@@ -14,25 +15,32 @@ def main():
     """
     run synapse detection
     """
+
+    if len(sys.argv) < 4:
+        print('Not enough arguements')
+        print(sys.argv)
+        return
+    else:
+        print('we have arguments')
+        print(sys.argv)
+
+
+    mouse_number = sys.argv[1]
+    mouse_project_str = sys.argv[2]
+    sheet_name = sys.argv[3]
+
     outputFoldername = 'results'
-    query_fn = '2ss_queries.json'
-    datalocation = '/Users/anish/Documents/yi_mice/2ss_stacks/'
+    query_fn = mouse_project_str + '_queries.json'
+    datalocation = '/Users/anish/Documents/yi_mice/' + str(mouse_number) + 'ss_stacks/'
     hostname = socket.gethostname()
-    if hostname == 'Galicia': 
-        datalocation = '/data5TB/yi_mice/2ss_stacks'
+    if hostname == 'Galicia':
+        datalocation = '/data5TB/yi_mice/' + str(mouse_number) + 'ss_stacks'
 
-    mouse2_df = sa.run_synapses(query_fn, datalocation, outputFoldername)
+    mouse_df = sa.run_synapses(query_fn, datalocation, outputFoldername)
 
-    query_fn = '3ss_queries.json'
-    datalocation = '/Users/anish/Documents/yi_mice/3ss_stacks/'
-    if hostname == 'Galicia': 
-        datalocation = '/data5TB/yi_mice/3ss_stacks'
-
-    mouse3_df = sa.run_synapses(query_fn, datalocation, outputFoldername)
-    
-    sheet_name = 'FragileX Mouse'
-    fn = 'fragileX_experiment.xlsx'
-    df_list = [mouse2_df, mouse3_df]
+    #sheet_name = 'FragileX Mouse'
+    fn = sheet_name + '.xlsx'
+    df_list = [mouse_df]
     aa.write_dfs_to_excel(df_list, sheet_name, fn)
 
 

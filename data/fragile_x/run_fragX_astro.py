@@ -2,6 +2,7 @@
 run fragilex synapse detections for YFP
 """
 import os
+import sys
 import pandas as pd
 from at_synapse_detection import dataAccess as da
 from at_synapse_detection import SynapseDetection as syn
