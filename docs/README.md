@@ -1,11 +1,11 @@
-# SynapseAnalysis
-Probabilistic synapse detection and evaluation for Allen Institute array tomography data
+# Synaptic Antibody Characterization Tool
+This repository hosts the Synaptic Antibody Characterization Tool (SACT) - a framework to evaluate synaptic antibodies for array tomography (AT) applications.  Paper: https://www.biorxiv.org/content/early/2018/02/01/258756
+
 
 ## Installation Guide 
+Thanks for trying out the SACT.  The tool is contained in the "SynapseAnalysis" python module; the following steps are recomended to install.  It is strongly advised to install anaconda and running the tool in a virutal environment. 
 
-We recommend installing anaconda and running this in a virutal environment. 
-
-
+#### Step 1
 download miniconda with python 3.6 from https://conda.io/miniconda.html
 
 Change permission of file, if needed: 
@@ -50,3 +50,8 @@ Install in developer mode since the repository is in active development.
 `python setup.py develop`
 
 
+## User Guide 
+The first step is to install the data
+
+## Data Location 
+[insert dropbox link]
