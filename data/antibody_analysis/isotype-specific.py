@@ -79,8 +79,8 @@ def isotype_specific():
         target_filenames.append(target_name)
 
         # Create query
-        query = {'preIF': [target_name], 'preIF_z': [2],
-                'postIF': [conjugate_name], 'postIF_z': [2],
+        query = {'preIF': [target_name], 'preIF_z': [1],
+                'postIF': [conjugate_name], 'postIF_z': [1],
                 'punctumSize': 2}
         query_list.append(query)
 
@@ -92,7 +92,7 @@ def isotype_specific():
     conjugate_name, target_name = findFilenames(reference_fn_str, target_fn_str, filenames, n)
     conjugate_filenames.append(conjugate_name)
     target_filenames.append(target_name)
-    query = {'preIF': [target_name], 'preIF_z': [2], 'postIF': [conjugate_name], 'postIF_z': [2], 'punctumSize': 2}
+    query = {'preIF': [target_name], 'preIF_z': [1], 'postIF': [conjugate_name], 'postIF_z': [1], 'punctumSize': 2}
     query_list.append(query)
 
     # Dataset 5
@@ -103,7 +103,7 @@ def isotype_specific():
     conjugate_name, target_name = findFilenames(reference_fn_str, target_fn_str, filenames, n)
     conjugate_filenames.append(conjugate_name)
     target_filenames.append(target_name)
-    query = {'preIF': [], 'preIF_z': [], 'postIF': [conjugate_name, target_name], 'postIF_z': [2, 2], 'punctumSize': 2}
+    query = {'preIF': [], 'preIF_z': [], 'postIF': [conjugate_name, target_name], 'postIF_z': [1, 1], 'punctumSize': 2}
     query_list.append(query)
 
     # Dataset 6
@@ -114,7 +114,7 @@ def isotype_specific():
     conjugate_name, target_name = findFilenames(reference_fn_str, target_fn_str, filenames, n)
     conjugate_filenames.append(conjugate_name)
     target_filenames.append(target_name)
-    query = {'preIF': [], 'preIF_z': [], 'postIF': [conjugate_name, target_name], 'postIF_z': [2, 2], 'punctumSize': 2}
+    query = {'preIF': [], 'preIF_z': [], 'postIF': [conjugate_name, target_name], 'postIF_z': [1, 1], 'punctumSize': 2}
     query_list.append(query)
 
     # Datasets 7:9
@@ -128,8 +128,8 @@ def isotype_specific():
         target_filenames.append(target_name)
 
         # Create query
-        query = {'preIF': [target_name], 'preIF_z': [2],
-                'postIF': [conjugate_name], 'postIF_z': [2],
+        query = {'preIF': [target_name], 'preIF_z': [1],
+                'postIF': [conjugate_name], 'postIF_z': [1],
                 'punctumSize': 2}
         query_list.append(query)
 
@@ -141,7 +141,7 @@ def isotype_specific():
     conjugate_name, target_name = findFilenames(reference_fn_str, target_fn_str, filenames, n)
     conjugate_filenames.append(conjugate_name)
     target_filenames.append(target_name)
-    query = {'preIF': [target_name], 'preIF_z': [2], 'postIF': [conjugate_name], 'postIF_z': [2], 'punctumSize': 2}
+    query = {'preIF': [target_name], 'preIF_z': [1], 'postIF': [conjugate_name], 'postIF_z': [1], 'punctumSize': 2}
     query_list.append(query)
 
     # Dataset 11
@@ -152,7 +152,7 @@ def isotype_specific():
     conjugate_name, target_name = findFilenames(reference_fn_str, target_fn_str, filenames, n)
     conjugate_filenames.append(conjugate_name)
     target_filenames.append(target_name)
-    query = {'preIF': [], 'preIF_z': [], 'postIF': [conjugate_name, target_name], 'postIF_z': [2, 2], 'punctumSize': 2}
+    query = {'preIF': [], 'preIF_z': [], 'postIF': [conjugate_name, target_name], 'postIF_z': [1, 1], 'punctumSize': 2}
     query_list.append(query)
 
     # Dataset 12
@@ -163,7 +163,7 @@ def isotype_specific():
     conjugate_name, target_name = findFilenames(reference_fn_str, target_fn_str, filenames, n)
     conjugate_filenames.append(conjugate_name)
     target_filenames.append(target_name)
-    query = {'preIF': [], 'preIF_z': [], 'postIF': [conjugate_name, target_name], 'postIF_z': [2, 2], 'punctumSize': 2}
+    query = {'preIF': [], 'preIF_z': [], 'postIF': [conjugate_name, target_name], 'postIF_z': [1, 1], 'punctumSize': 2}
     query_list.append(query)
 
     # Run all the queries
