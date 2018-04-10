@@ -381,13 +381,13 @@ def find_target_measure(measure, target_ab_name):
 
 def calculate_measure_lists(query_list, folder_names, base_dir, thresh,
                                  resolution, target_filenames):
-    """compare multiple antibody clones
+    """This function compares multiple antibody clones by using SACT 
 
     Paramters
     ---------------
-    query_list : list
-    folder_names : list
-    base_dir : str
+    query_list : list of dicts - contains queries 
+    folder_names : list of strs - contains the foldernames if each antibody subclone is in its own folder 
+    base_dir : str - data location 
     thresh : float
     resolution : dict
     target_filename : list
@@ -396,16 +396,15 @@ def calculate_measure_lists(query_list, folder_names, base_dir, thresh,
     ----------------
     measure_list : list
     """
-
     measure_list = []
     for n, query in enumerate(query_list):
-        #query = query_list[n]
 
         if folder_names == None:
             data_location = base_dir
         else:
             foldername = folder_names[n]
             data_location = os.path.join(base_dir, foldername)
+    
         target_antibody_name = target_filenames[n]
         synaptic_volumes = da.load_tiff_from_query(query, data_location)
         measure = run_ab_analysis(synaptic_volumes, query, thresh, resolution, target_antibody_name)
