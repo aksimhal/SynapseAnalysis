@@ -2,6 +2,8 @@
 Example runme for the synaptic antibody characterization tool.
 """
 import os
+import sys
+import socket
 import numpy as np
 import pandas as pd #also requires xlsxwriter
 from at_synapse_detection import dataAccess as da
@@ -62,11 +64,19 @@ def psd_pairwise_comparison():
 
 
 def main():
-    psd_df = psd_pairwise_comparison()
-
-    sheet_name = 'sact_psd_example'
+    # Output filename
     fn = 'sact_psd_example.xlsx'
+    sheet_name = 'sact_psd_example'
 
+    # Determine if file exists. This is only an issue when running on windows
+    if  os.path.isfile(fn): 
+        print('A sheet with this name already exists; rename sheet and rerun')
+        if socket.gethostname() != 'anish': #this line is optional 
+            sys.exit()
+
+    
+    
+    psd_df = psd_pairwise_comparison()
     df_list = [psd_df]
 
     # Export the dataframe to excel 
