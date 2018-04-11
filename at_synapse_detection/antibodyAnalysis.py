@@ -707,10 +707,10 @@ def findFilenames(reference_fn_str, target_fn_str, filenames, n):
     target_str = str(n) + '-' + target_fn_str
 
     # Search for file associated with the specific dataset number
-    indices = [i for i, s in enumerate(filenames) if reference_str == s[0:len(reference_str)]]
+    indices = [i for i, s in enumerate(filenames) if reference_str.lower() == s[0:len(reference_str)].lower()]
     reference_name = filenames[indices[0]]
     print(reference_name)
-    indices = [i for i, s in enumerate(filenames) if target_str == s[0:len(target_str)]]
+    indices = [i for i, s in enumerate(filenames) if target_str.lower() == s[0:len(target_str)].lower()]
     target_name = filenames[indices[0]]
     print(target_name)
     return reference_name, target_name
