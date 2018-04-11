@@ -36,7 +36,7 @@ def getdatavolume(synaptic_volumes, resolution):
 
     return volume_um3
 
-class ABMeasures:
+class SingleChannelMeasurements:
     """
     Single channel measurements
     """
@@ -54,6 +54,8 @@ class ABMeasures:
         self.puncta_size = 0.0
         self.puncta_std = 0.0
         self.puncta_count = 0
+        self.raw_mean = 0.0 
+        self.raw_std = 0.0
 
 
 
@@ -81,14 +83,15 @@ class AntibodyAnalysis:
         self.volume_um3 = 0.0
         self.synapse_count = 0
 
+
         presynaptic_list = []
         for name in query['preIF']:
-            ab_measure = ABMeasures(name)
+            ab_measure = SingleChannelMeasurements(name)
             presynaptic_list.append(ab_measure)
 
         postsynaptic_list = []
         for name in query['postIF']:
-            ab_measure = ABMeasures(name)
+            ab_measure = SingleChannelMeasurements(name)
             postsynaptic_list.append(ab_measure)
 
         self.presynaptic_list = presynaptic_list
@@ -178,6 +181,7 @@ def run_ab_analysis(synaptic_volumes, query, thresh, resolution, target_antibody
     - Standard deviation of the size
     - Synapse density
     - Target Specificity Ratio (tsr)
+    - Raw data mean/std
 
     Parameters
     -----------
@@ -210,6 +214,9 @@ def run_ab_analysis(synaptic_volumes, query, thresh, resolution, target_antibody
     preIF_z = query['preIF_z']
     postIF_z = query['postIF_z']
 
+    # Compute raw mean and standard deviation
+    antibody_measure = compute_raw_measures(presynaptic_volumes, antibody_measure, 'presynaptic')
+
     for n in range(0, len(presynaptic_volumes)):
         presynaptic_volumes[n] = syn.getProbMap(presynaptic_volumes[n]) # Step 1
         presynaptic_volumes[n] = syn.convolveVolume(presynaptic_volumes[n], blobsize) # Step 2
@@ -221,6 +228,8 @@ def run_ab_analysis(synaptic_volumes, query, thresh, resolution, target_antibody
     antibody_measure = single_channel_measurements(presynaptic_volumes, antibody_measure, thresh, 'presynaptic')
     print('Computed presynaptic single channel measurements')
 
+    # Compute raw mean and standard deviation
+    antibody_measure = compute_raw_measures(postsynaptic_volumes, antibody_measure, 'postsynaptic')
 
     for n in range(0, len(postsynaptic_volumes)):
         postsynaptic_volumes[n] = syn.getProbMap(postsynaptic_volumes[n]) # Step 1
@@ -249,6 +258,39 @@ def run_ab_analysis(synaptic_volumes, query, thresh, resolution, target_antibody
     antibody_measure = calculuate_target_ratio(antibody_measure, target_antibody_name)
 
     return antibody_measure
+
+
+def compute_raw_measures(synaptic_volumes, antibody_measure, synaptic_side):
+    """Compute raw measurements
+    Parameters
+    ---------------
+    synaptic_volumes : list
+    antibody_measure : AntibodyAnalysis()
+    synaptic_side : str
+
+    Return
+    ---------------
+    ab_measure : AntibodyAnalysis()
+    """
+
+    if synaptic_side == 'presynaptic':
+        for n in range(0, len(synaptic_volumes)):
+            raw_mean = np.mean(synaptic_volumes[n])
+            raw_std = np.std(synaptic_volumes[n])
+            
+            antibody_measure.presynaptic_list[n].raw_mean = raw_mean
+            antibody_measure.presynaptic_list[n].raw_std = raw_std
+
+    elif synaptic_side == 'postsynaptic':
+        for n in range(0, len(synaptic_volumes)):
+            raw_mean = np.mean(synaptic_volumes[n])
+            raw_std = np.std(synaptic_volumes[n])
+
+            antibody_measure.postsynaptic_list[n].raw_mean = raw_mean
+            antibody_measure.postsynaptic_list[n].raw_std = raw_std
+
+    return antibody_measure
+
 
 def run_ab_analysis_rayleigh(synaptic_volumes, query, thresh, resolution, target_antibody_name):
     """
@@ -465,7 +507,7 @@ def create_df(measure_list, folder_names, target_filenames, conjugate_filenames)
     df : dataframe
     """
     columnlabels = ['Target AB', 'Conjugate AB', 'Puncta Density',
-                    'Puncta Volume', 'Puncta STD', 'Synapse Density', 'TSR']
+                    'Puncta Volume', 'Puncta STD', 'Synapse Density', 'TSR', 'Raw Mean', 'Raw STD']
 
     df = pd.DataFrame(np.nan, index=folder_names, columns=columnlabels)
 
@@ -481,6 +523,9 @@ def create_df(measure_list, folder_names, target_filenames, conjugate_filenames)
         df.iloc[n, 4] = target_measure.puncta_std
         df.iloc[n, 5] = measure.synapse_density
         df.iloc[n, 6] = measure.specificity_ratio
+        df.iloc[n, 7] = target_measure.raw_mean
+        df.iloc[n, 8] = target_measure.raw_std
+
 
     return df
 
@@ -639,3 +684,33 @@ def run_pairwise(query1, query2, target_antibody_name1, target_antibody_name2,
     measure2 = run_ab_analysis(synaptic_volumes2, query2, thresh, resolution, target_antibody_name2)
 
     return [measure1, measure2]
+
+
+
+def findFilenames(reference_fn_str, target_fn_str, filenames, n): 
+    """
+    Find filenames given a start string for UC Davis data 
+
+    Parameters
+    --------------
+    reference_fn_str : str - the control antibody (reference antibody)
+    target_fn_str : str - the antibody of interest 
+    filenames : list of strs - contains the filenames in the folder to search 
+    n : int
+    Returns
+    --------------
+    reference_name : str - reference antibody filename 
+    target_name : str - target antibody filename 
+    """
+
+    reference_str = str(n) + '-' + reference_fn_str #filename to search for
+    target_str = str(n) + '-' + target_fn_str
+
+    # Search for file associated with the specific dataset number
+    indices = [i for i, s in enumerate(filenames) if reference_str == s[0:len(reference_str)]]
+    reference_name = filenames[indices[0]]
+    print(reference_name)
+    indices = [i for i, s in enumerate(filenames) if target_str == s[0:len(target_str)]]
+    target_name = filenames[indices[0]]
+    print(target_name)
+    return reference_name, target_name

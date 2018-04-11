@@ -9,34 +9,6 @@ from at_synapse_detection import dataAccess as da
 from at_synapse_detection import antibodyAnalysis as aa
 
 
-def findFilenames(reference_fn_str, target_fn_str, filenames, n): 
-    """
-    Find filenames given a start string for UC Davis data 
-
-    Parameters
-    --------------
-    reference_fn_str : str - the control antibody (reference antibody)
-    target_fn_str : str - the antibody of interest 
-    filenames : list of strs - contains the filenames in the folder to search 
-    n : int
-    Returns
-    --------------
-    reference_name : str - reference antibody filename 
-    target_name : str - target antibody filename 
-    """
-
-    reference_str = str(n) + '-' + reference_fn_str #filename to search for
-    target_str = str(n) + '-' + target_fn_str
-
-    # Search for file associated with the specific dataset number
-    indices = [i for i, s in enumerate(filenames) if reference_str == s[0:len(reference_str)]]
-    reference_name = filenames[indices[0]]
-    print(reference_name)
-    indices = [i for i, s in enumerate(filenames) if target_str == s[0:len(target_str)]]
-    target_name = filenames[indices[0]]
-    print(target_name)
-    return reference_name, target_name
-
 def isotype_specific():
     """ Run antibody characterization tool
     L106 is Gephyrin, L120 is Collybistin, L124 is Bassoon and K28 is PSD-95.
