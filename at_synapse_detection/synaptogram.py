@@ -1,7 +1,7 @@
 """
 Code needed to create synaptograms
 """
-import renderapi
+#import renderapi
 import scipy
 import numpy as np
 from scipy.stats import norm
