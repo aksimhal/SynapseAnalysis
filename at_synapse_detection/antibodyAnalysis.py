@@ -1,5 +1,6 @@
 """
 Antibody Analysis
+Contains the functions needed to run SACT
 """
 import os
 import numpy as np
@@ -7,6 +8,7 @@ import pandas as pd
 from skimage import measure
 from at_synapse_detection import SynapseDetection as syn
 from at_synapse_detection import dataAccess as da
+
 
 def getdatavolume(synaptic_volumes, resolution):
     """
@@ -28,13 +30,14 @@ def getdatavolume(synaptic_volumes, resolution):
     # Compute Volume
     if len(synaptic_volumes['presynaptic']) > 0:
         volume_um3 = np.prod(synaptic_volumes['presynaptic'][0].shape) \
-        * (res_xy_nm/1000) * (res_xy_nm/1000) * (res_z_nm/1000)
+            * (res_xy_nm / 1000) * (res_xy_nm / 1000) * (res_z_nm / 1000)
 
     elif len(synaptic_volumes['postsynaptic']) > 0:
         volume_um3 = np.prod(synaptic_volumes['postsynaptic'][0].shape) \
-        * (res_xy_nm/1000) * (res_xy_nm/1000) * (res_z_nm/1000)
+            * (res_xy_nm / 1000) * (res_xy_nm / 1000) * (res_z_nm / 1000)
 
     return volume_um3
+
 
 class SingleChannelMeasurements:
     """
@@ -48,20 +51,21 @@ class SingleChannelMeasurements:
         puncta_size : float
         puncta_std : float
         puncta_count : int
+        raw_mean : float
+        raw_std : float
         """
         self.name = name
         self.puncta_density = 0.0
         self.puncta_size = 0.0
         self.puncta_std = 0.0
         self.puncta_count = 0
-        self.raw_mean = 0.0 
+        self.raw_mean = 0.0
         self.raw_std = 0.0
-
 
 
 class AntibodyAnalysis:
     """
-    Contains the results of run_ab_analysis()
+    Contains the results of run_SACT()
 
     Attributes
     --------------
@@ -69,12 +73,16 @@ class AntibodyAnalysis:
     synapse_density : double - Synapse Density
     specificity_ratio: double - TSR
     volume_um3: double
-    presynaptic : list of dicts
-    postsynaptic : list of dicts
-
+    presynaptic : list of SingleChannelMeasurements objects
+    postsynaptic : list of SingleChannelMeasurements objects
     """
+
     def __init__(self, query):
         """
+        Initialize an Antibody Analysis object 
+
+        Parameters 
+        ---------------
         query : dict
         """
 
@@ -82,7 +90,6 @@ class AntibodyAnalysis:
         self.specificity_ratio = 0.0
         self.volume_um3 = 0.0
         self.synapse_count = 0
-
 
         presynaptic_list = []
         for name in query['preIF']:
@@ -98,14 +105,15 @@ class AntibodyAnalysis:
         self.postsynaptic_list = postsynaptic_list
 
 
-def single_channel_measurements(synaptic_volumes, antibody_measure, thresh, synaptic_side):
-    """Compute single channel measurements
+def compute_single_channel_measurements(synaptic_volumes, antibody_measure, thresh, synaptic_side):
+    """Compute single channel measurements needed for SACT
+
     Parameters
     ---------------
     synaptic_volumes : list
     antibody_measure : AntibodyAnalysis()
     thresh : float
-    synaptic_side : str
+    synaptic_side : str - needed to place results in the correct position of an AntibodyAnalysis object
 
     Return
     ---------------
@@ -116,33 +124,38 @@ def single_channel_measurements(synaptic_volumes, antibody_measure, thresh, syna
         for n in range(0, len(synaptic_volumes)):
             label_vol = measure.label(synaptic_volumes[n] > thresh)
             stats = measure.regionprops(label_vol)
-            antibody_measure.presynaptic_list[n].puncta_density = len(stats) / antibody_measure.volume_um3
+            antibody_measure.presynaptic_list[n].puncta_density = len(
+                stats) / antibody_measure.volume_um3
             antibody_measure.presynaptic_list[n].puncta_count = len(stats)
 
             arealist = []
             for stat in stats:
                 arealist.append(stat.area)
 
-            antibody_measure.presynaptic_list[n].puncta_size = np.mean(arealist)
+            antibody_measure.presynaptic_list[n].puncta_size = np.mean(
+                arealist)
             antibody_measure.presynaptic_list[n].puncta_std = np.std(arealist)
 
     elif synaptic_side == 'postsynaptic':
         for n in range(0, len(synaptic_volumes)):
             label_vol = measure.label(synaptic_volumes[n] > thresh)
             stats = measure.regionprops(label_vol)
-            antibody_measure.postsynaptic_list[n].puncta_density = len(stats) / antibody_measure.volume_um3
+            antibody_measure.postsynaptic_list[n].puncta_density = len(
+                stats) / antibody_measure.volume_um3
             antibody_measure.postsynaptic_list[n].puncta_count = len(stats)
             arealist = []
             for stat in stats:
                 arealist.append(stat.area)
-            antibody_measure.postsynaptic_list[n].puncta_size = np.mean(arealist)
+            antibody_measure.postsynaptic_list[n].puncta_size = np.mean(
+                arealist)
             antibody_measure.postsynaptic_list[n].puncta_std = np.std(arealist)
 
     return antibody_measure
 
+
 def calculuate_target_ratio(antibody_measure, target_antibody_name):
     """
-    Calculate target specificity ratio (tsr)
+    Calculate target specificity ratio (tsr) for the antibody specified
 
     Parameters
     -------------
@@ -154,7 +167,7 @@ def calculuate_target_ratio(antibody_measure, target_antibody_name):
     antibody_measure : AntibodyAnalysis()
 
     """
-    #find target antibody name
+    # find target antibody name
     puncta_count = 0
 
     for ab_measure in antibody_measure.presynaptic_list:
@@ -170,10 +183,9 @@ def calculuate_target_ratio(antibody_measure, target_antibody_name):
     return antibody_measure
 
 
-
-def run_ab_analysis(synaptic_volumes, query, thresh, resolution, target_antibody_name):
+def run_SACT(synaptic_volumes, query, thresh, resolution, target_antibody_name):
     """
-    Run AB Analysis
+    Run SACT. 
 
     MEASURES
     - Puncta Density
@@ -185,7 +197,7 @@ def run_ab_analysis(synaptic_volumes, query, thresh, resolution, target_antibody
 
     Parameters
     -----------
-    synaptic_volumes : dict
+    synaptic_volumes : dict - has two keys, 'postsynaptic' and 'presynaptic.' Each key contains a list of volumes. 
     query : dict
     thresh : float
     resolution : dict
@@ -199,12 +211,12 @@ def run_ab_analysis(synaptic_volumes, query, thresh, resolution, target_antibody
 
     # Get data volume
     antibody_measure.volume_um3 = getdatavolume(synaptic_volumes, resolution)
-    print('data volume: ', antibody_measure.volume_um3)
+    print('data volume: ', antibody_measure.volume_um3, 'um3')
 
-    #Check to see if user supplied blobsize
+    # Check to see if user supplied blobsize
     if 'punctumSize' in query.keys():
         blobsize = query['punctumSize']
-        edge_win = int(np.ceil(blobsize*1.5))
+        edge_win = int(np.ceil(blobsize * 1.5))
 
     # Data
     presynaptic_volumes = synaptic_volumes['presynaptic']
@@ -215,39 +227,49 @@ def run_ab_analysis(synaptic_volumes, query, thresh, resolution, target_antibody
     postIF_z = query['postIF_z']
 
     # Compute raw mean and standard deviation
-    antibody_measure = compute_raw_measures(presynaptic_volumes, antibody_measure, 'presynaptic')
+    antibody_measure = compute_raw_measures(
+        presynaptic_volumes, antibody_measure, 'presynaptic')
 
     for n in range(0, len(presynaptic_volumes)):
-        presynaptic_volumes[n] = syn.getProbMap(presynaptic_volumes[n]) # Step 1
-        presynaptic_volumes[n] = syn.convolveVolume(presynaptic_volumes[n], blobsize) # Step 2
+        presynaptic_volumes[n] = syn.getProbMap(
+            presynaptic_volumes[n])  # Step 1
+        presynaptic_volumes[n] = syn.convolveVolume(
+            presynaptic_volumes[n], blobsize)  # Step 2
         if preIF_z[n] > 1:
-            factor_vol = syn.computeFactor(presynaptic_volumes[n], int(preIF_z[n])) # Step 3
+            factor_vol = syn.computeFactor(
+                presynaptic_volumes[n], int(preIF_z[n]))  # Step 3
             presynaptic_volumes[n] = presynaptic_volumes[n] * factor_vol
 
     # Compute single channel measurements
-    antibody_measure = single_channel_measurements(presynaptic_volumes, antibody_measure, thresh, 'presynaptic')
+    antibody_measure = compute_single_channel_measurements(
+        presynaptic_volumes, antibody_measure, thresh, 'presynaptic')
     print('Computed presynaptic single channel measurements')
 
     # Compute raw mean and standard deviation
-    antibody_measure = compute_raw_measures(postsynaptic_volumes, antibody_measure, 'postsynaptic')
+    antibody_measure = compute_raw_measures(
+        postsynaptic_volumes, antibody_measure, 'postsynaptic')
 
     for n in range(0, len(postsynaptic_volumes)):
-        postsynaptic_volumes[n] = syn.getProbMap(postsynaptic_volumes[n]) # Step 1
-        postsynaptic_volumes[n] = syn.convolveVolume(postsynaptic_volumes[n], blobsize) # Step 2
+        postsynaptic_volumes[n] = syn.getProbMap(
+            postsynaptic_volumes[n])  # Step 1
+        postsynaptic_volumes[n] = syn.convolveVolume(
+            postsynaptic_volumes[n], blobsize)  # Step 2
         if postIF_z[n] > 1:
-            factor_vol = syn.computeFactor(postsynaptic_volumes[n], int(postIF_z[n])) # Step 3
+            factor_vol = syn.computeFactor(
+                postsynaptic_volumes[n], int(postIF_z[n]))  # Step 3
             postsynaptic_volumes[n] = postsynaptic_volumes[n] * factor_vol
 
     # Compute single channel measurements
-    antibody_measure = single_channel_measurements(postsynaptic_volumes, antibody_measure, thresh, 'postsynaptic')
+    antibody_measure = compute_single_channel_measurements(
+        postsynaptic_volumes, antibody_measure, thresh, 'postsynaptic')
     print('Computed postsynaptic single channel measurements')
 
-
-
     if len(postsynaptic_volumes) == 0:
-        resultVol = syn.combinePrePostVolumes(presynaptic_volumes, postsynaptic_volumes, edge_win, blobsize)
+        resultVol = syn.combinePrePostVolumes(
+            presynaptic_volumes, postsynaptic_volumes, edge_win, blobsize)
     else:
-        resultVol = syn.combinePrePostVolumes(postsynaptic_volumes, presynaptic_volumes, edge_win, blobsize)
+        resultVol = syn.combinePrePostVolumes(
+            postsynaptic_volumes, presynaptic_volumes, edge_win, blobsize)
 
     # Compute whole statistics
     label_vol = measure.label(resultVol > thresh)
@@ -255,13 +277,15 @@ def run_ab_analysis(synaptic_volumes, query, thresh, resolution, target_antibody
     antibody_measure.synapse_density = len(stats) / antibody_measure.volume_um3
     antibody_measure.synapse_count = len(stats)
 
-    antibody_measure = calculuate_target_ratio(antibody_measure, target_antibody_name)
+    antibody_measure = calculuate_target_ratio(
+        antibody_measure, target_antibody_name)
 
     return antibody_measure
 
 
 def compute_raw_measures(synaptic_volumes, antibody_measure, synaptic_side):
-    """Compute raw measurements
+    """Compute measurements on the raw data volumes 
+
     Parameters
     ---------------
     synaptic_volumes : list
@@ -277,7 +301,7 @@ def compute_raw_measures(synaptic_volumes, antibody_measure, synaptic_side):
         for n in range(0, len(synaptic_volumes)):
             raw_mean = np.mean(synaptic_volumes[n])
             raw_std = np.std(synaptic_volumes[n])
-            
+
             antibody_measure.presynaptic_list[n].raw_mean = raw_mean
             antibody_measure.presynaptic_list[n].raw_std = raw_std
 
@@ -294,7 +318,7 @@ def compute_raw_measures(synaptic_volumes, antibody_measure, synaptic_side):
 
 def run_ab_analysis_rayleigh(synaptic_volumes, query, thresh, resolution, target_antibody_name):
     """
-    Run AB Analysis
+    Run AB Analysis - special case 
 
     MEASURES
     - Puncta Density
@@ -321,10 +345,10 @@ def run_ab_analysis_rayleigh(synaptic_volumes, query, thresh, resolution, target
     antibody_measure.volume_um3 = getdatavolume(synaptic_volumes, resolution)
     print('data volume: ', antibody_measure.volume_um3)
 
-    #Check to see if user supplied blobsize
+    # Check to see if user supplied blobsize
     if 'punctumSize' in query.keys():
         blobsize = query['punctumSize']
-        edge_win = int(np.ceil(blobsize*1.5))
+        edge_win = int(np.ceil(blobsize * 1.5))
 
     # Data
     presynaptic_volumes = synaptic_volumes['presynaptic']
@@ -335,34 +359,41 @@ def run_ab_analysis_rayleigh(synaptic_volumes, query, thresh, resolution, target
     postIF_z = query['postIF_z']
 
     for n in range(0, len(presynaptic_volumes)):
-        presynaptic_volumes[n] = syn.getProbMap_rayleigh(presynaptic_volumes[n]) # Step 1
-        presynaptic_volumes[n] = syn.convolveVolume(presynaptic_volumes[n], blobsize) # Step 2
+        presynaptic_volumes[n] = syn.getProbMap_rayleigh(
+            presynaptic_volumes[n])  # Step 1
+        presynaptic_volumes[n] = syn.convolveVolume(
+            presynaptic_volumes[n], blobsize)  # Step 2
         if preIF_z[n] > 1:
-            factor_vol = syn.computeFactor(presynaptic_volumes[n], int(preIF_z[n])) # Step 3
+            factor_vol = syn.computeFactor(
+                presynaptic_volumes[n], int(preIF_z[n]))  # Step 3
             presynaptic_volumes[n] = presynaptic_volumes[n] * factor_vol
 
     # Compute single channel measurements
-    antibody_measure = single_channel_measurements(presynaptic_volumes, antibody_measure, thresh, 'presynaptic')
+    antibody_measure = compute_single_channel_measurements(
+        presynaptic_volumes, antibody_measure, thresh, 'presynaptic')
     print('Computed presynaptic single channel measurements')
 
-
     for n in range(0, len(postsynaptic_volumes)):
-        postsynaptic_volumes[n] = syn.getProbMap_rayleigh(postsynaptic_volumes[n]) # Step 1
-        postsynaptic_volumes[n] = syn.convolveVolume(postsynaptic_volumes[n], blobsize) # Step 2
+        postsynaptic_volumes[n] = syn.getProbMap_rayleigh(
+            postsynaptic_volumes[n])  # Step 1
+        postsynaptic_volumes[n] = syn.convolveVolume(
+            postsynaptic_volumes[n], blobsize)  # Step 2
         if postIF_z[n] > 1:
-            factor_vol = syn.computeFactor(postsynaptic_volumes[n], int(postIF_z[n])) # Step 3
+            factor_vol = syn.computeFactor(
+                postsynaptic_volumes[n], int(postIF_z[n]))  # Step 3
             postsynaptic_volumes[n] = postsynaptic_volumes[n] * factor_vol
 
     # Compute single channel measurements
-    antibody_measure = single_channel_measurements(postsynaptic_volumes, antibody_measure, thresh, 'postsynaptic')
+    antibody_measure = compute_single_channel_measurements(
+        postsynaptic_volumes, antibody_measure, thresh, 'postsynaptic')
     print('Computed postsynaptic single channel measurements')
 
-
-
     if len(postsynaptic_volumes) == 0:
-        resultVol = syn.combinePrePostVolumes(presynaptic_volumes, postsynaptic_volumes, edge_win, blobsize)
+        resultVol = syn.combinePrePostVolumes(
+            presynaptic_volumes, postsynaptic_volumes, edge_win, blobsize)
     else:
-        resultVol = syn.combinePrePostVolumes(postsynaptic_volumes, presynaptic_volumes, edge_win, blobsize)
+        resultVol = syn.combinePrePostVolumes(
+            postsynaptic_volumes, presynaptic_volumes, edge_win, blobsize)
 
     # Compute whole statistics
     label_vol = measure.label(resultVol > thresh)
@@ -370,7 +401,8 @@ def run_ab_analysis_rayleigh(synaptic_volumes, query, thresh, resolution, target
     antibody_measure.synapse_density = len(stats) / antibody_measure.volume_um3
     antibody_measure.synapse_count = len(stats)
 
-    antibody_measure = calculuate_target_ratio(antibody_measure, target_antibody_name)
+    antibody_measure = calculuate_target_ratio(
+        antibody_measure, target_antibody_name)
 
     return antibody_measure
 
@@ -422,14 +454,14 @@ def find_target_measure(measure, target_ab_name):
 
 
 def calculate_measure_lists(query_list, folder_names, base_dir, thresh,
-                                 resolution, target_filenames):
-    """This function compares multiple antibody clones by using SACT 
+                            resolution, target_filenames):
+    """This function compares multiple antibody clones by using SACT
 
     Paramters
     ---------------
-    query_list : list of dicts - contains queries 
-    folder_names : list of strs - contains the foldernames if each antibody subclone is in its own folder 
-    base_dir : str - data location 
+    query_list : list of dicts - contains queries
+    folder_names : list of strs - contains the foldernames if each antibody subclone is in its own folder
+    base_dir : str - data location
     thresh : float
     resolution : dict
     target_filename : list
@@ -446,18 +478,20 @@ def calculate_measure_lists(query_list, folder_names, base_dir, thresh,
         else:
             foldername = folder_names[n]
             data_location = os.path.join(base_dir, foldername)
-    
+
         target_antibody_name = target_filenames[n]
         synaptic_volumes = da.load_tiff_from_query(query, data_location)
-        measure = run_ab_analysis(synaptic_volumes, query, thresh, resolution, target_antibody_name)
+        measure = run_SACT(synaptic_volumes, query, thresh,
+                           resolution, target_antibody_name)
 
         measure_list.append(measure)
 
     return measure_list
 
+
 def calculate_measure_lists_rayleigh(query_list, folder_names, base_dir, thresh,
-                                 resolution, target_filenames):
-    """compare multiple antibody clones
+                                     resolution, target_filenames):
+    """compare multiple antibody clones - special case 
 
     Paramters
     ---------------
@@ -484,12 +518,12 @@ def calculate_measure_lists_rayleigh(query_list, folder_names, base_dir, thresh,
             data_location = os.path.join(base_dir, foldername)
         target_antibody_name = target_filenames[n]
         synaptic_volumes = da.load_tiff_from_query(query, data_location)
-        measure = run_ab_analysis_rayleigh(synaptic_volumes, query, thresh, resolution, target_antibody_name)
+        measure = run_ab_analysis_rayleigh(
+            synaptic_volumes, query, thresh, resolution, target_antibody_name)
 
         measure_list.append(measure)
 
     return measure_list
-
 
 
 def create_df(measure_list, folder_names, target_filenames, conjugate_filenames):
@@ -507,7 +541,8 @@ def create_df(measure_list, folder_names, target_filenames, conjugate_filenames)
     df : dataframe
     """
     columnlabels = ['Target AB', 'Conjugate AB', 'Puncta Density',
-                    'Puncta Volume', 'Puncta STD', 'Synapse Density', 'TSR', 'Raw Mean', 'Raw STD']
+                    'Puncta Volume', 'Puncta STD', 'Synapse Density',
+                    'TSR', 'Raw Mean', 'Raw STD']
 
     df = pd.DataFrame(np.nan, index=folder_names, columns=columnlabels)
 
@@ -526,8 +561,8 @@ def create_df(measure_list, folder_names, target_filenames, conjugate_filenames)
         df.iloc[n, 7] = target_measure.raw_mean
         df.iloc[n, 8] = target_measure.raw_std
 
-
     return df
+
 
 def getListOfFolders(base_dir):
     """Get list of folders in specified directory
@@ -607,7 +642,7 @@ def create_pairwise_df(measure1, measure2, target_antibody_name1, target_antibod
 
     columnlabels = ['Target AB', 'Conjugate AB', 'Puncta Density',
                     'Puncta Volume', 'Puncta STD', 'Synapse Density', 'TSR']
-    df = pd.DataFrame(np.nan, index=['AB1','AB2'], columns=columnlabels)
+    df = pd.DataFrame(np.nan, index=['AB1', 'AB2'], columns=columnlabels)
 
     df.iloc[0, 0] = target_antibody_name1
     df.iloc[1, 0] = target_antibody_name2
@@ -633,11 +668,10 @@ def create_pairwise_df(measure1, measure2, target_antibody_name1, target_antibod
     return df
 
 
-
 def find_conjugate_name(measure, target_ab_name):
     """Find conjugate antibody name
 
-    Paramters 
+    Paramters
     -----------
     measure : AntibodyAnalysis
     target_ab_name : str
@@ -670,7 +704,7 @@ def run_pairwise(query1, query2, target_antibody_name1, target_antibody_name2,
     target_antibody_name2 : str
     base_dir : str
     thresh : float
-    resultion : dict 
+    resultion : dict
 
     Return
     -------------
@@ -678,39 +712,42 @@ def run_pairwise(query1, query2, target_antibody_name1, target_antibody_name2,
     """
 
     synaptic_volumes1 = da.load_tiff_from_query(query1, base_dir)
-    measure1 = run_ab_analysis(synaptic_volumes1, query1, thresh, resolution, target_antibody_name1)
+    measure1 = run_SACT(
+        synaptic_volumes1, query1, thresh, resolution, target_antibody_name1)
 
     synaptic_volumes2 = da.load_tiff_from_query(query2, base_dir)
-    measure2 = run_ab_analysis(synaptic_volumes2, query2, thresh, resolution, target_antibody_name2)
+    measure2 = run_SACT(
+        synaptic_volumes2, query2, thresh, resolution, target_antibody_name2)
 
     return [measure1, measure2]
 
 
-
-def findFilenames(reference_fn_str, target_fn_str, filenames, n): 
+def findFilenames(reference_fn_str, target_fn_str, filenames, n):
     """
-    Find filenames given a start string for UC Davis data 
+    Find filenames given a start string for UC Davis data
 
     Parameters
     --------------
     reference_fn_str : str - the control antibody (reference antibody)
-    target_fn_str : str - the antibody of interest 
-    filenames : list of strs - contains the filenames in the folder to search 
+    target_fn_str : str - the antibody of interest
+    filenames : list of strs - contains the filenames in the folder to search
     n : int
     Returns
     --------------
-    reference_name : str - reference antibody filename 
-    target_name : str - target antibody filename 
+    reference_name : str - reference antibody filename
+    target_name : str - target antibody filename
     """
 
-    reference_str = str(n) + '-' + reference_fn_str #filename to search for
+    reference_str = str(n) + '-' + reference_fn_str  # filename to search for
     target_str = str(n) + '-' + target_fn_str
 
     # Search for file associated with the specific dataset number
-    indices = [i for i, s in enumerate(filenames) if reference_str.lower() == s[0:len(reference_str)].lower()]
+    indices = [i for i, s in enumerate(
+        filenames) if reference_str.lower() == s[0:len(reference_str)].lower()]
     reference_name = filenames[indices[0]]
     print(reference_name)
-    indices = [i for i, s in enumerate(filenames) if target_str.lower() == s[0:len(target_str)].lower()]
+    indices = [i for i, s in enumerate(
+        filenames) if target_str.lower() == s[0:len(target_str)].lower()]
     target_name = filenames[indices[0]]
     print(target_name)
     return reference_name, target_name

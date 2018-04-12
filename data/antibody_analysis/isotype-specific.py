@@ -139,13 +139,13 @@ def isotype_specific():
     query_list.append(query)
 
     # Run all the queries
-    # measure_list = aa.calculate_measure_lists(query_list, None, base_dir,
-    #                                     thresh, resolution, target_filenames)
+    measure_list = aa.calculate_measure_lists(query_list, None, base_dir,
+                                        thresh, resolution, target_filenames)
 
-    # df = aa.create_df(measure_list, folder_names, target_filenames, conjugate_filenames)
-    # print(df)
+    df = aa.create_df(measure_list, folder_names, target_filenames, conjugate_filenames)
+    print(df)
 
-    # return df
+    return df
 
 
 def main():
