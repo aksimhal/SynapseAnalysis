@@ -3,6 +3,7 @@ Antibody Analysis
 Contains the functions needed to run SACT
 """
 import os
+import copy
 import numpy as np
 import pandas as pd
 from skimage import measure
@@ -61,6 +62,8 @@ class SingleChannelMeasurements:
         self.puncta_count = 0
         self.raw_mean = 0.0
         self.raw_std = 0.0
+        self.signal_mean = 0.0
+        self.signal_std = 0.0
 
 
 class AntibodyAnalysis:
@@ -230,6 +233,11 @@ def run_SACT(synaptic_volumes, query, thresh, resolution, target_antibody_name):
     antibody_measure = compute_raw_measures(
         presynaptic_volumes, antibody_measure, 'presynaptic')
 
+    # SNR test
+    raw_presynaptic_volumes = []
+    for vol in presynaptic_volumes:
+        raw_presynaptic_volumes.append(np.copy(vol))
+
     for n in range(0, len(presynaptic_volumes)):
         presynaptic_volumes[n] = syn.getProbMap(
             presynaptic_volumes[n])  # Step 1
@@ -243,11 +251,22 @@ def run_SACT(synaptic_volumes, query, thresh, resolution, target_antibody_name):
     # Compute single channel measurements
     antibody_measure = compute_single_channel_measurements(
         presynaptic_volumes, antibody_measure, thresh, 'presynaptic')
+
+    # SNR test
+    antibody_measure = compute_SNR_synapticside(raw_presynaptic_volumes,
+                                                presynaptic_volumes, thresh,
+                                                antibody_measure, 'presynaptic')
+
     print('Computed presynaptic single channel measurements')
 
     # Compute raw mean and standard deviation
     antibody_measure = compute_raw_measures(
         postsynaptic_volumes, antibody_measure, 'postsynaptic')
+
+    # SNR test
+    raw_postsynaptic_volumes = []
+    for vol in postsynaptic_volumes:
+        raw_postsynaptic_volumes.append(np.copy(vol))
 
     for n in range(0, len(postsynaptic_volumes)):
         postsynaptic_volumes[n] = syn.getProbMap(
@@ -262,8 +281,14 @@ def run_SACT(synaptic_volumes, query, thresh, resolution, target_antibody_name):
     # Compute single channel measurements
     antibody_measure = compute_single_channel_measurements(
         postsynaptic_volumes, antibody_measure, thresh, 'postsynaptic')
+
+    # SNR test
+    antibody_measure = compute_SNR_synapticside(raw_postsynaptic_volumes,
+                                                postsynaptic_volumes, thresh,
+                                                antibody_measure, 'postsynaptic')
     print('Computed postsynaptic single channel measurements')
 
+    #"""
     if len(postsynaptic_volumes) == 0:
         resultVol = syn.combinePrePostVolumes(
             presynaptic_volumes, postsynaptic_volumes, edge_win, blobsize)
@@ -279,8 +304,57 @@ def run_SACT(synaptic_volumes, query, thresh, resolution, target_antibody_name):
 
     antibody_measure = calculuate_target_ratio(
         antibody_measure, target_antibody_name)
+    #"""
+    return antibody_measure
+
+
+def compute_SNR_synapticside(raw_synaptic_volumes, synaptic_volumes, thresh, antibody_measure, synaptic_side):
+    """
+    """
+    if synaptic_side == 'presynaptic':
+        for n in range(0, len(synaptic_volumes)):
+            signal_mean, signal_std = compute_SNR(
+                raw_synaptic_volumes[n], synaptic_volumes[n], thresh)
+
+            antibody_measure.presynaptic_list[n].signal_mean = signal_mean
+            antibody_measure.presynaptic_list[n].signal_std = signal_std
+
+    elif synaptic_side == 'postsynaptic':
+        for n in range(0, len(synaptic_volumes)):
+            signal_mean, signal_std = compute_SNR(
+                raw_synaptic_volumes[n], synaptic_volumes[n], thresh)
+
+            antibody_measure.postsynaptic_list[n].signal_mean = signal_mean
+            antibody_measure.postsynaptic_list[n].signal_std = signal_std
 
     return antibody_measure
+
+
+def compute_SNR(raw_synaptic_volume, synaptic_volume, thresh):
+    """ Compute SNR.  
+    Threshold 3D blobs, mask out raw data, compute mean blob intensity value
+
+    Parameters
+    ----------------
+    raw_synaptic_volume : np array
+    synaptic_volume : list of np array
+    thresh : float
+    synaptic_side : str
+
+    Return
+    -----------------
+
+    """
+    result = []
+    bw_vol = synaptic_volume > thresh
+    masked_vol = raw_synaptic_volume * bw_vol
+    flatvol = masked_vol.flatten()
+    zero_inds = np.where(flatvol == 0)
+    no_zeros_flatvol = np.delete(flatvol, zero_inds)
+    signal_mean = np.mean(no_zeros_flatvol)
+    signal_std = np.std(no_zeros_flatvol)
+
+    return signal_mean, signal_std
 
 
 def compute_raw_measures(synaptic_volumes, antibody_measure, synaptic_side):
@@ -542,7 +616,7 @@ def create_df(measure_list, folder_names, target_filenames, conjugate_filenames)
     """
     columnlabels = ['Target AB', 'Conjugate AB', 'Puncta Density',
                     'Puncta Volume', 'Puncta STD', 'Synapse Density',
-                    'TSR', 'Raw Mean', 'Raw STD']
+                    'TSR', 'Raw Mean', 'Raw STD', 'Signal Mean', 'Signal STD']
 
     df = pd.DataFrame(np.nan, index=folder_names, columns=columnlabels)
 
@@ -560,6 +634,8 @@ def create_df(measure_list, folder_names, target_filenames, conjugate_filenames)
         df.iloc[n, 6] = measure.specificity_ratio
         df.iloc[n, 7] = target_measure.raw_mean
         df.iloc[n, 8] = target_measure.raw_std
+        df.iloc[n, 9] = target_measure.signal_mean
+        df.iloc[n, 10] = target_measure.signal_std
 
     return df
 
