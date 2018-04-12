@@ -1,5 +1,5 @@
 # Synaptic Antibody Characterization Tool
-This repository hosts the Synaptic Antibody Characterization Tool (SACT) - a framework to evaluate synaptic antibodies for array tomography (AT) applications.  Paper: <https://www.biorxiv.org/content/early/2018/02/01/258756>
+This repository hosts the Synaptic Antibody Characterization Tool (SACT) - a framework to evaluate synaptic antibodies for array tomography (AT) applications.  Paper: <https://www.biorxiv.org/content/early/2018/03/14/258756>
 
 This webpage contains the following: 
     - Installation Guide 
