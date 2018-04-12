@@ -1,6 +1,0 @@
-scipy
-numpy
-scikit-image
-argschema>1.15.5
-rtree
-shapely
