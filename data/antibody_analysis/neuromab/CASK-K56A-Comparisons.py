@@ -19,7 +19,7 @@ def cask():
     """
 
     # Location of data
-    base_dir = "C:/Users/stjst/Desktop/Work/Image_Processing/20171213_CASK_TBS_COMPARISON/Align_Tiffs" #Location of align tif
+    base_dir = "S:/AIBS_Stanford_for_AT/AT_Plans_and_NM_AT_Images/20171213_JAT_CASK_(K56A)_and_TBS_Comparison/Align_Tiffs" #Location of align tif
     resolution = {'res_xy_nm': 100, 'res_z_nm': 70} #Resolution of a pixel
     thresh = 0.9 #What qualifies for final probability map
     number_of_datasets = 20 #Number of wells
@@ -59,7 +59,7 @@ def cask():
 
         # Create query
         #
-        query = {'preIF': [target_name, conjugate_name], 'preIF_z': [1,1],
+        query = {'preIF': [target_name, conjugate_name], 'preIF_z': [1,2],
                 'postIF': [], 'postIF_z': [],
                 'punctumSize': 2}
 
@@ -94,7 +94,7 @@ def main():
     cck_df = cask()
     
     sheet_name = 'cask-K56A'
-    fn = 'cask-K56A.xlsx'
+    fn = 'cask-K56A-1,2.xlsx'
     df_list = [cck_df]
     aa.write_dfs_to_excel(df_list, sheet_name, fn)
     

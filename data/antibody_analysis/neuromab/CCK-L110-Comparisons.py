@@ -3,6 +3,8 @@ Run antibody characterization tool on the L110-CCK dataset
 Output an excel sheet of results
 """
 import os
+import sys
+import socket
 import numpy as np
 import pandas as pd #also requires xlsxwriter
 from at_synapse_detection import dataAccess as da
@@ -19,13 +21,13 @@ def cck():
     """
 
     # Location of data
-    base_dir = "C:/Users/stjst/Desktop/Anish_Visit/20180307_L110/Align" #Location of align tif
+    base_dir = "S:/AIBS Stanford for AT/AT Plans and NM AT Images/20180307 CCK L110 Rescreen Hippocampus/Align Raw Tiffs" #Location of align tif
     resolution = {'res_xy_nm': 100, 'res_z_nm': 70} #Resolution of a pixel
     thresh = 0.9 #What qualifies for final probability map
     number_of_datasets = 14 #Number of wells
 
     #Rb Antibody
-    conjugate_fn_str = 'Gad2' #String segment to search in a filename 
+    conjugate_fn_str = 'GAD2' #String segment to search in a filename 
     #Ms Antibody project name, no parent or subclone number needed
     target_fn_str = 'L110'
     #Takes base directory string and gives you an array of all the files within
@@ -82,6 +84,13 @@ def main():
     
     sheet_name = 'CCK-L110'
     fn = 'CCK-L110.xlsx'
+
+    if  os.path.isfile(fn): 
+        print('A sheet with this name already exists; rename sheet and rerun')
+        if socket.gethostname() != 'anish': #this line is optional 
+            sys.exit()
+
+    
     df_list = [cck_df]
     aa.write_dfs_to_excel(df_list, sheet_name, fn)
     
