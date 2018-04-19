@@ -61,7 +61,9 @@ def getProbMap_rayleigh(data):
 
         # The maximum likelihood estimate has a simple form
         phat = np.sqrt(0.5 * np.mean(np.power(data[:, :, zInd], 2)))
-        output = 1 - np.exp(-1*np.power(data[:, :, zInd], 2) / (2*np.power(phat, 2))) 
+        output = 1 - \
+            np.exp(-1 * np.power(data[:, :, zInd],
+                                 2) / (2 * np.power(phat, 2)))
 
         # Calculate foreground probabilities
         data[:, :, zInd] = output
@@ -107,6 +109,10 @@ def convolveVolume(vol, kernelLength):
     vol = np.log(vol)
 
     kernel = np.ones([kernelLength, kernelLength])
+    if len(vol.shape) == 2:
+        vol_expanded = np.zeros((vol.shape[0], vol.shape[1], 1))
+        vol_expanded[:, :, 0] = vol
+        vol = vol_expanded
 
     for n in range(0, vol.shape[2]):
         img = vol[:, :, n]
@@ -160,9 +166,9 @@ def computeFactor(vol, numslices):
 
         # Edge cases
         # First Slice
-        #print(vol.shape)
+        # print(vol.shape)
         if n == 0:
-            #print(n)
+            # print(n)
             diff = np.exp(-1 *
                           (np.power((vol[:, :, n] - vol[:, :, n + 1]), 2)))
 
@@ -204,7 +210,7 @@ def computeFactor(vol, numslices):
 #     if (numslices == 1):
 #         return factorVol
 
-#     for n in range(0, vol.shape[2]): 
+#     for n in range(0, vol.shape[2]):
 #         max_filt_vol[:, :, n] = scipy.ndimage.filters.maximum_filter(vol[:, :, n], size=(3, 3))
 
 
@@ -234,7 +240,6 @@ def computeFactor(vol, numslices):
 #         factorVol[:, :, n] = diff
 
 #     return factorVol
-
 
 
 def loadQueriesJSON(fileName):
@@ -269,7 +274,7 @@ def createLookupTables(inputVol):
     inputVol : 3D Numpy Array
 
     """
-    #print(len(inputVol))
+    # print(len(inputVol))
     for volItr in range(0, len(inputVol)):
         for z in range(0, inputVol[0].shape[2]):
             inputVol[volItr][:, :, z] = np.cumsum(
@@ -305,6 +310,10 @@ def searchAdjacentChannel(adjacentVolList, search_win, cInd, rInd, zInd):
             (adjacentVolList[0].shape[2] - 2), adjacentVolList[0].shape[2])
     else:
         zrange = range(zInd - 1, zInd + 2)
+
+    if adjacentVolList[0].shape[2] == 1:
+        zrange = [0]
+        #print('single slice data')
 
     for zItr in zrange:
         rstart = rInd - 1.5 * search_win
@@ -414,17 +423,24 @@ def combinePrePostVolumes(baseVolList, adjacentVolList, edge_win, search_win):
                     continue
 
                 if len(adjacentVolList) > 0:
-                    adjResult = searchAdjacentChannel(adjacentVolList, search_win, cInd, rInd, zInd)
-                    outputVol[rInd, cInd, zInd] = baseVol[rInd,cInd, zInd] * adjResult
+                    adjResult = searchAdjacentChannel(
+                        adjacentVolList, search_win, cInd, rInd, zInd)
+                    outputVol[rInd, cInd, zInd] = baseVol[rInd,
+                                                          cInd, zInd] * adjResult
 
                     if len(baseVolList) > 1:
-                        coresult = searchColocalizeChannel(baseVolList, search_win, cInd, rInd, zInd)
-                        outputVol[rInd, cInd, zInd] = baseVol[rInd,cInd, zInd] * coresult * adjResult
+                        coresult = searchColocalizeChannel(
+                            baseVolList, search_win, cInd, rInd, zInd)
+                        outputVol[rInd, cInd, zInd] = baseVol[rInd,
+                                                              cInd, zInd] * coresult * adjResult
                 else:
-                    coresult = searchColocalizeChannel(baseVolList, search_win, cInd, rInd, zInd)
-                    outputVol[rInd, cInd, zInd] = baseVol[rInd,cInd, zInd] * coresult
+                    coresult = searchColocalizeChannel(
+                        baseVolList, search_win, cInd, rInd, zInd)
+                    outputVol[rInd, cInd, zInd] = baseVol[rInd,
+                                                          cInd, zInd] * coresult
 
     return outputVol
+
 
 def combinePrePostVolumes_astro(baseVolList, adjacentVolList, glialvolumes, edge_win, search_win):
     """
@@ -465,10 +481,9 @@ def combinePrePostVolumes_astro(baseVolList, adjacentVolList, glialvolumes, edge
     for zInd in range(0, baseVol.shape[2]):
         print("starting z ind: " + str(zInd))
 
-        # if zInd > 2: 
+        # if zInd > 2:
         #     return outputVol
 
-            
         for rInd in range(rStartEdge, rEndEdge):
             for cInd in range(cStartEdge, cEndEdge):
 
@@ -476,22 +491,26 @@ def combinePrePostVolumes_astro(baseVolList, adjacentVolList, glialvolumes, edge
                     continue
 
                 if len(adjacentVolList) > 0:
-                    adjResult = searchAdjacentChannel(adjacentVolList, search_win, cInd, rInd, zInd)
-                    adjResult2 = searchAdjacentChannel(glialvolumes, search_win, cInd, rInd, zInd)
+                    adjResult = searchAdjacentChannel(
+                        adjacentVolList, search_win, cInd, rInd, zInd)
+                    adjResult2 = searchAdjacentChannel(
+                        glialvolumes, search_win, cInd, rInd, zInd)
                     #outputVol[rInd, cInd, zInd] = adjResult2
-                    outputVol[rInd, cInd, zInd] = baseVol[rInd,cInd, zInd] * adjResult * adjResult2
-
+                    outputVol[rInd, cInd, zInd] = baseVol[rInd,
+                                                          cInd, zInd] * adjResult * adjResult2
 
                     if len(baseVolList) > 1:
-                        coresult = searchColocalizeChannel(baseVolList, search_win, cInd, rInd, zInd)
+                        coresult = searchColocalizeChannel(
+                            baseVolList, search_win, cInd, rInd, zInd)
                         #outputVol[rInd, cInd, zInd] = baseVol[rInd,cInd, zInd] * coresult * adjResult * adjResult2
-                        
+
                 else:
-                    coresult = searchColocalizeChannel(baseVolList, search_win, cInd, rInd, zInd)
-                    outputVol[rInd, cInd, zInd] = baseVol[rInd,cInd, zInd] * coresult
+                    coresult = searchColocalizeChannel(
+                        baseVolList, search_win, cInd, rInd, zInd)
+                    outputVol[rInd, cInd, zInd] = baseVol[rInd,
+                                                          cInd, zInd] * coresult
 
     return outputVol
-
 
 
 def getSynapseDetections(synapticVolumes, query, blobsize=2, edge_win=3):
@@ -515,7 +534,7 @@ def getSynapseDetections(synapticVolumes, query, blobsize=2, edge_win=3):
     resultVol : 3D numpy array - final probability map
     """
 
-    #Check to see if user supplied blobsize
+    # Check to see if user supplied blobsize
     if 'punctumSize' in query.keys():
         blobsize = query['punctumSize']
         edge_win = int(np.ceil(blobsize * 1.5))
@@ -559,6 +578,7 @@ def getSynapseDetections(synapticVolumes, query, blobsize=2, edge_win=3):
 
     return resultVol
 
+
 def getSynapseDetections_astro(synapticVolumes, query, blobsize=2, edge_win=3):
     """
     This function calls the functions needed to run probabilistic synapse detection
@@ -580,7 +600,7 @@ def getSynapseDetections_astro(synapticVolumes, query, blobsize=2, edge_win=3):
     resultVol : 3D numpy array - final probability map
     """
 
-    #Check to see if user supplied blobsize
+    # Check to see if user supplied blobsize
     if 'punctumSize' in query.keys():
         blobsize = query['punctumSize']
         edge_win = int(np.ceil(blobsize * 1.5))
@@ -627,7 +647,6 @@ def getSynapseDetections_astro(synapticVolumes, query, blobsize=2, edge_win=3):
             factorVol = computeFactor(
                 glialVolumes[n], int(glialIF_z[n]))  # Step 3
             glialVolumes[n] = glialVolumes[n] * factorVol
-
 
     if len(postsynapticVolumes) == 0:
         resultVol = combinePrePostVolumes_astro(
