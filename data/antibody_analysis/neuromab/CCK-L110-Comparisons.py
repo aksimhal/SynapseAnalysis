@@ -59,11 +59,33 @@ def cck():
 
         # Create query
         #
-        query = {'preIF': [target_name, conjugate_name], 'preIF_z': [2,2],
+        query = {'preIF': [target_name, conjugate_name], 'preIF_z': [1,1],
                 'postIF': [], 'postIF_z': [],
                 'punctumSize': 2}
 
         query_list.append(query)
+
+    n = 15
+    folder_names.append('Control' + str(n)) # Collate 'dataset' names for excel sheet
+    reference_fn_str = 'Gad2' #String segment to search in a filename
+    target_fn_str = 'L114'
+    conjugate_name, target_name = aa.findFilenames(reference_fn_str, target_fn_str, filenames, n)
+    conjugate_filenames.append(conjugate_name)
+    target_filenames.append(target_name)
+    query = {'preIF': [target_name,conjugate_name], 'preIF_z': [2,2], 'postIF': [], 'postIF_z': [], 'punctumSize': 2}
+    query_list.append(query)
+
+    n = 16
+    folder_names.append('Control' + str(n)) # Collate 'dataset' names for excel sheet
+    reference_fn_str = 'Gad2' #String segment to search in a filename
+    target_fn_str = 'L106'
+    conjugate_name, target_name = aa.findFilenames(reference_fn_str, target_fn_str, filenames, n)
+    conjugate_filenames.append(conjugate_name)
+    target_filenames.append(target_name)
+    query = {'preIF': [target_name,conjugate_name], 'preIF_z': [2,2], 'postIF': [], 'postIF_z': [], 'punctumSize': 2}
+    query_list.append(query)
+
+
 
     # Run all the queries
     measure_list = aa.calculate_measure_lists(query_list, None, base_dir,
