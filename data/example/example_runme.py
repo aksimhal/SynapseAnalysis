@@ -8,28 +8,28 @@ from at_synapse_detection import SynapseDetection as syn
 
 
 def main():
-    
+
     # Example use case of the synapse detection pipeline
     # Location of Queries
     queryFN = 'example_queries.json'
 
     # List of Queries
-    listOfQueries = syn.loadQueriesJSON(queryFN)
+    list_of_queries = syn.loadQueriesJSON(queryFN)
 
     # Test the first query
-    query = listOfQueries[0]
+    query = list_of_queries[0]
 
-    # Load the data 
-    synapticVolumes = da.loadChannelVolFromQuery(query)
+    # Load the data
+    synaptic_volumes = da.load_tiff_from_query(query)
 
     # Run Synapse Detection
     # Takes ~5 minutes to run
-    resultVol = syn.getSynapseDetections(synapticVolumes, query)
+    result_vol = syn.getSynapseDetections(synaptic_volumes, query)
 
-    # Verify Output  
-    labelVol = measure.label(resultVol > 0.9)
-    stats = measure.regionprops(labelVol)
-    print(len(stats)) #output should be 5440
+    # Verify Output
+    label_vol = measure.label(result_vol > 0.9)
+    stats = measure.regionprops(label_vol)
+    print(len(stats))  # output should be 5440
 
 
 if __name__ == '__main__':
