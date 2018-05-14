@@ -14,8 +14,7 @@ import copy
 import numpy as np
 
 
-def run_synapse_detection(query, queryID, nQuery, resolution, data_location, data_location_base,
-                          output_foldername, region_name):
+def run_synapse_detection(atet_input):
     """
     Run synapse detection and result evalution.  The parameters need to be rethought 
 
@@ -28,26 +27,38 @@ def run_synapse_detection(query, queryID, nQuery, resolution, data_location, dat
     output_foldername : str (ie result)
     region_name : str (ie F001)
     output : Queue object() 
-    """
 
-    print(query)
+
+    """
+    # atet_input = {'query': query, 'queryID': queryID, 'nQuery': nQuery, 'resolution': resolution,
+    #                       'data_location': data_location, 'data_location_base': data_location_base,
+    #                       'output_foldername': output_foldername, 'region_name': region_name}
+
+    query = atet_input['query']
+    queryID = atet_input['queryID']
+    nQuery = atet_input['nQuery']
+    resolution = atet_input['resolution']
+    data_location = atet_input['data_location']
+    data_location_base = atet_input['data_location_base']
+    output_foldername = atet_input['output_foldername']
+    region_name = atet_input['region_name']
 
     # Load the data
     synaptic_volumes = da.load_tiff_from_query(query, data_location)
     volume_um3 = aa.getdatavolume(synaptic_volumes, resolution)
-
+    print(volume_um3)
     # # Run Synapse Detection
     print('running synapse detection')
-    # resultvol = syn.getSynapseDetections(synaptic_volumes, query)
+    resultvol = syn.getSynapseDetections(synaptic_volumes, query)
 
-    # # Save the probability map to file, if you want
-    # outputNPYlocation = os.path.join(
-    #     data_location_base, output_foldername, region_name)
-    # syn.saveresultvol(resultvol, outputNPYlocation, 'query_', queryID)
+    # Save the probability map to file, if you want
+    outputNPYlocation = os.path.join(
+        data_location_base, output_foldername, region_name)
+    syn.saveresultvol(resultvol, outputNPYlocation, 'query_', queryID)
 
-    # thresh = 0.9
-    # queryresult = sa.compute_measurements(
-    #     resultvol, query, volume_um3, thresh)
+    thresh = 0.9
+    queryresult = sa.compute_measurements(
+        resultvol, query, volume_um3, thresh)
     queryresult = sa.SynapseAnalysis(query)
 
     output_dict = {'queryID': queryID,
@@ -117,7 +128,7 @@ def main():
     result_list = []
     num_workers = mp.cpu_count() - 1
 
-    mp.set_start_method('spawn')
+    # mp.set_start_method('spawn')
 
     print(num_workers)
     pool = mp.Pool(num_workers)
@@ -128,6 +139,9 @@ def main():
         result_list.append(result)
 
     # Setup a list of processes that we want to run
+
+    atet_inputs_list = []
+
     queryID = 0
     foldernames = []
     for region_num in range(0, 4):
@@ -139,12 +153,22 @@ def main():
             foldernames.append(foldername)
             print(foldername)
 
-            pool.apply_async(run_synapse_detection, args=(query, queryID, nQuery, resolution,
-                                                          data_location, data_location_base, output_foldername, region_name), callback=log_result)
+            atet_input = {'query': query, 'queryID': queryID, 'nQuery': nQuery, 'resolution': resolution,
+                          'data_location': data_location, 'data_location_base': data_location_base,
+                          'output_foldername': output_foldername, 'region_name': region_name}
+            atet_inputs_list.append(atet_input)
+            # pool.apply_async(run_synapse_detection, args=(query, queryID, nQuery, resolution,\
+            #                                               data_location, data_location_base, \
+            #                                               output_foldername, region_name), callback=log_result)
 
             queryID = queryID + 1
 
     # Run processes
+    # Using fxn "calculate", feed taskList, and values stored in "results" list
+    result_list = pool.map(
+        run_synapse_detection, atet_inputs_list)
+    # result_list.wait()                # Wait on the results from the map_async
+
     pool.close()
     pool.join()
 
