@@ -37,6 +37,7 @@ def run_synapse_detection(query, queryID, nQuery, resolution, data_location, dat
     volume_um3 = aa.getdatavolume(synaptic_volumes, resolution)
 
     # # Run Synapse Detection
+    print('running synapse detection')
     resultvol = syn.getSynapseDetections(synaptic_volumes, query)
 
     # Save the probability map to file, if you want
@@ -88,9 +89,9 @@ def main():
     mouse_project_str = sys.argv[2]
     sheet_name = sys.argv[3]
 
-    # mouse_number = 2
-    # mouse_project_str = '2ss'
-    # sheet_name = '2ss_fragX'
+    mouse_number = 2
+    mouse_project_str = '2ss'
+    sheet_name = '2ss_fragX'
 
     output_foldername = 'results_' + sheet_name
     query_fn = mouse_project_str + '_queries.json'
@@ -124,7 +125,6 @@ def main():
         result_list.append(result)
 
     # Setup a list of processes that we want to run
-    processes = []
     queryID = 0
     foldernames = []
     for region_num in range(0, 4):
@@ -136,8 +136,8 @@ def main():
             foldernames.append(foldername)
             print(foldername)
 
-            pool.apply_async(run_synapse_detection, args=(query, queryID, nQuery, resolution, data_location,
-                                                          data_location_base, output_foldername, region_name), callback=log_result)
+            pool.apply_async(run_synapse_detection, args=(query, queryID, nQuery, resolution,
+                                                          data_location, data_location_base, output_foldername, region_name), callback=log_result)
 
             queryID = queryID + 1
 
