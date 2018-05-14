@@ -37,17 +37,17 @@ def run_synapse_detection(query, queryID, nQuery, resolution, data_location, dat
     volume_um3 = aa.getdatavolume(synaptic_volumes, resolution)
 
     # # Run Synapse Detection
-    # resultvol = syn.getSynapseDetections(synaptic_volumes, query)
+    resultvol = syn.getSynapseDetections(synaptic_volumes, query)
 
-    # # Save the probability map to file, if you want
-    # outputNPYlocation = os.path.join(
-    #     data_location_base, output_foldername, region_name)
-    # syn.saveresultvol(resultvol, outputNPYlocation, 'query_', queryID)
+    # Save the probability map to file, if you want
+    outputNPYlocation = os.path.join(
+        data_location_base, output_foldername, region_name)
+    syn.saveresultvol(resultvol, outputNPYlocation, 'query_', queryID)
 
-    # thresh = 0.9
-    # queryresult = sa.compute_measurements(
-    #     resultvol, query, volume_um3, thresh)
-    queryresult = sa.SynapseAnalysis(query)
+    thresh = 0.9
+    queryresult = sa.compute_measurements(
+        resultvol, query, volume_um3, thresh)
+    #queryresult = sa.SynapseAnalysis(query)
 
     output_dict = {'queryID': queryID,
                    'query': query, 'queryresult': queryresult}
