@@ -31,7 +31,7 @@ def compute_measurements(resultvol, query, volume_um3, thresh):
     label_vol = measure.label(resultvol > thresh)
     stats = measure.regionprops(label_vol)
     queryresult.synapse_density = len(stats) / queryresult.volume_um3
-    queryresult.synapse_count = len(stats)
+    queryresult.num_synapses = len(stats)
 
     return queryresult
 
