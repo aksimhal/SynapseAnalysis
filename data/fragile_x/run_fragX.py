@@ -59,7 +59,6 @@ def run_synapse_detection(atet_input):
     thresh = 0.9
     queryresult = sa.compute_measurements(
         resultvol, query, volume_um3, thresh)
-    queryresult = sa.SynapseAnalysis(query)
 
     output_dict = {'queryID': queryID,
                    'query': query, 'queryresult': queryresult}
