@@ -99,9 +99,9 @@ def main():
     mouse_project_str = sys.argv[2]
     sheet_name = sys.argv[3]
 
-    mouse_number = 2
-    mouse_project_str = '2ss'
-    sheet_name = '2ss_fragX'
+    # mouse_number = 2
+    # mouse_project_str = '2ss'
+    # sheet_name = '2ss_fragX'
 
     output_foldername = 'results_' + sheet_name
     query_fn = mouse_project_str + '_queries.json'
