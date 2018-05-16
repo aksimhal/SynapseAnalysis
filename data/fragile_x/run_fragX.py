@@ -20,40 +20,35 @@ def run_synapse_detection(atet_input):
 
     Parameters
     -------------------
-    query : dict
-    resolution : dict 
-    data_location : str - raw IF data folder (ie F000, F001, F002, F003)
-    data_location_base - folder for the mouse (ie 2ss, 3ss)
-    output_foldername : str (ie result)
-    region_name : str (ie F001)
-    output : Queue object() 
+    atet_input : dict 
 
+    Returns
+    -------------------
+    output_dict : dict 
 
     """
-    # atet_input = {'query': query, 'queryID': queryID, 'nQuery': nQuery, 'resolution': resolution,
-    #                       'data_location': data_location, 'data_location_base': data_location_base,
-    #                       'output_foldername': output_foldername, 'region_name': region_name}
 
     query = atet_input['query']
     queryID = atet_input['queryID']
     nQuery = atet_input['nQuery']
     resolution = atet_input['resolution']
     data_location = atet_input['data_location']
-    data_location_base = atet_input['data_location_base']
+    data_region_location = atet_input['data_region_location']
     output_foldername = atet_input['output_foldername']
     region_name = atet_input['region_name']
 
     # Load the data
-    synaptic_volumes = da.load_tiff_from_query(query, data_location)
+    synaptic_volumes = da.load_tiff_from_query(query, data_region_location)
     volume_um3 = aa.getdatavolume(synaptic_volumes, resolution)
     print(volume_um3)
-    # # Run Synapse Detection
+
+    # Run Synapse Detection
     print('running synapse detection')
     resultvol = syn.getSynapseDetections(synaptic_volumes, query)
 
     # Save the probability map to file, if you want
     outputNPYlocation = os.path.join(
-        data_location_base, output_foldername, region_name)
+        data_location, output_foldername, region_name)
     syn.saveresultvol(resultvol, outputNPYlocation, 'query_', queryID)
 
     thresh = 0.9
@@ -82,41 +77,29 @@ def organize_result_lists(result_list):
     return sorted_queryresult
 
 
-def main():
+def run_list_of_queries(mouse_number, mouse_project_str, sheet_name):
     """
-    run synapse detection
+    run queries in a parallel manner
+
+    Parameters
+    -----------------
+    mouse_number : int 
+    mouse_project_str : str
+    sheet_name : str 
+
     """
-
-    if len(sys.argv) < 4:
-        print('Not enough arguements')
-        print(sys.argv)
-        return
-    else:
-        print('we have arguments')
-        print(sys.argv)
-
-    mouse_number = sys.argv[1]
-    mouse_project_str = sys.argv[2]
-    sheet_name = sys.argv[3]
-
-    # mouse_number = 2
-    # mouse_project_str = '2ss'
-    # sheet_name = '2ss_fragX'
 
     output_foldername = 'results_' + sheet_name
     query_fn = mouse_project_str + '_queries.json'
-    datalocation = '/Users/anish/Documents/yi_mice/' + \
-        str(mouse_number) + 'ss_stacks/'
-    data_location_base = '/Users/anish/Documents/yi_mice/' + \
+    data_location = '/Users/anish/Documents/yi_mice/' + \
         str(mouse_number) + 'ss_stacks/'
 
     hostname = socket.gethostname()
     if hostname == 'Galicia':
-        datalocation = '/data5TB/yi_mice/' + str(mouse_number) + 'ss_stacks'
-        data_location_base = '/data5TB/yi_mice/' + \
-            str(mouse_number) + 'ss_stacks'
+        data_location = '/data5TB/yi_mice/' + str(mouse_number) + 'ss_stacks'
+
     print('Query Filename: ', query_fn)
-    print('Data Location: ', datalocation)
+    print('Data Location: ', data_location)
     print('OutputFoldername: ', output_foldername)
     print('Sheetname: ', sheet_name)
 
@@ -128,17 +111,8 @@ def main():
     result_list = []
     num_workers = mp.cpu_count() - 1
 
-    # mp.set_start_method('spawn')
-
     print(num_workers)
     pool = mp.Pool(num_workers)
-
-    def log_result(result):
-        # This is called whenever foo_pool(i) returns a result.
-        # result_list is modified only by the main process, not the pool workers.
-        result_list.append(result)
-
-    # Setup a list of processes that we want to run
 
     atet_inputs_list = []
 
@@ -146,7 +120,7 @@ def main():
     foldernames = []
     for region_num in range(0, 4):
         region_name = region_name_base + str(region_num)
-        data_location = os.path.join(data_location_base, region_name)
+        data_region_location = os.path.join(data_location, region_name)
 
         for nQuery, query in enumerate(listOfQueries):
             foldername = region_name + '-Q' + str(nQuery)
@@ -154,35 +128,53 @@ def main():
             print(foldername)
 
             atet_input = {'query': query, 'queryID': queryID, 'nQuery': nQuery, 'resolution': resolution,
-                          'data_location': data_location, 'data_location_base': data_location_base,
+                          'data_region_location': data_region_location, 'data_location': data_location,
                           'output_foldername': output_foldername, 'region_name': region_name}
             atet_inputs_list.append(atet_input)
-            # pool.apply_async(run_synapse_detection, args=(query, queryID, nQuery, resolution,\
-            #                                               data_location, data_location_base, \
-            #                                               output_foldername, region_name), callback=log_result)
 
             queryID = queryID + 1
 
     # Run processes
-    # Using fxn "calculate", feed taskList, and values stored in "results" list
-    result_list = pool.map(
-        run_synapse_detection, atet_inputs_list)
-    # result_list.wait()                # Wait on the results from the map_async
+    result_list = pool.map(run_synapse_detection, atet_inputs_list)
 
     pool.close()
     pool.join()
 
     print('Get process results from the output queue')
-
     sorted_queryresult = organize_result_lists(result_list)
 
     mouse_df = sa.create_synapse_df(sorted_queryresult, foldernames)
     print(mouse_df)
 
-    sheet_name = 'FragileX Mouse'
     fn = sheet_name + '.xlsx'
     df_list = [mouse_df]
     aa.write_dfs_to_excel(df_list, sheet_name, fn)
+
+
+def main():
+
+    if len(sys.argv) < 4:
+        print('Run All Combinations')
+        print(sys.argv)
+        # mouse_number = 2
+        # mouse_project_str = '2ss'
+        # sheet_name = '2ss_fragX'
+        run_list_of_queries(
+            mouse_number=2, mouse_project_str='2ss', sheet_name='2ss_fragX')
+        run_list_of_queries(
+            mouse_number=3, mouse_project_str='3ss', sheet_name='3ss_fragX')
+        run_list_of_queries(
+            mouse_number=4, mouse_project_str='4ss', sheet_name='4ss_fragX')
+        run_list_of_queries(
+            mouse_number=6, mouse_project_str='6ss', sheet_name='6ss_fragX')
+
+    else:
+        print('we have arguments')
+        print(sys.argv)
+        mouse_number = sys.argv[1]
+        mouse_project_str = sys.argv[2]
+        sheet_name = sys.argv[3]
+        run_list_of_queries(mouse_number, mouse_project_str, sheet_name)
 
 
 if __name__ == '__main__':
