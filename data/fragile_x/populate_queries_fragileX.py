@@ -24,7 +24,8 @@ def mouse_generic_queries(mouse_number):
     postIF_str = str(mouse_number) + 'ss_PSD.tif'
     postIF = [postIF_str]
     postIF_z = [2]
-    query = {'preIF': preIF, 'preIF_z': preIF_z, 'postIF': postIF, 'postIF_z': postIF_z, 'punctumSize': punctum_size}
+    query = {'preIF': preIF, 'preIF_z': preIF_z, 'postIF': postIF,
+             'postIF_z': postIF_z, 'punctumSize': punctum_size}
     listOfQueries.append(query)
 
     # Query 1
@@ -35,7 +36,8 @@ def mouse_generic_queries(mouse_number):
     postIF_str = str(mouse_number) + 'ss_PSD.tif'
     postIF = [postIF_str]
     postIF_z = [2]
-    query = {'preIF': preIF, 'preIF_z': preIF_z, 'postIF': postIF, 'postIF_z': postIF_z, 'punctumSize': punctum_size}
+    query = {'preIF': preIF, 'preIF_z': preIF_z, 'postIF': postIF,
+             'postIF_z': postIF_z, 'punctumSize': punctum_size}
     listOfQueries.append(query)
 
     # Query 2
@@ -45,7 +47,8 @@ def mouse_generic_queries(mouse_number):
     postIF_str = str(mouse_number) + 'ss_PSD.tif'
     postIF = [postIF_str]
     postIF_z = [2]
-    query = {'preIF': preIF, 'preIF_z': preIF_z, 'postIF': postIF, 'postIF_z': postIF_z, 'punctumSize': punctum_size}
+    query = {'preIF': preIF, 'preIF_z': preIF_z, 'postIF': postIF,
+             'postIF_z': postIF_z, 'punctumSize': punctum_size}
     listOfQueries.append(query)
 
     # Query 3
@@ -57,7 +60,8 @@ def mouse_generic_queries(mouse_number):
     postIF_str = str(mouse_number) + 'ss_PSD.tif'
     postIF = [postIF_str]
     postIF_z = [2]
-    query = {'preIF': preIF, 'preIF_z': preIF_z, 'postIF': postIF, 'postIF_z': postIF_z, 'punctumSize': punctum_size}
+    query = {'preIF': preIF, 'preIF_z': preIF_z, 'postIF': postIF,
+             'postIF_z': postIF_z, 'punctumSize': punctum_size}
     listOfQueries.append(query)
 
     # Query 4
@@ -68,7 +72,8 @@ def mouse_generic_queries(mouse_number):
     postIF_str1 = str(mouse_number) + 'ss_Geph.tif'
     postIF = [postIF_str1]
     postIF_z = [1]
-    query = {'preIF': preIF, 'preIF_z': preIF_z, 'postIF': postIF, 'postIF_z': postIF_z, 'punctumSize': punctum_size}
+    query = {'preIF': preIF, 'preIF_z': preIF_z, 'postIF': postIF,
+             'postIF_z': postIF_z, 'punctumSize': punctum_size}
     listOfQueries.append(query)
 
     # NEW GEPHYRIN QUERIES FROM YI
@@ -81,7 +86,8 @@ def mouse_generic_queries(mouse_number):
     postIF_str2 = str(mouse_number) + 'ss_Geph.tif'
     postIF = [postIF_str1, postIF_str2]
     postIF_z = [2, 1]
-    query = {'preIF': preIF, 'preIF_z': preIF_z, 'postIF': postIF, 'postIF_z': postIF_z, 'punctumSize': punctum_size}
+    query = {'preIF': preIF, 'preIF_z': preIF_z, 'postIF': postIF,
+             'postIF_z': postIF_z, 'punctumSize': punctum_size}
     listOfQueries.append(query)
 
     # Query 6
@@ -93,13 +99,14 @@ def mouse_generic_queries(mouse_number):
     postIF_str2 = str(mouse_number) + 'ss_Geph.tif'
     postIF = [postIF_str1, postIF_str2]
     postIF_z = [2, 1]
-    query = {'preIF': preIF, 'preIF_z': preIF_z, 'postIF': postIF, 'postIF_z': postIF_z, 'punctumSize': punctum_size}
+    query = {'preIF': preIF, 'preIF_z': preIF_z, 'postIF': postIF,
+             'postIF_z': postIF_z, 'punctumSize': punctum_size}
     listOfQueries.append(query)
 
     data = {'listOfQueries': listOfQueries}
-    fn = '/Users/anish/Documents/Connectome/SynapseAnalysis/data/fragile_x/' + str(mouse_number) + 'ss_queries.json'
+    fn = '/Users/anish/Documents/Connectome/SynapseAnalysis/data/fragile_x/' + \
+        str(mouse_number) + 'ss_queries.json'
     da.writeJSONFile(fn, data)
-
 
 
 def mouse_YFP_queries(mouse_number):
@@ -117,7 +124,8 @@ def mouse_YFP_queries(mouse_number):
     postIF_str2 = str(mouse_number) + 'ss_YFP.tif'
     postIF = [postIF_str1, postIF_str2]
     postIF_z = [2, 2]
-    query = {'preIF': preIF, 'preIF_z': preIF_z, 'postIF': postIF, 'postIF_z': postIF_z, 'punctumSize': punctum_size}
+    query = {'preIF': preIF, 'preIF_z': preIF_z, 'postIF': postIF,
+             'postIF_z': postIF_z, 'punctumSize': punctum_size}
     listOfQueries.append(query)
 
     # Query 1
@@ -129,7 +137,8 @@ def mouse_YFP_queries(mouse_number):
     postIF_str2 = str(mouse_number) + 'ss_YFP.tif'
     postIF = [postIF_str1, postIF_str2]
     postIF_z = [2, 2]
-    query = {'preIF': preIF, 'preIF_z': preIF_z, 'postIF': postIF, 'postIF_z': postIF_z, 'punctumSize': punctum_size}
+    query = {'preIF': preIF, 'preIF_z': preIF_z, 'postIF': postIF,
+             'postIF_z': postIF_z, 'punctumSize': punctum_size}
     listOfQueries.append(query)
 
     # Query 2
@@ -141,7 +150,8 @@ def mouse_YFP_queries(mouse_number):
     postIF_str2 = str(mouse_number) + 'ss_YFP.tif'
     postIF = [postIF_str1, postIF_str2]
     postIF_z = [2, 2]
-    query = {'preIF': preIF, 'preIF_z': preIF_z, 'postIF': postIF, 'postIF_z': postIF_z, 'punctumSize': punctum_size}
+    query = {'preIF': preIF, 'preIF_z': preIF_z, 'postIF': postIF,
+             'postIF_z': postIF_z, 'punctumSize': punctum_size}
     listOfQueries.append(query)
 
     # Query 3
@@ -154,7 +164,8 @@ def mouse_YFP_queries(mouse_number):
     postIF_str2 = str(mouse_number) + 'ss_YFP.tif'
     postIF = [postIF_str1, postIF_str2]
     postIF_z = [2, 2]
-    query = {'preIF': preIF, 'preIF_z': preIF_z, 'postIF': postIF, 'postIF_z': postIF_z, 'punctumSize': punctum_size}
+    query = {'preIF': preIF, 'preIF_z': preIF_z, 'postIF': postIF,
+             'postIF_z': postIF_z, 'punctumSize': punctum_size}
     listOfQueries.append(query)
 
     # Query 4
@@ -167,11 +178,13 @@ def mouse_YFP_queries(mouse_number):
     postIF = [postIF_str1, postIF_str2]
     postIF_z = [1, 2]
 
-    query = {'preIF': preIF, 'preIF_z': preIF_z, 'postIF': postIF, 'postIF_z': postIF_z, 'punctumSize': punctum_size}
+    query = {'preIF': preIF, 'preIF_z': preIF_z, 'postIF': postIF,
+             'postIF_z': postIF_z, 'punctumSize': punctum_size}
     listOfQueries.append(query)
 
     data = {'listOfQueries': listOfQueries}
-    fn = '/Users/anish/Documents/Connectome/SynapseAnalysis/data/fragile_x/' + str(mouse_number) + 'ss_YFP_queries.json'
+    fn = '/Users/anish/Documents/Connectome/SynapseAnalysis/data/fragile_x/' + \
+        str(mouse_number) + 'ss_YFP_queries.json'
     da.writeJSONFile(fn, data)
 
 
@@ -262,7 +275,8 @@ def mouse_astro_queries(mouse_number):
     listOfQueries.append(query)
 
     data = {'listOfQueries': listOfQueries}
-    fn = '/Users/anish/Documents/Connectome/SynapseAnalysis/data/fragile_x/' + str(mouse_number) + 'ss_astro_queries.json'
+    fn = '/Users/anish/Documents/Connectome/SynapseAnalysis/data/fragile_x/' + \
+        str(mouse_number) + 'ss_astro_queries.json'
     da.writeJSONFile(fn, data)
 
 
@@ -283,6 +297,15 @@ def main():
     mouse_generic_queries(6)
     mouse_YFP_queries(6)
     mouse_astro_queries(6)
+
+    mouse_generic_queries(5)
+    mouse_YFP_queries(5)
+    mouse_astro_queries(5)
+
+    mouse_generic_queries(7)
+    mouse_YFP_queries(7)
+    mouse_astro_queries(7)
+
 
 if __name__ == '__main__':
     main()

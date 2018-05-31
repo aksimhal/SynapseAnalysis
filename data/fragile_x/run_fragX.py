@@ -159,14 +159,24 @@ def main():
         # mouse_number = 2
         # mouse_project_str = '2ss'
         # sheet_name = '2ss_fragX'
-        # run_list_of_queries(
-        #     mouse_number=2, mouse_project_str='2ss', sheet_name='2ss_fragX')
-        # run_list_of_queries(
-        #     mouse_number=3, mouse_project_str='3ss', sheet_name='3ss_fragX')
-        # run_list_of_queries(
-        #     mouse_number=4, mouse_project_str='4ss', sheet_name='4ss_fragX')
-        # run_list_of_queries(
-        #     mouse_number=6, mouse_project_str='6ss', sheet_name='6ss_fragX')
+        run_list_of_queries(
+            mouse_number=5, mouse_project_str='5ss', sheet_name='5ss_fragX')
+        run_list_of_queries(
+            mouse_number=7, mouse_project_str='7ss', sheet_name='7ss_fragX')
+
+        run_list_of_queries(
+            mouse_number=5, mouse_project_str='5ss_YFP', sheet_name='5ss_YFP_fragX')
+        run_list_of_queries(
+            mouse_number=7, mouse_project_str='7ss_YFP', sheet_name='7ss_YFP_fragX')
+
+        run_list_of_queries(
+            mouse_number=2, mouse_project_str='2ss', sheet_name='2ss_fragX')
+        run_list_of_queries(
+            mouse_number=3, mouse_project_str='3ss', sheet_name='3ss_fragX')
+        run_list_of_queries(
+            mouse_number=4, mouse_project_str='4ss', sheet_name='4ss_fragX')
+        run_list_of_queries(
+            mouse_number=6, mouse_project_str='6ss', sheet_name='6ss_fragX')
 
         # python run_fragX.py 4 '4ss_YFP' '4ss_YFP_fragX'
         run_list_of_queries(
