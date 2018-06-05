@@ -98,3 +98,66 @@ def run_synapses_astro(query_fn, data_location_base, outputFoldername):
     df = create_synapse_df(result_list, foldernames)
     print(df)
     return df
+
+
+def run_synapse_detection(atet_input):
+    """
+    Run synapse detection and result evalution.  The parameters need to be rethought 
+
+    Parameters
+    -------------------
+    atet_input : dict 
+
+    Returns
+    -------------------
+    output_dict : dict 
+
+    """
+
+    query = atet_input['query']
+    queryID = atet_input['queryID']
+    nQuery = atet_input['nQuery']
+    resolution = atet_input['resolution']
+    data_location = atet_input['data_location']
+    data_region_location = atet_input['data_region_location']
+    output_foldername = atet_input['output_foldername']
+    region_name = atet_input['region_name']
+
+    # Load the data
+    synaptic_volumes = da.load_tiff_from_query(query, data_region_location)
+    volume_um3 = aa.getdatavolume(synaptic_volumes, resolution)
+    print(volume_um3)
+
+    # Run Synapse Detection
+    print('running synapse detection')
+    resultvol = syn.getSynapseDetections(synaptic_volumes, query)
+
+    # Save the probability map to file, if you want
+    outputNPYlocation = os.path.join(
+        data_location, output_foldername, region_name)
+    syn.saveresultvol(resultvol, outputNPYlocation, 'query_', queryID)
+
+    thresh = 0.9
+    queryresult = compute_measurements(
+        resultvol, query, volume_um3, thresh)
+
+    output_dict = {'queryID': queryID,
+                   'query': query, 'queryresult': queryresult}
+    return output_dict
+
+
+def organize_result_lists(result_list):
+    """
+    output_dict = {'queryID': queryID,
+                   'query': query, 'queryresult': queryresult}
+    """
+    query_inds = []
+    list_of_queryresult = []
+    for result in result_list:
+        query_inds.append(result['queryID'])
+        list_of_queryresult.append(result['queryresult'])
+
+    sorted_inds = np.argsort(query_inds)
+    sorted_queryresult = [list_of_queryresult[n] for n in sorted_inds]
+
+    return sorted_queryresult
