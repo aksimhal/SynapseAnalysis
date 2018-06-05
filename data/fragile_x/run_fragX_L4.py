@@ -30,7 +30,7 @@ def run_queries_layer4():
 
     for n, mouse_number in enumerate(mouse_id_list):
 
-        query_fn = mouse_number + 'ss_queries.json'
+        query_fn = str(mouse_number) + 'ss_queries.json'
         data_location = '/Users/anish/Documents/yi_mice/' + \
             str(mouse_number) + 'ss_stacks/'
         mask_location_str = '/Users/anish/Documents/yi_mice/masks/' + \
