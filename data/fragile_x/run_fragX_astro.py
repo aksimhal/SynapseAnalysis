@@ -1,41 +1,91 @@
 """
-run fragilex synapse detections for YFP
+Run FragileX Astrocyte Queries
 """
 import os
 import sys
 import pandas as pd
 from at_synapse_detection import dataAccess as da
 from at_synapse_detection import SynapseDetection as syn
-from at_synapse_detection import antibodyAnalysis as aa 
+from at_synapse_detection import antibodyAnalysis as aa
 from at_synapse_detection import SynapseAnalysis as sa
 import socket
+import multiprocessing as mp
+import numpy as np
+
+
+def run_queries():
+    """
+    Run FragileX astrocyte queries
+    """
+    # Select data
+    mouse_id_list = [2, 3, 4, 5, 6, 7]
+    mouse_region_list = ['F000', 'F001', 'F002', 'F003']
+    # Specify output
+    output_foldername = 'results_astro'
+    sheet_name = 'results_astro'
+    # Set global
+    resolution = {'res_xy_nm': 100, 'res_z_nm': 70}
+    thresh = 0.9
+    # Set multiprocessing pool
+    num_workers = mp.cpu_count() - 1
+    pool = mp.Pool(num_workers)
+
+    atet_inputs_list = []
+    result_list = []
+    foldernames = []
+    queryID = 0
+
+    # Collect data for mp pool
+    for n, mouse_number in enumerate(mouse_id_list):
+        # Load specific query file
+        query_fn = str(mouse_number) + 'ss_astro_queries.json'
+        listOfQueries = syn.loadQueriesJSON(query_fn)
+
+        hostname = socket.gethostname()
+        if hostname == 'Galicia':
+            data_location = '/data5TB/yi_mice/' + \
+                str(mouse_number) + 'ss_stacks'
+            mask_location_str = None
+        elif hostname == 'anish':
+            data_location = '/Users/anish/Documents/yi_mice/' + \
+                str(mouse_number) + 'ss_stacks/'
+            mask_location_str = None
+
+        # Set up processes
+        for region_name in mouse_region_list:
+            data_region_location = os.path.join(data_location, region_name)
+            # Iterate over queries
+            for nQuery, query in enumerate(listOfQueries):
+                foldername = str(mouse_number) + 'ss-' + \
+                    region_name + '-Q' + str(nQuery)
+                foldernames.append(foldername)
+                print(foldername)
+
+                atet_input = {'query': query, 'queryID': queryID, 'nQuery': nQuery, 'resolution': resolution,
+                              'data_region_location': data_region_location, 'data_location': data_location,
+                              'output_foldername': output_foldername, 'region_name': region_name, 'mask_str': mask_location_str}
+                atet_inputs_list.append(atet_input)
+                queryID = queryID + 1
+
+    # Run processes
+    result_list = pool.map(sa.run_synapse_detection_astro, atet_inputs_list)
+
+    pool.close()
+    pool.join()
+
+    print('Get process results from the output queue')
+    sorted_queryresult = sa.organize_result_lists(result_list)
+
+    mouse_df = sa.create_synapse_df(sorted_queryresult, foldernames)
+    print(mouse_df)
+
+    fn = sheet_name + '.xlsx'
+    df_list = [mouse_df]
+    aa.write_dfs_to_excel(df_list, sheet_name, fn)
 
 
 def main():
-    """
-    run synapse detection
-    """
-    outputFoldername = 'results_astro'
-    query_fn = '2ss_astro_queries.json'
-    datalocation = '/Users/anish/Documents/yi_mice/2ss_stacks/'
-    hostname = socket.gethostname()
-    if hostname == 'Galicia': 
-        datalocation = '/data5TB/yi_mice/2ss_stacks'
-
-    mouse2_df = sa.run_synapses_astro(query_fn, datalocation, outputFoldername)
-
-    query_fn = '3ss_astro_queries.json'
-    datalocation = '/Users/anish/Documents/yi_mice/3ss_stacks/'
-    if hostname == 'Galicia': 
-        datalocation = '/data5TB/yi_mice/3ss_stacks'
-
-    mouse3_df = sa.run_synapses_astro(query_fn, datalocation, outputFoldername)
-    
-    sheet_name = 'FragileX astro'
-    fn = 'fragileX_astro_experiment.xlsx'
-    df_list = [mouse2_df, mouse3_df]
-    aa.write_dfs_to_excel(df_list, sheet_name, fn)
-
+    run_queries()
 
 
 if __name__ == '__main__':

@@ -58,49 +58,6 @@ def create_synapse_df(result_list, row_labels):
     return df
 
 
-def run_synapses_astro(query_fn, data_location_base, outputFoldername):
-    """
-    """
-
-    listOfQueries = syn.loadQueriesJSON(query_fn)
-    resolution = {'res_xy_nm': 100, 'res_z_nm': 70}
-    region_name_base = 'F00'
-    thresh = 0.9
-
-    foldernames = []
-    result_list = []
-    for region_num in range(0, 4):
-        region_name = region_name_base + str(region_num)
-        data_location = os.path.join(data_location_base, region_name)
-
-        for n, query in enumerate(listOfQueries):
-            print(query)
-            foldername = region_name + '-Q' + str(n)
-            foldernames.append(foldername)
-            print(foldername)
-            # Load the data
-
-            synaptic_volumes = da.load_tiff_from_astro_query(
-                query, data_location)
-            volume_um3 = aa.getdatavolume(synaptic_volumes, resolution)
-
-            # Run Synapse Detection
-            resultvol = syn.getSynapseDetections_astro(synaptic_volumes, query)
-
-            # Save the probability map to file, if you want
-            outputNPYlocation = os.path.join(
-                data_location_base, outputFoldername, region_name)
-            syn.saveresultvol(resultvol, outputNPYlocation, 'query_', n)
-
-            queryresult = compute_measurements(
-                resultvol, query, volume_um3, thresh)
-            result_list.append(queryresult)
-
-    df = create_synapse_df(result_list, foldernames)
-    print(df)
-    return df
-
-
 def run_synapse_detection(atet_input):
     """
     Run synapse detection and result evalution.  The parameters need to be rethought 
@@ -142,9 +99,57 @@ def run_synapse_detection(atet_input):
     resultvol = syn.getSynapseDetections(synaptic_volumes, query)
 
     # Save the probability map to file, if you want
-    outputNPYlocation = os.path.join(
-        data_location, output_foldername, region_name)
-    syn.saveresultvol(resultvol, outputNPYlocation, 'query_', queryID)
+    # outputNPYlocation = os.path.join(
+    #     data_location, output_foldername, region_name)
+    # syn.saveresultvol(resultvol, outputNPYlocation, 'query_', queryID)
+
+    thresh = 0.9
+    queryresult = compute_measurements(
+        resultvol, query, volume_um3, thresh)
+
+    output_dict = {'queryID': queryID,
+                   'query': query, 'queryresult': queryresult}
+    return output_dict
+
+
+def run_synapse_detection_astro(atet_input):
+    """
+    Run synapse detection and result evalution.  The parameters need to be rethought 
+
+    Parameters
+    -------------------
+    atet_input : dict 
+
+    Returns
+    -------------------
+    output_dict : dict 
+
+    """
+
+    query = atet_input['query']
+    queryID = atet_input['queryID']
+    nQuery = atet_input['nQuery']
+    resolution = atet_input['resolution']
+    data_location = atet_input['data_location']
+    data_region_location = atet_input['data_region_location']
+    output_foldername = atet_input['output_foldername']
+    region_name = atet_input['region_name']
+    mask_str = atet_input['mask_str']
+
+    # Load the data
+    synaptic_volumes = da.load_tiff_from_query(query, data_region_location)
+
+    volume_um3 = aa.getdatavolume(synaptic_volumes, resolution)
+    print(volume_um3)
+
+    # Run Synapse Detection
+    print('running synapse detection')
+    resultvol = syn.getSynapseDetections_astro(synaptic_volumes, query)
+
+    # Save the probability map to file, if you want
+    # outputNPYlocation = os.path.join(
+    #     data_location, output_foldername, region_name)
+    # syn.saveresultvol(resultvol, outputNPYlocation, 'query_', queryID)
 
     thresh = 0.9
     queryresult = compute_measurements(

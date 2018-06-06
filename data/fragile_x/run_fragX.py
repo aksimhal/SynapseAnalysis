@@ -60,23 +60,6 @@ def run_synapse_detection(atet_input):
     return output_dict
 
 
-def organize_result_lists(result_list):
-    """
-    output_dict = {'queryID': queryID,
-                   'query': query, 'queryresult': queryresult}
-    """
-    query_inds = []
-    list_of_queryresult = []
-    for result in result_list:
-        query_inds.append(result['queryID'])
-        list_of_queryresult.append(result['queryresult'])
-
-    sorted_inds = np.argsort(query_inds)
-    sorted_queryresult = [list_of_queryresult[n] for n in sorted_inds]
-
-    return sorted_queryresult
-
-
 def run_list_of_queries(mouse_number, mouse_project_str, sheet_name):
     """
     run queries in a parallel manner
@@ -141,7 +124,7 @@ def run_list_of_queries(mouse_number, mouse_project_str, sheet_name):
     pool.join()
 
     print('Get process results from the output queue')
-    sorted_queryresult = organize_result_lists(result_list)
+    sorted_queryresult = sa.organize_result_lists(result_list)
 
     mouse_df = sa.create_synapse_df(sorted_queryresult, foldernames)
     print(mouse_df)
