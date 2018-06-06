@@ -127,6 +127,7 @@ def run_synapse_detection(atet_input):
 
     # Load the data
     synaptic_volumes = da.load_tiff_from_query(query, data_region_location)
+
     # Load mask
     mask = Image.open(mask_str)
     mask = np.array(mask)

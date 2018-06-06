@@ -24,13 +24,25 @@ def run_queries_layer4():
     mouse_id_list = [2, 3, 4, 5, 6, 7]
     mouse_region_list = ['F000', 'F000', 'F000', 'F000', 'F003', 'F003']
     output_foldername = 'results_layer4'
+    sheet_name = 'results_layer4'
+
     resolution = {'res_xy_nm': 100, 'res_z_nm': 70}
     thresh = 0.9
-    sheet_name = 'results_layer4'
+
+    num_workers = mp.cpu_count() - 1
+    print(num_workers)
+    pool = mp.Pool(num_workers)
+
+    atet_inputs_list = []
+    result_list = []
+    foldernames = []
+    queryID = 0
 
     for n, mouse_number in enumerate(mouse_id_list):
 
         query_fn = str(mouse_number) + 'ss_queries.json'
+        listOfQueries = syn.loadQueriesJSON(query_fn)
+
         data_location = '/Users/anish/Documents/yi_mice/' + \
             str(mouse_number) + 'ss_stacks/'
         mask_location_str = '/Users/anish/Documents/yi_mice/masks/' + \
@@ -43,17 +55,7 @@ def run_queries_layer4():
             mask_location_str = '/data5TB/yi_mice/L4masks/' + \
                 str(mouse_number) + 'ss_mask.png'
 
-        listOfQueries = syn.loadQueriesJSON(query_fn)
         region_name = mouse_region_list[n]
-
-        num_workers = mp.cpu_count() - 1
-        print(num_workers)
-        pool = mp.Pool(num_workers)
-
-        atet_inputs_list = []
-        result_list = []
-        foldernames = []
-        queryID = 0
 
         data_region_location = os.path.join(data_location, region_name)
 
@@ -67,7 +69,6 @@ def run_queries_layer4():
                           'data_region_location': data_region_location, 'data_location': data_location,
                           'output_foldername': output_foldername, 'region_name': region_name, 'mask_str': mask_location_str}
             atet_inputs_list.append(atet_input)
-
             queryID = queryID + 1
 
     # Run processes
