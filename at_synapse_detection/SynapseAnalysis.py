@@ -6,6 +6,7 @@ from skimage import measure
 from at_synapse_detection import SynapseDetection as syn
 from at_synapse_detection import dataAccess as da
 from at_synapse_detection import antibodyAnalysis as aa
+from PIL import Image
 
 
 class SynapseAnalysis:
@@ -122,10 +123,17 @@ def run_synapse_detection(atet_input):
     data_region_location = atet_input['data_region_location']
     output_foldername = atet_input['output_foldername']
     region_name = atet_input['region_name']
+    mask_str = atet_input['mask_str']
 
     # Load the data
     synaptic_volumes = da.load_tiff_from_query(query, data_region_location)
-    volume_um3 = aa.getdatavolume(synaptic_volumes, resolution)
+    # Load mask
+    mask = Image.open(mask_str)
+    mask = np.array(mask)
+    # Mask data
+    synaptic_volumes = mask_synaptic_volumes(synaptic_volumes, mask)
+
+    volume_um3 = get_masked_volume(synaptic_volumes, mask, resolution)
     print(volume_um3)
 
     # Run Synapse Detection
@@ -161,3 +169,64 @@ def organize_result_lists(result_list):
     sorted_queryresult = [list_of_queryresult[n] for n in sorted_inds]
 
     return sorted_queryresult
+
+
+def mask_synaptic_volumes(synaptic_volumes, mask):
+    """
+    Mask synaptic volumes 
+
+    Parameters
+    -------------
+    synaptic_volumes : dict 
+    mask : 2D array 
+
+    Returns 
+    --------------
+    synaptic_volumes : dict 
+    """
+
+    keys = synaptic_volumes.keys()
+    masked_synaptic_volumes = {key: [] for key in keys}
+
+    for key in synaptic_volumes.keys():
+        print(key)
+        for volume in synaptic_volumes[key]:
+            maskedVol = np.zeros(volume.shape)
+            for sliceInd in range(0, volume.shape[2]):
+                maskedVol[:, :, sliceInd] = volume[:, :, sliceInd] * mask
+            masked_synaptic_volumes[key].append(maskedVol)
+
+    return masked_synaptic_volumes
+
+
+def get_masked_volume(synaptic_volumes, mask, resolution):
+    """
+    Compute volume of data in cubic microns
+
+    Parameters
+    -------------
+    synaptic_volumes : dict
+    resolution : dict
+    mask : numpy 2d array
+
+    Return
+    --------------
+    volume_um3 : double
+    """
+
+    res_xy_nm = resolution['res_xy_nm']
+    res_z_nm = resolution['res_z_nm']
+
+    slice_volume_um3 = np.count_nonzero(
+        mask) * (res_xy_nm / 1000) * (res_xy_nm / 1000)
+
+    # Compute Volume
+    if len(synaptic_volumes['presynaptic']) > 0:
+        volume_um3 = np.prod(
+            synaptic_volumes['presynaptic'][0].shape[2]) * (res_z_nm / 1000) * slice_volume_um3
+
+    elif len(synaptic_volumes['postsynaptic']) > 0:
+        volume_um3 = np.prod(
+            synaptic_volumes['postsynaptic'][0].shape[2]) * (res_z_nm / 1000) * slice_volume_um3
+
+    return volume_um3

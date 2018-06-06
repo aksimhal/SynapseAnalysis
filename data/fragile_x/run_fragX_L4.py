@@ -65,7 +65,7 @@ def run_queries_layer4():
 
             atet_input = {'query': query, 'queryID': queryID, 'nQuery': nQuery, 'resolution': resolution,
                           'data_region_location': data_region_location, 'data_location': data_location,
-                          'output_foldername': output_foldername, 'region_name': region_name}
+                          'output_foldername': output_foldername, 'region_name': region_name, 'mask_str': mask_location_str}
             atet_inputs_list.append(atet_input)
 
             queryID = queryID + 1
