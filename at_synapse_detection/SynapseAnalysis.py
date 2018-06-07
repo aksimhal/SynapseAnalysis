@@ -137,7 +137,8 @@ def run_synapse_detection_astro(atet_input):
     mask_str = atet_input['mask_str']
 
     # Load the data
-    synaptic_volumes = da.load_tiff_from_query(query, data_region_location)
+    synaptic_volumes = da.load_tiff_from_astro_query(
+        query, data_region_location)
 
     volume_um3 = aa.getdatavolume(synaptic_volumes, resolution)
     print(volume_um3)
