@@ -54,10 +54,13 @@ def run_queries_layer4():
                 str(mouse_number) + 'ss_stacks'
             mask_location_str = '/data5TB/yi_mice/L4masks/' + \
                 str(mouse_number) + 'ss_mask.png'
+            dapi_mask_str_base = '/data5TB/yi_mice/dapi-masks/' + \
+                str(mouse_number) + 'ss_stacks'
 
         region_name = mouse_region_list[n]
 
         data_region_location = os.path.join(data_location, region_name)
+        dapi_mask_str = os.path.join(dapi_mask_str_base, region_name)
 
         for nQuery, query in enumerate(listOfQueries):
             foldername = str(mouse_number) + 'ss-' + \
@@ -67,7 +70,8 @@ def run_queries_layer4():
 
             atet_input = {'query': query, 'queryID': queryID, 'nQuery': nQuery, 'resolution': resolution,
                           'data_region_location': data_region_location, 'data_location': data_location,
-                          'output_foldername': output_foldername, 'region_name': region_name, 'mask_str': mask_location_str}
+                          'output_foldername': output_foldername, 'region_name': region_name,
+                          'mask_str': mask_location_str, 'dapi_mask_str': dapi_mask_str, 'mouse_number': mouse_number}
             atet_inputs_list.append(atet_input)
             queryID = queryID + 1
 
