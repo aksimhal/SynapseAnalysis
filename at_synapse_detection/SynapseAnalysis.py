@@ -99,9 +99,9 @@ def run_synapse_detection(atet_input):
     # Merge DAPI mask and Layer 4 mask
     combined_mask = merge_DAPI_L4_masks(layer_mask, dapi_mask)
     # Mask data
-    synaptic_volumes = mask_synaptic_volumes(synaptic_volumes, layer_mask)
+    synaptic_volumes = mask_synaptic_volumes(synaptic_volumes, combined_mask)
 
-    volume_um3 = get_masked_volume(synaptic_volumes, layer_mask, resolution)
+    volume_um3 = get_masked_volume(synaptic_volumes, combined_mask, resolution)
     print(volume_um3)
 
     # Run Synapse Detection
