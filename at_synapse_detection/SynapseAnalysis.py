@@ -239,7 +239,8 @@ def mask_synaptic_volumes(synaptic_volumes, mask):
         for volume in synaptic_volumes[key]:
             maskedVol = np.zeros(volume.shape)
             for sliceInd in range(0, volume.shape[2]):
-                maskedVol[:, :, sliceInd] = volume[:, :, sliceInd] * mask
+                maskedVol[:, :, sliceInd] = volume[:,
+                                                   :, sliceInd] * mask[:, :, sliceInd]
             masked_synaptic_volumes[key].append(maskedVol)
 
     return masked_synaptic_volumes
