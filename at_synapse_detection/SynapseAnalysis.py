@@ -265,15 +265,16 @@ def get_masked_volume(synaptic_volumes, mask, resolution):
     res_z_nm = resolution['res_z_nm']
 
     slice_volume_um3 = np.count_nonzero(
-        mask) * (res_xy_nm / 1000) * (res_xy_nm / 1000)
+        mask) * (res_xy_nm / 1000) * (res_xy_nm / 1000) * (res_z_nm / 1000)
 
+    volume_um3 = slice_volume_um3
     # Compute Volume
-    if len(synaptic_volumes['presynaptic']) > 0:
-        volume_um3 = np.prod(
-            synaptic_volumes['presynaptic'][0].shape[2]) * (res_z_nm / 1000) * slice_volume_um3
+    # if len(synaptic_volumes['presynaptic']) > 0:
+    #     volume_um3 = np.prod(
+    #         synaptic_volumes['presynaptic'][0].shape[2]) * (res_z_nm / 1000) * slice_volume_um3
 
-    elif len(synaptic_volumes['postsynaptic']) > 0:
-        volume_um3 = np.prod(
-            synaptic_volumes['postsynaptic'][0].shape[2]) * (res_z_nm / 1000) * slice_volume_um3
+    # elif len(synaptic_volumes['postsynaptic']) > 0:
+    #     volume_um3 = np.prod(
+    #         synaptic_volumes['postsynaptic'][0].shape[2]) * (res_z_nm / 1000) * slice_volume_um3
 
     return volume_um3
