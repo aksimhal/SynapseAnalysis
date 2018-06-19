@@ -88,8 +88,9 @@ def run_synapse_detection(atet_input):
     synaptic_volumes = da.load_tiff_from_query(query, data_region_location)
 
     # Load layer mask
-    layer_mask = Image.open(layer_mask_str)
-    layer_mask = np.array(layer_mask)
+    if layer_mask_str != -1:
+        layer_mask = Image.open(layer_mask_str)
+        layer_mask = np.array(layer_mask)
 
     # Load DAPI mask
     dapi_mask_fn = os.path.join(dapi_mask_str, str(
@@ -97,7 +98,11 @@ def run_synapse_detection(atet_input):
     dapi_mask = da.imreadtiff(dapi_mask_fn)
 
     # Merge DAPI mask and Layer 4 mask
-    combined_mask = merge_DAPI_L4_masks(layer_mask, dapi_mask)
+    if layer_mask_str != -1:
+        combined_mask = merge_DAPI_L4_masks(layer_mask, dapi_mask)
+    else:
+        combined_mask = dapi_mask.astype(np.bool)
+
     # Mask data
     synaptic_volumes = mask_synaptic_volumes(synaptic_volumes, combined_mask)
 
