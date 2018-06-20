@@ -101,7 +101,8 @@ def run_synapse_detection(atet_input):
     if layer_mask_str != -1:
         combined_mask = merge_DAPI_L4_masks(layer_mask, dapi_mask)
     else:
-        combined_mask = dapi_mask.astype(np.bool)
+        dapi_mask = dapi_mask.astype(np.bool)
+        combined_mask = np.logical_not(dapi_mask)
 
     # Mask data
     synaptic_volumes = mask_synaptic_volumes(synaptic_volumes, combined_mask)
@@ -178,13 +179,24 @@ def run_synapse_detection_astro(atet_input):
     data_region_location = atet_input['data_region_location']
     output_foldername = atet_input['output_foldername']
     region_name = atet_input['region_name']
-    mask_str = atet_input['mask_str']
+    layer_mask_str = atet_input['mask_str']
+    dapi_mask_str = atet_input['dapi_mask_str']
+    mouse_number = atet_input['mouse_number']
 
     # Load the data
     synaptic_volumes = da.load_tiff_from_astro_query(
         query, data_region_location)
 
-    volume_um3 = aa.getdatavolume(synaptic_volumes, resolution)
+    # Load DAPI mask
+    dapi_mask_fn = os.path.join(dapi_mask_str, str(
+        mouse_number) + 'ss-DAPI-mask.tiff')
+    dapi_mask = da.imreadtiff(dapi_mask_fn)
+    dapi_mask = dapi_mask.astype(np.bool)
+    combined_mask = np.logical_not(dapi_mask)
+    # Mask data
+    synaptic_volumes = mask_synaptic_volumes(synaptic_volumes, combined_mask)
+
+    volume_um3 = get_masked_volume(synaptic_volumes, combined_mask, resolution)
     print(volume_um3)
 
     # Run Synapse Detection
@@ -192,9 +204,9 @@ def run_synapse_detection_astro(atet_input):
     resultvol = syn.getSynapseDetections_astro(synaptic_volumes, query)
 
     # Save the probability map to file, if you want
-    # outputNPYlocation = os.path.join(
-    #     data_location, output_foldername, region_name)
-    # syn.saveresultvol(resultvol, outputNPYlocation, 'query_', queryID)
+    outputNPYlocation = os.path.join(
+        data_location, output_foldername, region_name)
+    syn.saveresultvol(resultvol, outputNPYlocation, 'query_', queryID)
 
     thresh = 0.9
     queryresult = compute_measurements(

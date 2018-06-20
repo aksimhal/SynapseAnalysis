@@ -45,6 +45,9 @@ def run_queries():
         if hostname == 'Galicia':
             data_location = '/data5TB/yi_mice/' + \
                 str(mouse_number) + 'ss_stacks'
+            dapi_mask_str_base = '/data5TB/yi_mice/dapi-masks/' + \
+                str(mouse_number) + 'ss_stacks'
+
             mask_location_str = None
         elif hostname == 'anish':
             data_location = '/Users/anish/Documents/yi_mice/' + \
@@ -54,6 +57,9 @@ def run_queries():
         # Set up processes
         for region_name in mouse_region_list:
             data_region_location = os.path.join(data_location, region_name)
+
+            dapi_mask_str = os.path.join(dapi_mask_str_base, region_name)
+
             # Iterate over queries
             for nQuery, query in enumerate(listOfQueries):
                 foldername = str(mouse_number) + 'ss-' + \
@@ -63,7 +69,8 @@ def run_queries():
 
                 atet_input = {'query': query, 'queryID': queryID, 'nQuery': nQuery, 'resolution': resolution,
                               'data_region_location': data_region_location, 'data_location': data_location,
-                              'output_foldername': output_foldername, 'region_name': region_name, 'mask_str': mask_location_str}
+                              'output_foldername': output_foldername, 'region_name': region_name,
+                              'mask_str': mask_location_str, 'dapi_mask_str': dapi_mask_str, 'mouse_number': mouse_number}
                 atet_inputs_list.append(atet_input)
                 queryID = queryID + 1
 
