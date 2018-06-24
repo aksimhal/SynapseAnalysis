@@ -102,7 +102,7 @@ def run_synapse_detection(atet_input):
         combined_mask = merge_DAPI_L4_masks(layer_mask, dapi_mask)
     else:
         dapi_mask = dapi_mask.astype(np.bool)
-        combined_mask = np.logical_not(dapi_mask)
+        combined_mask = np.logical_not(dapi_mask)  # keep portions without dapi
 
     # Mask data
     synaptic_volumes = mask_synaptic_volumes(synaptic_volumes, combined_mask)
