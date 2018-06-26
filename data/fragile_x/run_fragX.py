@@ -14,52 +14,6 @@ import copy
 import numpy as np
 
 
-# def run_synapse_detection(atet_input):
-#     """
-#     Run synapse detection and result evalution.  The parameters need to be rethought
-
-#     Parameters
-#     -------------------
-#     atet_input : dict
-
-#     Returns
-#     -------------------
-#     output_dict : dict
-
-#     """
-
-#     query = atet_input['query']
-#     queryID = atet_input['queryID']
-#     nQuery = atet_input['nQuery']
-#     resolution = atet_input['resolution']
-#     data_location = atet_input['data_location']
-#     data_region_location = atet_input['data_region_location']
-#     output_foldername = atet_input['output_foldername']
-#     region_name = atet_input['region_name']
-
-#     # Load the data
-#     synaptic_volumes = da.load_tiff_from_query(query, data_region_location)
-#     volume_um3 = aa.getdatavolume(synaptic_volumes, resolution)
-#     print(volume_um3)
-
-#     # Run Synapse Detection
-#     print('running synapse detection')
-#     resultvol = syn.getSynapseDetections(synaptic_volumes, query)
-
-#     # Save the probability map to file, if you want
-#     outputNPYlocation = os.path.join(
-#         data_location, output_foldername, region_name)
-#     syn.saveresultvol(resultvol, outputNPYlocation, 'query_', queryID)
-
-#     thresh = 0.9
-#     queryresult = sa.compute_measurements(
-#         resultvol, query, volume_um3, thresh)
-
-#     output_dict = {'queryID': queryID,
-#                    'query': query, 'queryresult': queryresult}
-#     return output_dict
-
-
 def run_list_of_queries(mouse_number, mouse_project_str, sheet_name):
     """
     run queries in a parallel manner
@@ -162,18 +116,18 @@ def main():
             mouse_number=7, mouse_project_str='7ss', sheet_name='7ss_fragX')
 
         # python run_fragX.py 4 '4ss_YFP' '4ss_YFP_fragX'
-        run_list_of_queries(
-            mouse_number=2, mouse_project_str='2ss_YFP', sheet_name='2ss_YFP_fragX')
-        run_list_of_queries(
-            mouse_number=3, mouse_project_str='3ss_YFP', sheet_name='3ss_YFP_fragX')
-        run_list_of_queries(
-            mouse_number=4, mouse_project_str='4ss_YFP', sheet_name='4ss_YFP_fragX')
-        run_list_of_queries(
-            mouse_number=6, mouse_project_str='6ss_YFP', sheet_name='6ss_YFP_fragX')
-        run_list_of_queries(
-            mouse_number=5, mouse_project_str='5ss_YFP', sheet_name='5ss_YFP_fragX')
-        run_list_of_queries(
-            mouse_number=7, mouse_project_str='7ss_YFP', sheet_name='7ss_YFP_fragX')
+        # run_list_of_queries(
+        #     mouse_number=2, mouse_project_str='2ss_YFP', sheet_name='2ss_YFP_fragX')
+        # run_list_of_queries(
+        #     mouse_number=3, mouse_project_str='3ss_YFP', sheet_name='3ss_YFP_fragX')
+        # run_list_of_queries(
+        #     mouse_number=4, mouse_project_str='4ss_YFP', sheet_name='4ss_YFP_fragX')
+        # run_list_of_queries(
+        #     mouse_number=6, mouse_project_str='6ss_YFP', sheet_name='6ss_YFP_fragX')
+        # run_list_of_queries(
+        #     mouse_number=5, mouse_project_str='5ss_YFP', sheet_name='5ss_YFP_fragX')
+        # run_list_of_queries(
+        #     mouse_number=7, mouse_project_str='7ss_YFP', sheet_name='7ss_YFP_fragX')
 
     else:
         print('we have arguments')

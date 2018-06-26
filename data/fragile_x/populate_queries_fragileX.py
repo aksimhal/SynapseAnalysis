@@ -17,13 +17,15 @@ def mouse_generic_queries(mouse_number):
     listOfQueries = []
     punctum_size = 2
 
+    slice_span = 1
+
     # Query 0
     preIF_str = str(mouse_number) + 'ss_Synap.tif'
     preIF = [preIF_str]
-    preIF_z = [3]
+    preIF_z = [slice_span]
     postIF_str = str(mouse_number) + 'ss_PSD.tif'
     postIF = [postIF_str]
-    postIF_z = [3]
+    postIF_z = [slice_span]
     query = {'preIF': preIF, 'preIF_z': preIF_z, 'postIF': postIF,
              'postIF_z': postIF_z, 'punctumSize': punctum_size}
     listOfQueries.append(query)
@@ -32,10 +34,10 @@ def mouse_generic_queries(mouse_number):
     preIF_str1 = str(mouse_number) + 'ss_Synap.tif'
     preIF_str2 = str(mouse_number) + 'ss_VGluT1.tif'
     preIF = [preIF_str1, preIF_str2]
-    preIF_z = [3, 3]
+    preIF_z = [slice_span, slice_span]
     postIF_str = str(mouse_number) + 'ss_PSD.tif'
     postIF = [postIF_str]
-    postIF_z = [3]
+    postIF_z = [slice_span]
     query = {'preIF': preIF, 'preIF_z': preIF_z, 'postIF': postIF,
              'postIF_z': postIF_z, 'punctumSize': punctum_size}
     listOfQueries.append(query)
@@ -44,62 +46,119 @@ def mouse_generic_queries(mouse_number):
     preIF_str1 = str(mouse_number) + 'ss_Synap.tif'
     preIF_str2 = str(mouse_number) + 'ss_VGluT2.tif'
     preIF = [preIF_str1, preIF_str2]
-    preIF_z = [3, 3]
+    preIF_z = [slice_span, slice_span]
     postIF_str = str(mouse_number) + 'ss_PSD.tif'
     postIF = [postIF_str]
-    postIF_z = [3]
+    postIF_z = [slice_span]
     query = {'preIF': preIF, 'preIF_z': preIF_z, 'postIF': postIF,
              'postIF_z': postIF_z, 'punctumSize': punctum_size}
     listOfQueries.append(query)
 
     # Query 3
     preIF_str1 = str(mouse_number) + 'ss_Synap.tif'
-    preIF_str2 = str(mouse_number) + 'ss_VGluT1.tif'
-    preIF_str3 = str(mouse_number) + 'ss_VGluT2.tif'
-    preIF = [preIF_str1, preIF_str2, preIF_str3]
-    preIF_z = [3, 3, 3]
-    postIF_str = str(mouse_number) + 'ss_PSD.tif'
-    postIF = [postIF_str]
-    postIF_z = [3]
-    query = {'preIF': preIF, 'preIF_z': preIF_z, 'postIF': postIF,
-             'postIF_z': postIF_z, 'punctumSize': punctum_size}
-    listOfQueries.append(query)
-
-    # Query 4
-    preIF_str1 = str(mouse_number) + 'ss_VGAT.tif'
     preIF_str2 = str(mouse_number) + 'ss_GAD.tif'
     preIF = [preIF_str1, preIF_str2]
-    preIF_z = [3, 3]
+    preIF_z = [slice_span, slice_span]
     postIF_str1 = str(mouse_number) + 'ss_Geph.tif'
     postIF = [postIF_str1]
-    postIF_z = [3]
+    postIF_z = [slice_span]
     query = {'preIF': preIF, 'preIF_z': preIF_z, 'postIF': postIF,
              'postIF_z': postIF_z, 'punctumSize': punctum_size}
     listOfQueries.append(query)
 
-    # NEW GEPHYRIN QUERIES FROM YI
-    # Query 5
+    slice_span = 2
+    # Query 0
+    preIF_str = str(mouse_number) + 'ss_Synap.tif'
+    preIF = [preIF_str]
+    preIF_z = [slice_span]
+    postIF_str = str(mouse_number) + 'ss_PSD.tif'
+    postIF = [postIF_str]
+    postIF_z = [slice_span]
+    query = {'preIF': preIF, 'preIF_z': preIF_z, 'postIF': postIF,
+             'postIF_z': postIF_z, 'punctumSize': punctum_size}
+    listOfQueries.append(query)
+
+    # Query 1
     preIF_str1 = str(mouse_number) + 'ss_Synap.tif'
     preIF_str2 = str(mouse_number) + 'ss_VGluT1.tif'
     preIF = [preIF_str1, preIF_str2]
-    preIF_z = [3, 3]
-    postIF_str1 = str(mouse_number) + 'ss_PSD.tif'
-    postIF_str2 = str(mouse_number) + 'ss_Geph.tif'
-    postIF = [postIF_str1, postIF_str2]
-    postIF_z = [3, 3]
+    preIF_z = [slice_span, slice_span]
+    postIF_str = str(mouse_number) + 'ss_PSD.tif'
+    postIF = [postIF_str]
+    postIF_z = [slice_span]
     query = {'preIF': preIF, 'preIF_z': preIF_z, 'postIF': postIF,
              'postIF_z': postIF_z, 'punctumSize': punctum_size}
     listOfQueries.append(query)
 
-    # Query 6
+    # Query 2
     preIF_str1 = str(mouse_number) + 'ss_Synap.tif'
     preIF_str2 = str(mouse_number) + 'ss_VGluT2.tif'
     preIF = [preIF_str1, preIF_str2]
-    preIF_z = [3, 3]
-    postIF_str1 = str(mouse_number) + 'ss_PSD.tif'
-    postIF_str2 = str(mouse_number) + 'ss_Geph.tif'
-    postIF = [postIF_str1, postIF_str2]
-    postIF_z = [3, 3]
+    preIF_z = [slice_span, slice_span]
+    postIF_str = str(mouse_number) + 'ss_PSD.tif'
+    postIF = [postIF_str]
+    postIF_z = [slice_span]
+    query = {'preIF': preIF, 'preIF_z': preIF_z, 'postIF': postIF,
+             'postIF_z': postIF_z, 'punctumSize': punctum_size}
+    listOfQueries.append(query)
+
+    # Query 3
+    preIF_str1 = str(mouse_number) + 'ss_Synap.tif'
+    preIF_str2 = str(mouse_number) + 'ss_GAD.tif'
+    preIF = [preIF_str1, preIF_str2]
+    preIF_z = [slice_span, slice_span]
+    postIF_str1 = str(mouse_number) + 'ss_Geph.tif'
+    postIF = [postIF_str1]
+    postIF_z = [slice_span]
+    query = {'preIF': preIF, 'preIF_z': preIF_z, 'postIF': postIF,
+             'postIF_z': postIF_z, 'punctumSize': punctum_size}
+    listOfQueries.append(query)
+
+    slice_span = 3
+
+    # Query 0
+    preIF_str = str(mouse_number) + 'ss_Synap.tif'
+    preIF = [preIF_str]
+    preIF_z = [slice_span]
+    postIF_str = str(mouse_number) + 'ss_PSD.tif'
+    postIF = [postIF_str]
+    postIF_z = [slice_span]
+    query = {'preIF': preIF, 'preIF_z': preIF_z, 'postIF': postIF,
+             'postIF_z': postIF_z, 'punctumSize': punctum_size}
+    listOfQueries.append(query)
+
+    # Query 1
+    preIF_str1 = str(mouse_number) + 'ss_Synap.tif'
+    preIF_str2 = str(mouse_number) + 'ss_VGluT1.tif'
+    preIF = [preIF_str1, preIF_str2]
+    preIF_z = [slice_span, slice_span]
+    postIF_str = str(mouse_number) + 'ss_PSD.tif'
+    postIF = [postIF_str]
+    postIF_z = [slice_span]
+    query = {'preIF': preIF, 'preIF_z': preIF_z, 'postIF': postIF,
+             'postIF_z': postIF_z, 'punctumSize': punctum_size}
+    listOfQueries.append(query)
+
+    # Query 2
+    preIF_str1 = str(mouse_number) + 'ss_Synap.tif'
+    preIF_str2 = str(mouse_number) + 'ss_VGluT2.tif'
+    preIF = [preIF_str1, preIF_str2]
+    preIF_z = [slice_span, slice_span]
+    postIF_str = str(mouse_number) + 'ss_PSD.tif'
+    postIF = [postIF_str]
+    postIF_z = [slice_span]
+    query = {'preIF': preIF, 'preIF_z': preIF_z, 'postIF': postIF,
+             'postIF_z': postIF_z, 'punctumSize': punctum_size}
+    listOfQueries.append(query)
+
+    # Query 3
+    preIF_str1 = str(mouse_number) + 'ss_Synap.tif'
+    preIF_str2 = str(mouse_number) + 'ss_GAD.tif'
+    preIF = [preIF_str1, preIF_str2]
+    preIF_z = [slice_span, slice_span]
+    postIF_str1 = str(mouse_number) + 'ss_Geph.tif'
+    postIF = [postIF_str1]
+    postIF_z = [slice_span]
     query = {'preIF': preIF, 'preIF_z': preIF_z, 'postIF': postIF,
              'postIF_z': postIF_z, 'punctumSize': punctum_size}
     listOfQueries.append(query)
@@ -372,7 +431,7 @@ def main():
     # mouse_astro_queries(7)
 
     for n in range(2, 8):
-        mouse_inhibitory_queries(n)
+        mouse_generic_queries(n)
 
 
 if __name__ == '__main__':
