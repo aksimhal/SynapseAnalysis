@@ -8,7 +8,7 @@ from at_synapse_detection import dataAccess as da
 
 
 def mouse_generic_queries(mouse_number):
-    """ The generic list of queries plus Yi's interest in VGLUT+Gephyrin
+    """ The generic list of queries
 
     Parameters
     -------------
@@ -318,16 +318,18 @@ def mouse_astro_queries(mouse_number):
     listOfQueries = []
     punctum_size = 2
 
+    slice_span = 1
+
     # Query 0
     preIF_str1 = str(mouse_number) + 'ss_Synap.tif'
     preIF = [preIF_str1]
-    preIF_z = [2]
+    preIF_z = [slice_span]
     postIF_str1 = str(mouse_number) + 'ss_PSD.tif'
     postIF = [postIF_str1]
-    postIF_z = [2]
+    postIF_z = [slice_span]
     glialIF_str = str(mouse_number) + 'ss_GS.tif'
     glialIF = [glialIF_str]
-    glialIF_z = [2]
+    glialIF_z = [slice_span]
     query = {'glialIF': glialIF, 'glialIF_z': glialIF_z, 'preIF': preIF,
              'preIF_z': preIF_z, 'postIF': postIF, 'postIF_z': postIF_z,
              'punctumSize': punctum_size}
@@ -337,13 +339,13 @@ def mouse_astro_queries(mouse_number):
     preIF_str1 = str(mouse_number) + 'ss_Synap.tif'
     preIF_str2 = str(mouse_number) + 'ss_VGluT1.tif'
     preIF = [preIF_str1, preIF_str2]
-    preIF_z = [2, 2]
+    preIF_z = [slice_span, slice_span]
     postIF_str1 = str(mouse_number) + 'ss_PSD.tif'
     postIF = [postIF_str1]
-    postIF_z = [2]
+    postIF_z = [slice_span]
     glialIF_str = str(mouse_number) + 'ss_GS.tif'
     glialIF = [glialIF_str]
-    glialIF_z = [2]
+    glialIF_z = [slice_span]
     query = {'glialIF': glialIF, 'glialIF_z': glialIF_z, 'preIF': preIF,
              'preIF_z': preIF_z, 'postIF': postIF, 'postIF_z': postIF_z,
              'punctumSize': punctum_size}
@@ -353,13 +355,13 @@ def mouse_astro_queries(mouse_number):
     preIF_str1 = str(mouse_number) + 'ss_Synap.tif'
     preIF_str2 = str(mouse_number) + 'ss_VGluT2.tif'
     preIF = [preIF_str1, preIF_str2]
-    preIF_z = [2, 2]
+    preIF_z = [slice_span, slice_span]
     postIF_str1 = str(mouse_number) + 'ss_PSD.tif'
     postIF = [postIF_str1]
-    postIF_z = [2]
+    postIF_z = [slice_span]
     glialIF_str = str(mouse_number) + 'ss_GS.tif'
     glialIF = [glialIF_str]
-    glialIF_z = [2]
+    glialIF_z = [slice_span]
     query = {'glialIF': glialIF, 'glialIF_z': glialIF_z, 'preIF': preIF,
              'preIF_z': preIF_z, 'postIF': postIF, 'postIF_z': postIF_z,
              'punctumSize': punctum_size}
@@ -370,33 +372,200 @@ def mouse_astro_queries(mouse_number):
     preIF_str2 = str(mouse_number) + 'ss_VGluT1.tif'
     preIF_str3 = str(mouse_number) + 'ss_VGluT2.tif'
     preIF = [preIF_str1, preIF_str2, preIF_str3]
-    preIF_z = [2, 2, 2]
+    preIF_z = [slice_span, slice_span, slice_span]
     postIF_str1 = str(mouse_number) + 'ss_PSD.tif'
     postIF = [postIF_str1]
-    postIF_z = [2]
+    postIF_z = [slice_span]
     glialIF_str = str(mouse_number) + 'ss_GS.tif'
     glialIF = [glialIF_str]
-    glialIF_z = [2]
+    glialIF_z = [slice_span]
     query = {'glialIF': glialIF, 'glialIF_z': glialIF_z, 'preIF': preIF,
              'preIF_z': preIF_z, 'postIF': postIF, 'postIF_z': postIF_z,
              'punctumSize': punctum_size}
     listOfQueries.append(query)
 
     # Query 4
-    preIF_str1 = str(mouse_number) + 'ss_VGAT.tif'
+    #preIF_str1 = str(mouse_number) + 'ss_VGAT.tif'
     preIF_str2 = str(mouse_number) + 'ss_GAD.tif'
-    preIF = [preIF_str1, preIF_str2]
-    preIF_z = [2, 2]
+    preIF = [preIF_str2]
+    preIF_z = [slice_span]
     postIF_str1 = str(mouse_number) + 'ss_Geph.tif'
     postIF = [postIF_str1]
-    postIF_z = [1]
+    postIF_z = [slice_span]
     glialIF_str = str(mouse_number) + 'ss_GS.tif'
     glialIF = [glialIF_str]
-    glialIF_z = [2]
+    glialIF_z = [slice_span]
     query = {'glialIF': glialIF, 'glialIF_z': glialIF_z, 'preIF': preIF,
              'preIF_z': preIF_z, 'postIF': postIF, 'postIF_z': postIF_z,
              'punctumSize': punctum_size}
     listOfQueries.append(query)
+
+
+    slice_span = 2
+
+    # Query 0
+    preIF_str1 = str(mouse_number) + 'ss_Synap.tif'
+    preIF = [preIF_str1]
+    preIF_z = [slice_span]
+    postIF_str1 = str(mouse_number) + 'ss_PSD.tif'
+    postIF = [postIF_str1]
+    postIF_z = [slice_span]
+    glialIF_str = str(mouse_number) + 'ss_GS.tif'
+    glialIF = [glialIF_str]
+    glialIF_z = [slice_span]
+    query = {'glialIF': glialIF, 'glialIF_z': glialIF_z, 'preIF': preIF,
+             'preIF_z': preIF_z, 'postIF': postIF, 'postIF_z': postIF_z,
+             'punctumSize': punctum_size}
+    listOfQueries.append(query)
+
+    # Query 1
+    preIF_str1 = str(mouse_number) + 'ss_Synap.tif'
+    preIF_str2 = str(mouse_number) + 'ss_VGluT1.tif'
+    preIF = [preIF_str1, preIF_str2]
+    preIF_z = [slice_span, slice_span]
+    postIF_str1 = str(mouse_number) + 'ss_PSD.tif'
+    postIF = [postIF_str1]
+    postIF_z = [slice_span]
+    glialIF_str = str(mouse_number) + 'ss_GS.tif'
+    glialIF = [glialIF_str]
+    glialIF_z = [slice_span]
+    query = {'glialIF': glialIF, 'glialIF_z': glialIF_z, 'preIF': preIF,
+             'preIF_z': preIF_z, 'postIF': postIF, 'postIF_z': postIF_z,
+             'punctumSize': punctum_size}
+    listOfQueries.append(query)
+
+    # Query 2
+    preIF_str1 = str(mouse_number) + 'ss_Synap.tif'
+    preIF_str2 = str(mouse_number) + 'ss_VGluT2.tif'
+    preIF = [preIF_str1, preIF_str2]
+    preIF_z = [slice_span, slice_span]
+    postIF_str1 = str(mouse_number) + 'ss_PSD.tif'
+    postIF = [postIF_str1]
+    postIF_z = [slice_span]
+    glialIF_str = str(mouse_number) + 'ss_GS.tif'
+    glialIF = [glialIF_str]
+    glialIF_z = [slice_span]
+    query = {'glialIF': glialIF, 'glialIF_z': glialIF_z, 'preIF': preIF,
+             'preIF_z': preIF_z, 'postIF': postIF, 'postIF_z': postIF_z,
+             'punctumSize': punctum_size}
+    listOfQueries.append(query)
+
+    # Query 3
+    preIF_str1 = str(mouse_number) + 'ss_Synap.tif'
+    preIF_str2 = str(mouse_number) + 'ss_VGluT1.tif'
+    preIF_str3 = str(mouse_number) + 'ss_VGluT2.tif'
+    preIF = [preIF_str1, preIF_str2, preIF_str3]
+    preIF_z = [slice_span, slice_span, slice_span]
+    postIF_str1 = str(mouse_number) + 'ss_PSD.tif'
+    postIF = [postIF_str1]
+    postIF_z = [slice_span]
+    glialIF_str = str(mouse_number) + 'ss_GS.tif'
+    glialIF = [glialIF_str]
+    glialIF_z = [slice_span]
+    query = {'glialIF': glialIF, 'glialIF_z': glialIF_z, 'preIF': preIF,
+             'preIF_z': preIF_z, 'postIF': postIF, 'postIF_z': postIF_z,
+             'punctumSize': punctum_size}
+    listOfQueries.append(query)
+
+    # Query 4
+    #preIF_str1 = str(mouse_number) + 'ss_VGAT.tif'
+    preIF_str2 = str(mouse_number) + 'ss_GAD.tif'
+    preIF = [preIF_str2]
+    preIF_z = [slice_span]
+    postIF_str1 = str(mouse_number) + 'ss_Geph.tif'
+    postIF = [postIF_str1]
+    postIF_z = [slice_span]
+    glialIF_str = str(mouse_number) + 'ss_GS.tif'
+    glialIF = [glialIF_str]
+    glialIF_z = [slice_span]
+    query = {'glialIF': glialIF, 'glialIF_z': glialIF_z, 'preIF': preIF,
+             'preIF_z': preIF_z, 'postIF': postIF, 'postIF_z': postIF_z,
+             'punctumSize': punctum_size}
+    listOfQueries.append(query)
+
+    slice_span = 3
+
+    # Query 0
+    preIF_str1 = str(mouse_number) + 'ss_Synap.tif'
+    preIF = [preIF_str1]
+    preIF_z = [slice_span]
+    postIF_str1 = str(mouse_number) + 'ss_PSD.tif'
+    postIF = [postIF_str1]
+    postIF_z = [slice_span]
+    glialIF_str = str(mouse_number) + 'ss_GS.tif'
+    glialIF = [glialIF_str]
+    glialIF_z = [slice_span]
+    query = {'glialIF': glialIF, 'glialIF_z': glialIF_z, 'preIF': preIF,
+             'preIF_z': preIF_z, 'postIF': postIF, 'postIF_z': postIF_z,
+             'punctumSize': punctum_size}
+    listOfQueries.append(query)
+
+    # Query 1
+    preIF_str1 = str(mouse_number) + 'ss_Synap.tif'
+    preIF_str2 = str(mouse_number) + 'ss_VGluT1.tif'
+    preIF = [preIF_str1, preIF_str2]
+    preIF_z = [slice_span, slice_span]
+    postIF_str1 = str(mouse_number) + 'ss_PSD.tif'
+    postIF = [postIF_str1]
+    postIF_z = [slice_span]
+    glialIF_str = str(mouse_number) + 'ss_GS.tif'
+    glialIF = [glialIF_str]
+    glialIF_z = [slice_span]
+    query = {'glialIF': glialIF, 'glialIF_z': glialIF_z, 'preIF': preIF,
+             'preIF_z': preIF_z, 'postIF': postIF, 'postIF_z': postIF_z,
+             'punctumSize': punctum_size}
+    listOfQueries.append(query)
+
+    # Query 2
+    preIF_str1 = str(mouse_number) + 'ss_Synap.tif'
+    preIF_str2 = str(mouse_number) + 'ss_VGluT2.tif'
+    preIF = [preIF_str1, preIF_str2]
+    preIF_z = [slice_span, slice_span]
+    postIF_str1 = str(mouse_number) + 'ss_PSD.tif'
+    postIF = [postIF_str1]
+    postIF_z = [slice_span]
+    glialIF_str = str(mouse_number) + 'ss_GS.tif'
+    glialIF = [glialIF_str]
+    glialIF_z = [slice_span]
+    query = {'glialIF': glialIF, 'glialIF_z': glialIF_z, 'preIF': preIF,
+             'preIF_z': preIF_z, 'postIF': postIF, 'postIF_z': postIF_z,
+             'punctumSize': punctum_size}
+    listOfQueries.append(query)
+
+    # Query 3
+    preIF_str1 = str(mouse_number) + 'ss_Synap.tif'
+    preIF_str2 = str(mouse_number) + 'ss_VGluT1.tif'
+    preIF_str3 = str(mouse_number) + 'ss_VGluT2.tif'
+    preIF = [preIF_str1, preIF_str2, preIF_str3]
+    preIF_z = [slice_span, slice_span, slice_span]
+    postIF_str1 = str(mouse_number) + 'ss_PSD.tif'
+    postIF = [postIF_str1]
+    postIF_z = [slice_span]
+    glialIF_str = str(mouse_number) + 'ss_GS.tif'
+    glialIF = [glialIF_str]
+    glialIF_z = [slice_span]
+    query = {'glialIF': glialIF, 'glialIF_z': glialIF_z, 'preIF': preIF,
+             'preIF_z': preIF_z, 'postIF': postIF, 'postIF_z': postIF_z,
+             'punctumSize': punctum_size}
+    listOfQueries.append(query)
+
+    # Query 4
+    #preIF_str1 = str(mouse_number) + 'ss_VGAT.tif'
+    preIF_str2 = str(mouse_number) + 'ss_GAD.tif'
+    preIF = [preIF_str2]
+    preIF_z = [slice_span]
+    postIF_str1 = str(mouse_number) + 'ss_Geph.tif'
+    postIF = [postIF_str1]
+    postIF_z = [slice_span]
+    glialIF_str = str(mouse_number) + 'ss_GS.tif'
+    glialIF = [glialIF_str]
+    glialIF_z = [slice_span]
+    query = {'glialIF': glialIF, 'glialIF_z': glialIF_z, 'preIF': preIF,
+             'preIF_z': preIF_z, 'postIF': postIF, 'postIF_z': postIF_z,
+             'punctumSize': punctum_size}
+    listOfQueries.append(query)
+
+
 
     data = {'listOfQueries': listOfQueries}
     fn = '/Users/anish/Documents/Connectome/SynapseAnalysis/data/fragile_x/' + \
@@ -429,6 +598,9 @@ def main():
     # mouse_generic_queries(7)
     # mouse_YFP_queries(7)
     # mouse_astro_queries(7)
+
+    for n in range(2, 8):
+        mouse_astro_queries(n)
 
     for n in range(2, 8):
         mouse_generic_queries(n)
