@@ -19,7 +19,7 @@ def VIP():
     """
 
     # Location of data
-    base_dir = "C:/Users/stjst/Desktop/Work/Image_Processing/20180316/Align_Raw_Tiffs" #Location of align tif"
+    base_dir = "C:/Users/i3x-MM/DesktopSACT/20180316/Align_Raw_Tiffs" #Location of align tif"
     resolution = {'res_xy_nm': 100, 'res_z_nm': 70} #Resolution of a pixel
     thresh = 0.9 #What qualifies for final probability map
     number_of_datasets = 12 #Number of wells
