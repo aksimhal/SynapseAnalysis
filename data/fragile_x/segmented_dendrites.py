@@ -87,7 +87,7 @@ def iterate_yfp_volumes():
     signal_list = []
     thresh = 0.9
     num_of_dendrites = 10
-    output_basedir = '/home/anish/Connectome/segmented-dendrites'
+    output_basedir = '/data5TB/yi_mice/segmented-dendrites'
 
     for mouse_num in mouse_num_list:
         for region_name in region_list:
