@@ -44,9 +44,17 @@ def segment_dendrites(vol, thresh, num_of_dendrites, output_dir):
         output_filename = os.path.join(output_dir, filename)
         write_off_file(list_of_coords, output_filename)
         stl_filename = os.path.join(output_dir, 'dendrite' + str(n) + '.stl')
-        print('starting meshlab', output_filename)
-        subprocess.call(["meshlabserver", "-i", output_filename,
-                         "-o", stl_filename, "-s", "ballpivot.mlx"])
+        print('number of points: ', str(len(list_of_coords)))
+
+        if len(list_of_coords) < 40000:
+            print('starting meshlab', output_filename)
+            subprocess.call(["meshlabserver", "-i", output_filename,
+                             "-o", stl_filename, "-s", "ballpivot.mlx"])
+        else:
+            print('starting meshlab subsampling', output_filename)
+            subprocess.call(["meshlabserver", "-i", output_filename,
+                             "-o", stl_filename, "-s", "ballpivot2.mlx"])
+
         print('stl created', stl_filename)
 
     return stl_filename
