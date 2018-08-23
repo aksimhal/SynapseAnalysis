@@ -115,19 +115,29 @@ def main():
         # run_list_of_queries(
         #     mouse_number=7, mouse_project_str='7ss', sheet_name='7ss_fragX')
 
+        run_list_of_queries(
+            mouse_number=1, mouse_project_str='1ss', sheet_name='1ss_fragX')
+        run_list_of_queries(
+            mouse_number=22, mouse_project_str='22ss', sheet_name='22ss_fragX')
+
         # python run_fragX.py 4 '4ss_YFP' '4ss_YFP_fragX'
+        # run_list_of_queries(
+        #     mouse_number=2, mouse_project_str='2ss_YFP', sheet_name='2ss_YFP_fragX')
+        # run_list_of_queries(
+        #     mouse_number=3, mouse_project_str='3ss_YFP', sheet_name='3ss_YFP_fragX')
+        # run_list_of_queries(
+        #     mouse_number=4, mouse_project_str='4ss_YFP', sheet_name='4ss_YFP_fragX')
+        # run_list_of_queries(
+        #     mouse_number=6, mouse_project_str='6ss_YFP', sheet_name='6ss_YFP_fragX')
+        # run_list_of_queries(
+        #     mouse_number=5, mouse_project_str='5ss_YFP', sheet_name='5ss_YFP_fragX')
+        # run_list_of_queries(
+        #     mouse_number=7, mouse_project_str='7ss_YFP', sheet_name='7ss_YFP_fragX')
+
         run_list_of_queries(
-            mouse_number=2, mouse_project_str='2ss_YFP', sheet_name='2ss_YFP_fragX')
+            mouse_number=1, mouse_project_str='1ss_YFP', sheet_name='2ss_YFP_fragX')
         run_list_of_queries(
-            mouse_number=3, mouse_project_str='3ss_YFP', sheet_name='3ss_YFP_fragX')
-        run_list_of_queries(
-            mouse_number=4, mouse_project_str='4ss_YFP', sheet_name='4ss_YFP_fragX')
-        run_list_of_queries(
-            mouse_number=6, mouse_project_str='6ss_YFP', sheet_name='6ss_YFP_fragX')
-        run_list_of_queries(
-            mouse_number=5, mouse_project_str='5ss_YFP', sheet_name='5ss_YFP_fragX')
-        run_list_of_queries(
-            mouse_number=7, mouse_project_str='7ss_YFP', sheet_name='7ss_YFP_fragX')
+            mouse_number=22, mouse_project_str='22ss_YFP', sheet_name='22ss_YFP_fragX')
 
     else:
         print('we have arguments')

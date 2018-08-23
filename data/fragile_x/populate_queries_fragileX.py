@@ -363,14 +363,21 @@ def mouse_astroYFP_queries(mouse_number):
 
 def main():
 
-    for n in range(2, 8):
-        mouse_YFP_queries(n)
+    mouse_generic_queries(1)
+    mouse_generic_queries(22)
+    mouse_YFP_queries(1)
+    mouse_YFP_queries(22)
 
-    for n in range(2, 8):
-        mouse_astro_queries(n)
 
-    for n in range(2, 8):
-        mouse_astroYFP_queries(n)
+    #     
+    # for n in range(2, 8):
+    #     mouse_YFP_queries(n)
+
+    # for n in range(2, 8):
+    #     mouse_astro_queries(n)
+
+    # for n in range(2, 8):
+    #     mouse_astroYFP_queries(n)
 
     # for n in range(2, 8):
     #     mouse_generic_queries(n)
