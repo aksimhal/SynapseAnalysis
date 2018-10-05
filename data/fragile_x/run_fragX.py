@@ -68,6 +68,9 @@ def run_list_of_queries(mouse_number, mouse_project_str, sheet_name):
             foldernames.append(foldername)
             print(foldername)
 
+            mask_location_str = -1
+            #dapi_mask_str = -1
+
             atet_input = {'query': query, 'queryID': queryID, 'nQuery': nQuery, 'resolution': resolution,
                           'data_region_location': data_region_location, 'data_location': data_location,
                           'output_foldername': output_foldername, 'region_name': region_name,

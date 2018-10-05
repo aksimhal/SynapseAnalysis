@@ -67,7 +67,7 @@ def mouse_generic_queries(mouse_number):
         listOfQueries.append(query)
 
     data = {'listOfQueries': listOfQueries}
-    fn = '/Users/anish/Documents/Connectome/SynapseAnalysis/data/fragile_x/' + \
+    fn = '/Users/anish/Documents/Connectome/SynapseAnalysis/data/fragile_x/queries/' + \
         str(mouse_number) + 'ss_queries.json'
     da.writeJSONFile(fn, data)
 
@@ -131,7 +131,7 @@ def mouse_inhibitory_queries(mouse_number):
     listOfQueries.append(query)
 
     data = {'listOfQueries': listOfQueries}
-    fn = '/Users/anish/Documents/Connectome/SynapseAnalysis/data/fragile_x/' + \
+    fn = '/Users/anish/Documents/Connectome/SynapseAnalysis/data/fragile_x/queries/' + \
         str(mouse_number) + 'ss_inhibitory_queries.json'
     da.writeJSONFile(fn, data)
 
@@ -197,7 +197,7 @@ def mouse_YFP_queries(mouse_number):
         listOfQueries.append(query)
 
     data = {'listOfQueries': listOfQueries}
-    fn = '/Users/anish/Documents/Connectome/SynapseAnalysis/data/fragile_x/' + \
+    fn = '/Users/anish/Documents/Connectome/SynapseAnalysis/data/fragile_x/queries/' + \
         str(mouse_number) + 'ss_YFP_queries.json'
     da.writeJSONFile(fn, data)
 
@@ -274,7 +274,7 @@ def mouse_astro_queries(mouse_number):
         listOfQueries.append(query)
 
     data = {'listOfQueries': listOfQueries}
-    fn = '/Users/anish/Documents/Connectome/SynapseAnalysis/data/fragile_x/' + \
+    fn = '/Users/anish/Documents/Connectome/SynapseAnalysis/data/fragile_x/queries/' + \
         str(mouse_number) + 'ss_astro_queries.json'
     da.writeJSONFile(fn, data)
 
@@ -356,31 +356,29 @@ def mouse_astroYFP_queries(mouse_number):
         listOfQueries.append(query)
 
     data = {'listOfQueries': listOfQueries}
-    fn = '/Users/anish/Documents/Connectome/SynapseAnalysis/data/fragile_x/' + \
+    fn = '/Users/anish/Documents/Connectome/SynapseAnalysis/data/fragile_x/queries/' + \
         str(mouse_number) + 'ss_astroYFP_queries.json'
     da.writeJSONFile(fn, data)
 
 
 def main():
 
-    mouse_generic_queries(1)
     mouse_generic_queries(22)
-    mouse_YFP_queries(1)
     mouse_YFP_queries(22)
+    mouse_astro_queries(22)
+    mouse_astroYFP_queries(22)
 
+    for n in range(1, 8):
+        mouse_YFP_queries(n)
 
-    #     
-    # for n in range(2, 8):
-    #     mouse_YFP_queries(n)
+    for n in range(1, 8):
+        mouse_astro_queries(n)
 
-    # for n in range(2, 8):
-    #     mouse_astro_queries(n)
+    for n in range(1, 8):
+        mouse_astroYFP_queries(n)
 
-    # for n in range(2, 8):
-    #     mouse_astroYFP_queries(n)
-
-    # for n in range(2, 8):
-    #     mouse_generic_queries(n)
+    for n in range(1, 8):
+        mouse_generic_queries(n)
 
 
 if __name__ == '__main__':
