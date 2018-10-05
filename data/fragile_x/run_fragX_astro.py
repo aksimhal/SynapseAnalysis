@@ -18,7 +18,7 @@ def run_queries():
     Run FragileX astrocyte queries
     """
     # Select data
-    mouse_id_list = [2, 3, 4, 5, 6, 7]
+    mouse_id_list = [1, 22, 2, 3, 4, 5, 6, 7]
     mouse_region_list = ['F000', 'F001', 'F002', 'F003']
     # Specify output
     output_foldername = 'results_astro'
@@ -38,7 +38,7 @@ def run_queries():
     # Collect data for mp pool
     for n, mouse_number in enumerate(mouse_id_list):
         # Load specific query file
-        query_fn = str(mouse_number) + 'ss_astro_queries.json'
+        query_fn = 'queries/' + str(mouse_number) + 'ss_astro_queries.json'
         listOfQueries = syn.loadQueriesJSON(query_fn)
 
         hostname = socket.gethostname()
@@ -96,7 +96,7 @@ def run_queries_astroYFP():
     Run FragileX astrocyte queries
     """
     # Select data
-    mouse_id_list = [2, 3, 4, 5, 6, 7]
+    mouse_id_list = [1, 2, 3, 4, 5, 6, 7, 22]
     mouse_region_list = ['F000', 'F001', 'F002', 'F003']
     # Specify output
     output_foldername = 'results_astroYFP'
@@ -116,7 +116,7 @@ def run_queries_astroYFP():
     # Collect data for mp pool
     for n, mouse_number in enumerate(mouse_id_list):
         # Load specific query file
-        query_fn = str(mouse_number) + 'ss_astroYFP_queries.json'
+        query_fn = 'queries/' + str(mouse_number) + 'ss_astroYFP_queries.json'
         listOfQueries = syn.loadQueriesJSON(query_fn)
 
         hostname = socket.gethostname()
@@ -170,7 +170,7 @@ def run_queries_astroYFP():
 
 
 def main():
-    # run_queries()
+    run_queries()
     run_queries_astroYFP()
 
 
