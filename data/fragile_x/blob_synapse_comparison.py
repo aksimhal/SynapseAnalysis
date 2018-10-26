@@ -170,7 +170,7 @@ def run_blob_synapse(mouse_number, mouse_project_str, base_query_num, channel_na
         target_antibody_name = str(mouse_number) + channel_name
         target_filenames.append(target_antibody_name)
         query_number = nQuery + 12 * region_num
-        result_location = os.path.join(data_location, str(
+        result_location = os.path.join(data_location, 'results_' + str(
             mouse_number) + 'ss_fragX', region_name, 'query_' + str(query_number) + '.npy')
 
         antibody_measure = run_SACT_FXS(
