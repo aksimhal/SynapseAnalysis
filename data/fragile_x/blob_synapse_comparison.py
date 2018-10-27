@@ -11,9 +11,10 @@ from skimage import measure
 from at_synapse_detection import SynapseDetection as syn
 from at_synapse_detection import dataAccess as da
 from at_synapse_detection import antibodyAnalysis as aa
+from at_synapse_detection import SynapseAnalysis as sa
 
 
-def run_SACT_FXS(synaptic_volumes, query, thresh, resolution, target_antibody_name, result_location):
+def run_SACT_FXS(synaptic_volumes, query, thresh, resolution, target_antibody_name, result_location, volume_um3):
     """
     Run SACT. 
 
@@ -40,9 +41,7 @@ def run_SACT_FXS(synaptic_volumes, query, thresh, resolution, target_antibody_na
     antibody_measure = aa.AntibodyAnalysis(query)
 
     # Get data volume
-    antibody_measure.volume_um3 = aa.getdatavolume(
-        synaptic_volumes, resolution)
-    print('data volume: ', antibody_measure.volume_um3, 'um3')
+    antibody_measure.volume_um3 = volume_um3
 
     # Check to see if user supplied blobsize
     if 'punctumSize' in query.keys():
@@ -142,6 +141,9 @@ def run_blob_synapse(mouse_number, mouse_project_str, base_query_num, channel_na
     hostname = socket.gethostname()
     if hostname == 'Galicia':
         data_location = '/data5TB/yi_mice/' + str(mouse_number) + 'ss_stacks'
+        dapi_mask_str_base = '/data5TB/yi_mice/dapi-masks/' + \
+            str(mouse_number) + 'ss_stacks'
+
     listOfQueries = syn.loadQueriesJSON(query_fn)
 
     resolution = {'res_xy_nm': 100, 'res_z_nm': 70}
@@ -159,22 +161,40 @@ def run_blob_synapse(mouse_number, mouse_project_str, base_query_num, channel_na
         data_region_location = os.path.join(data_location, region_name)
 
         query = listOfQueries[base_query_num]
-        nQuery = base_query_num
-        foldername = region_name + '-Q' + str(nQuery)
+
+        query_number = base_query_num + 12 * region_num
+
+        foldername = region_name + '-Q' + str(base_query_num)
         foldernames.append(foldername)
         conjugate_filenames.append('Query' + str(base_query_num))
+
         # Load the data
         synaptic_volumes = da.load_tiff_from_query(
             query, data_region_location)
 
+        # Load DAPI mask
+        dapi_mask_str = os.path.join(dapi_mask_str_base, region_name)
+        dapi_mask_fn = os.path.join(dapi_mask_str, str(
+            mouse_number) + 'ss-DAPI-mask.tiff')
+        dapi_mask = da.imreadtiff(dapi_mask_fn)
+
+        # Mask data
+        dapi_mask = dapi_mask.astype(np.bool)
+        combined_mask = np.logical_not(dapi_mask)  # keep portions without dapi
+        synaptic_volumes = sa.mask_synaptic_volumes(
+            synaptic_volumes, combined_mask)
+
+        volume_um3 = sa.get_masked_volume(
+            synaptic_volumes, combined_mask, resolution)
+        print(volume_um3)
+
         target_antibody_name = str(mouse_number) + channel_name
         target_filenames.append(target_antibody_name)
-        query_number = nQuery + 12 * region_num
         result_location = os.path.join(data_location, 'results_' + str(
             mouse_number) + 'ss_fragX', region_name, 'query_' + str(query_number) + '.npy')
 
         antibody_measure = run_SACT_FXS(
-            synaptic_volumes, query, thresh, resolution, target_antibody_name, result_location)
+            synaptic_volumes, query, thresh, resolution, target_antibody_name, result_location, volume_um3)
 
         measure_list.append(antibody_measure)
 
@@ -198,8 +218,29 @@ def iterate_over_mice(query_number, channel_name):
 
 def iterate_over_queries():
     channel_name = 'ss_PSD.tif'
-    df_list = iterate_over_mice(0, channel_name)
-    aa.write_dfs_to_excel(df_list, 'blob_synapse', 'blob_synapse.xlsx')
+    query_number = 4
+    df_list = iterate_over_mice(query_number, channel_name)
+    aa.write_dfs_to_excel(df_list, 'blob_synapse', 'psd_q4_ratio.xlsx')
+
+    channel_name = 'ss_VGluT1.tif'
+    query_number = 5
+    df_list = iterate_over_mice(query_number, channel_name)
+    aa.write_dfs_to_excel(df_list, 'blob_synapse', 'vglut1_q5_ratio.xlsx')
+
+    channel_name = 'ss_Synap.tif'
+    query_number = 5
+    df_list = iterate_over_mice(query_number, channel_name)
+    aa.write_dfs_to_excel(df_list, 'blob_synapse', 'synap_q5_ratio.xlsx')
+
+    channel_name = 'ss_VGluT2.tif'
+    query_number = 6
+    df_list = iterate_over_mice(query_number, channel_name)
+    aa.write_dfs_to_excel(df_list, 'blob_synapse', 'vglut1_q6_ratio.xlsx')
+
+    channel_name = 'ss_Synap.tif'
+    query_number = 6
+    df_list = iterate_over_mice(query_number, channel_name)
+    aa.write_dfs_to_excel(df_list, 'blob_synapse', 'synap_q6_ratio.xlsx')
 
 
 def main():
