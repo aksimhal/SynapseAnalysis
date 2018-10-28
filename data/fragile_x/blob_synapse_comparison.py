@@ -235,7 +235,7 @@ def iterate_over_queries():
     channel_name = 'ss_VGluT2.tif'
     query_number = 6
     df_list = iterate_over_mice(query_number, channel_name)
-    aa.write_dfs_to_excel(df_list, 'blob_synapse', 'vglut1_q6_ratio.xlsx')
+    aa.write_dfs_to_excel(df_list, 'blob_synapse', 'vglut2_q6_ratio.xlsx')
 
     channel_name = 'ss_Synap.tif'
     query_number = 6
