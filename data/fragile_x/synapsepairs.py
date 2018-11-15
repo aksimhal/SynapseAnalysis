@@ -18,7 +18,7 @@ def run_combos(queryID1, queryID2):
 
     for mouse_num in mouse_num_list:
         print(mouse_num)
-        queryoffset = 0
+        queryoffset = 12
         for region_ind, region_name in enumerate(region_list):
             vol_dir_base = os.path.join(data_dir, str(
                 mouse_num) + mouse_base_fn, 'results_' + str(mouse_num) + 'ss_fragX', region_name)
@@ -62,7 +62,6 @@ def run_combos(queryID1, queryID2):
                 close_synapse_list) / len(close_synapse_list)
             print(percent)
             signal_list.append(percent)
-            queryoffset = queryoffset + 1
 
     return vol_name_list, signal_list
 
