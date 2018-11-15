@@ -30,6 +30,9 @@ def run_combos(queryID1, queryID2):
                                str(queryID1 + region_ind * queryoffset) + '.npy')
             fn2 = os.path.join(vol_dir_base, 'query_' +
                                str(queryID2 + region_ind * queryoffset) + '.npy')
+            print("fn1: ", fn1)
+            print("fn2: ", fn2)
+
             vol1 = np.load(fn1)
             vol2 = np.load(fn2)
             thresh = 0.9
@@ -92,10 +95,10 @@ def write_df(vol_name_list, signal_list, output_fn):
 
 def main():
 
-    vol_name_list, signal_list = run_combos(queryID1=1 + 4, queryID2=3 + 4)
+    vol_name_list, signal_list = run_combos(queryID1=5, queryID2=7)
     write_df(vol_name_list, signal_list, 'vglut1_vs_inhibitory')
 
-    vol_name_list, signal_list = run_combos(queryID1=2 + 4, queryID2=3 + 4)
+    vol_name_list, signal_list = run_combos(queryID1=6, queryID2=7)
     write_df(vol_name_list, signal_list, 'vglut2_vs_inhibitory')
 
 
