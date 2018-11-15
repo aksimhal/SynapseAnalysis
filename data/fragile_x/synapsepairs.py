@@ -1,7 +1,6 @@
 import os
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
 from skimage import measure
 from at_synapse_detection import antibodyAnalysis as aa
 
@@ -9,7 +8,7 @@ from at_synapse_detection import antibodyAnalysis as aa
 def run_combos(queryID1, queryID2):
     """
     """
-    mouse_num_list = [2, 3, 4, 5, 6, 7, 22]
+    mouse_num_list = [1, 2, 3, 4, 5, 6, 7, 22]
     mouse_base_fn = 'ss_stacks'
     region_list = ['F000', 'F001', 'F002', 'F003']
     data_dir = '/data5TB/yi_mice/'
@@ -18,15 +17,19 @@ def run_combos(queryID1, queryID2):
     signal_list = []
 
     for mouse_num in mouse_num_list:
-        for region_name in region_list:
+        print(mouse_num)
+        queryoffset = 0
+        for region_ind, region_name in enumerate(region_list):
             vol_dir_base = os.path.join(data_dir, str(
                 mouse_num) + mouse_base_fn, 'results_' + str(mouse_num) + 'ss_fragX', region_name)
 
             vol_name = str(mouse_num) + 'ss_' + region_name
             vol_name_list.append(vol_name)
 
-            fn1 = os.path.join(vol_dir_base, 'query_' + str(queryID1) + '.npy')
-            fn2 = os.path.join(vol_dir_base, 'query_' + str(queryID2) + '.npy')
+            fn1 = os.path.join(vol_dir_base, 'query_' +
+                               str(queryID1 + region_ind * queryoffset) + '.npy')
+            fn2 = os.path.join(vol_dir_base, 'query_' +
+                               str(queryID2 + region_ind * queryoffset) + '.npy')
             vol1 = np.load(fn1)
             vol2 = np.load(fn2)
             thresh = 0.9
@@ -56,6 +59,7 @@ def run_combos(queryID1, queryID2):
                 close_synapse_list) / len(close_synapse_list)
             print(percent)
             signal_list.append(percent)
+            queryoffset = queryoffset + 1
 
     return vol_name_list, signal_list
 
@@ -87,10 +91,11 @@ def write_df(vol_name_list, signal_list, output_fn):
 
 
 def main():
-    vol_name_list, signal_list = run_combos(queryID1=1, queryID2=3)
+
+    vol_name_list, signal_list = run_combos(queryID1=1 + 4, queryID2=3 + 4)
     write_df(vol_name_list, signal_list, 'vglut1_vs_inhibitory')
 
-    vol_name_list, signal_list = run_combos(queryID1=2, queryID2=3)
+    vol_name_list, signal_list = run_combos(queryID1=2 + 4, queryID2=3 + 4)
     write_df(vol_name_list, signal_list, 'vglut2_vs_inhibitory')
 
 
