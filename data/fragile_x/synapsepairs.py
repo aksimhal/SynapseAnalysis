@@ -95,10 +95,10 @@ def write_df(vol_name_list, signal_list, output_fn):
 def main():
 
     vol_name_list, signal_list = run_combos(queryID1=5, queryID2=7)
-    write_df(vol_name_list, signal_list, 'vglut1_vs_inhibitory')
+    write_df(vol_name_list, signal_list, 'vglut1_vs_inhibitory.xlsx')
 
     vol_name_list, signal_list = run_combos(queryID1=6, queryID2=7)
-    write_df(vol_name_list, signal_list, 'vglut2_vs_inhibitory')
+    write_df(vol_name_list, signal_list, 'vglut2_vs_inhibitory.xlsx')
 
 
 if __name__ == '__main__':
