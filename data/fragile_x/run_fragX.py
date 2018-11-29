@@ -1,5 +1,5 @@
 """
-run fragilex synapse detections
+Run FragileX data synapse detections
 """
 import os
 import sys
@@ -60,7 +60,6 @@ def run_list_of_queries(mouse_number, mouse_project_str, sheet_name):
     for region_num in range(0, 4):
         region_name = region_name_base + str(region_num)
         data_region_location = os.path.join(data_location, region_name)
-
         dapi_mask_str = os.path.join(dapi_mask_str_base, region_name)
 
         for nQuery, query in enumerate(listOfQueries):
