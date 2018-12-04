@@ -106,7 +106,7 @@ def main():
         # python run_fragX.py 4 '4ss_inhibitory' '4ss_inhibitory_fragX'
 
         run_list_of_queries(
-            mouse_number=1, mouse_project_str='1ss_inhibitory_astro', sheet_name='2ss_inhibitory_astro')
+            mouse_number=1, mouse_project_str='1ss_inhibitory_astro', sheet_name='1ss_inhibitory_astro')
         run_list_of_queries(
             mouse_number=22, mouse_project_str='22ss_inhibitory_astro', sheet_name='22ss_inhibitory_astro')
         run_list_of_queries(
