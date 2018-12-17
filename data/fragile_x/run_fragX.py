@@ -105,39 +105,39 @@ def main():
         # sheet_name = '2ss_fragX'
         # python run_fragX.py 4 '4ss_inhibitory' '4ss_inhibitory_fragX'
 
-        run_list_of_queries(
-            mouse_number=1, mouse_project_str='1ss_inhibitory', sheet_name='1ss_inhibitory_fragX')
+        # run_list_of_queries(
+        #     mouse_number=1, mouse_project_str='1ss_inhibitory', sheet_name='1ss_inhibitory_fragX')
         # run_list_of_queries(
         #     mouse_number=22, mouse_project_str='22ss_inhibitory', sheet_name='22ss_inhibitory_fragX')
-        run_list_of_queries(
-            mouse_number=2, mouse_project_str='2ss_inhibitory', sheet_name='2ss_inhibitory_fragX')
+        # run_list_of_queries(
+        #     mouse_number=2, mouse_project_str='2ss_inhibitory', sheet_name='2ss_inhibitory_fragX')
         # run_list_of_queries(
         #     mouse_number=3, mouse_project_str='3ss_inhibitory', sheet_name='3ss_inhibitory_fragX')
-        run_list_of_queries(
-            mouse_number=4, mouse_project_str='4ss_inhibitory', sheet_name='4ss_inhibitory_fragX')
-        run_list_of_queries(
-            mouse_number=6, mouse_project_str='6ss_inhibitory', sheet_name='6ss_inhibitory_fragX')
-        run_list_of_queries(
-            mouse_number=5, mouse_project_str='5ss_inhibitory', sheet_name='5ss_inhibitory_fragX')
-        run_list_of_queries(
-            mouse_number=7, mouse_project_str='7ss_inhibitory', sheet_name='7ss_inhibitory_fragX')
+        # run_list_of_queries(
+        #     mouse_number=4, mouse_project_str='4ss_inhibitory', sheet_name='4ss_inhibitory_fragX')
+        # run_list_of_queries(
+        #     mouse_number=6, mouse_project_str='6ss_inhibitory', sheet_name='6ss_inhibitory_fragX')
+        # run_list_of_queries(
+        #     mouse_number=5, mouse_project_str='5ss_inhibitory', sheet_name='5ss_inhibitory_fragX')
+        # run_list_of_queries(
+        #     mouse_number=7, mouse_project_str='7ss_inhibitory', sheet_name='7ss_inhibitory_fragX')
 
-        # run_list_of_queries(
-        #     mouse_number=1, mouse_project_str='1ss', sheet_name='1ss_fragX')
-        # run_list_of_queries(
-        #     mouse_number=22, mouse_project_str='22ss', sheet_name='22ss_fragX')
-        # run_list_of_queries(
-        #     mouse_number=2, mouse_project_str='2ss', sheet_name='2ss_fragX')
-        # run_list_of_queries(
-        #     mouse_number=3, mouse_project_str='3ss', sheet_name='3ss_fragX')
-        # run_list_of_queries(
-        #     mouse_number=4, mouse_project_str='4ss', sheet_name='4ss_fragX')
-        # run_list_of_queries(
-        #     mouse_number=6, mouse_project_str='6ss', sheet_name='6ss_fragX')
-        # run_list_of_queries(
-        #     mouse_number=5, mouse_project_str='5ss', sheet_name='5ss_fragX')
-        # run_list_of_queries(
-        #     mouse_number=7, mouse_project_str='7ss', sheet_name='7ss_fragX')
+        run_list_of_queries(
+            mouse_number=1, mouse_project_str='1ss', sheet_name='1ss_fragX')
+        run_list_of_queries(
+            mouse_number=22, mouse_project_str='22ss', sheet_name='22ss_fragX')
+        run_list_of_queries(
+            mouse_number=2, mouse_project_str='2ss', sheet_name='2ss_fragX')
+        run_list_of_queries(
+            mouse_number=3, mouse_project_str='3ss', sheet_name='3ss_fragX')
+        run_list_of_queries(
+            mouse_number=4, mouse_project_str='4ss', sheet_name='4ss_fragX')
+        run_list_of_queries(
+            mouse_number=6, mouse_project_str='6ss', sheet_name='6ss_fragX')
+        run_list_of_queries(
+            mouse_number=5, mouse_project_str='5ss', sheet_name='5ss_fragX')
+        run_list_of_queries(
+            mouse_number=7, mouse_project_str='7ss', sheet_name='7ss_fragX')
 
     else:
         print('we have arguments')
