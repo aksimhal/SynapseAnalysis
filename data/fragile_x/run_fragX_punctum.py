@@ -27,7 +27,7 @@ def run_list_of_queries(mouse_number, mouse_project_str, sheet_name):
     """
 
     output_foldername = 'results_' + sheet_name
-    query_fn = 'queries/' + mouse_project_str + 'puncta_queries.json'
+    query_fn = 'queries/' + mouse_project_str + '_queries.json'
     data_location = '/Users/anish/Documents/yi_mice/' + \
         str(mouse_number) + 'ss_stacks/'
 
