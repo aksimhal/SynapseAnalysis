@@ -78,6 +78,16 @@ def single_channel_queries(mouse_number):
                  'postIF_z': postIF_z, 'punctumSize': punctum_size}
         listOfQueries.append(query)
 
+        # Query 6 - GS
+        preIF_str1 = str(mouse_number) + 'ss_GS.tif'
+        preIF = [preIF_str1]
+        preIF_z = [slice_span]
+        postIF = []
+        postIF_z = []
+        query = {'preIF': preIF, 'preIF_z': preIF_z, 'postIF': postIF,
+                 'postIF_z': postIF_z, 'punctumSize': punctum_size}
+        listOfQueries.append(query)
+
 
     data = {'listOfQueries': listOfQueries}
     fn = '/Users/anish/Documents/Connectome/SynapseAnalysis/data/fragile_x/queries/' + \
