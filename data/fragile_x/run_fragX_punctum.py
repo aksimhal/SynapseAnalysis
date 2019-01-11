@@ -123,7 +123,7 @@ def main():
         #     mouse_number=7, mouse_project_str='7ss_inhibitory', sheet_name='7ss_inhibitory_fragX')
 
         run_list_of_queries(
-            mouse_number=1, mouse_project_str='1s_puncta', sheet_name='1ss_puncta_fragX')
+            mouse_number=1, mouse_project_str='1ss_puncta', sheet_name='1ss_puncta_fragX')
         run_list_of_queries(
             mouse_number=22, mouse_project_str='22ss_puncta', sheet_name='22ss_puncta_fragX')
         run_list_of_queries(
