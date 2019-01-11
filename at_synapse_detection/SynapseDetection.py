@@ -394,6 +394,11 @@ def combinePrePostVolumes(baseVolList, adjacentVolList, edge_win, search_win):
     ----------
     outputVol : 3D Numpy Array - Final Probability Map
     """
+
+    if len(baseVolList) == 1 and len(adjacentVolList) == 0: 
+        print('return input')
+        return baseVolList[0]
+
     # Allocate memory
     outputVol = np.zeros(baseVolList[0].shape)
 
