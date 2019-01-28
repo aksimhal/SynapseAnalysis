@@ -105,39 +105,39 @@ def main():
         # sheet_name = '2ss_fragX'
         # python run_fragX.py 4 '4ss_inhibitory' '4ss_inhibitory_fragX'
 
-        run_list_of_queries(
-            mouse_number=1, mouse_project_str='1ss_inhibitory_astro', sheet_name='1ss_inhibitory_astro')
-        run_list_of_queries(
-            mouse_number=22, mouse_project_str='22ss_inhibitory_astro', sheet_name='22ss_inhibitory_astro')
-        run_list_of_queries(
-            mouse_number=2, mouse_project_str='2ss_inhibitory_astro', sheet_name='2ss_inhibitory_astro')
-        run_list_of_queries(
-            mouse_number=3, mouse_project_str='3ss_inhibitory_astro', sheet_name='3ss_inhibitory_astro')
-        run_list_of_queries(
-            mouse_number=4, mouse_project_str='4ss_inhibitory_astro', sheet_name='4ss_inhibitory_astro')
-        run_list_of_queries(
-            mouse_number=6, mouse_project_str='6ss_inhibitory_astro', sheet_name='6ss_inhibitory_astro')
-        run_list_of_queries(
-            mouse_number=5, mouse_project_str='5ss_inhibitory_astro', sheet_name='5ss_inhibitory_astro')
-        run_list_of_queries(
-            mouse_number=7, mouse_project_str='7ss_inhibitory_astro', sheet_name='7ss_inhibitory_astro')
+        # run_list_of_queries(
+        #     mouse_number=1, mouse_project_str='1ss_inhibitory_astro', sheet_name='1ss_inhibitory_astro')
+        # run_list_of_queries(
+        #     mouse_number=22, mouse_project_str='22ss_inhibitory_astro', sheet_name='22ss_inhibitory_astro')
+        # run_list_of_queries(
+        #     mouse_number=2, mouse_project_str='2ss_inhibitory_astro', sheet_name='2ss_inhibitory_astro')
+        # run_list_of_queries(
+        #     mouse_number=3, mouse_project_str='3ss_inhibitory_astro', sheet_name='3ss_inhibitory_astro')
+        # run_list_of_queries(
+        #     mouse_number=4, mouse_project_str='4ss_inhibitory_astro', sheet_name='4ss_inhibitory_astro')
+        # run_list_of_queries(
+        #     mouse_number=6, mouse_project_str='6ss_inhibitory_astro', sheet_name='6ss_inhibitory_astro')
+        # run_list_of_queries(
+        #     mouse_number=5, mouse_project_str='5ss_inhibitory_astro', sheet_name='5ss_inhibitory_astro')
+        # run_list_of_queries(
+        #     mouse_number=7, mouse_project_str='7ss_inhibitory_astro', sheet_name='7ss_inhibitory_astro')
 
         run_list_of_queries(
-            mouse_number=1, mouse_project_str='1ss_excitatory_astro', sheet_name='1ss_fragX_excitatory_astro')
+            mouse_number=1, mouse_project_str='1ss_excitatory_astro1slice', sheet_name='1ss_fragX_excitatory_astro1slice')
         run_list_of_queries(
-            mouse_number=22, mouse_project_str='22ss_excitatory_astro', sheet_name='22ss_fragX_excitatory_astro')
+            mouse_number=22, mouse_project_str='22ss_excitatory_astro1slice', sheet_name='22ss_fragX_excitatory_astro1slice')
         run_list_of_queries(
-            mouse_number=2, mouse_project_str='2ss_excitatory_astro', sheet_name='2ss_fragX_excitatory_astro')
+            mouse_number=2, mouse_project_str='2ss_excitatory_astro1slice', sheet_name='2ss_fragX_excitatory_astro1slice')
         run_list_of_queries(
-            mouse_number=3, mouse_project_str='3ss_excitatory_astro', sheet_name='3ss_fragX_excitatory_astro')
+            mouse_number=3, mouse_project_str='3ss_excitatory_astro1slice', sheet_name='3ss_fragX_excitatory_astro1slice')
         run_list_of_queries(
-            mouse_number=4, mouse_project_str='4ss_excitatory_astro', sheet_name='4ss_fragX_excitatory_astro')
+            mouse_number=4, mouse_project_str='4ss_excitatory_astro1slice', sheet_name='4ss_fragX_excitatory_astro1slice')
         run_list_of_queries(
-            mouse_number=6, mouse_project_str='6ss_excitatory_astro', sheet_name='6ss_fragX_excitatory_astro')
+            mouse_number=6, mouse_project_str='6ss_excitatory_astro1slice', sheet_name='6ss_fragX_excitatory_astro1slice')
         run_list_of_queries(
-            mouse_number=5, mouse_project_str='5ss_excitatory_astro', sheet_name='5ss_fragX_excitatory_astro')
+            mouse_number=5, mouse_project_str='5ss_excitatory_astro1slice', sheet_name='5ss_fragX_excitatory_astro1slice')
         run_list_of_queries(
-            mouse_number=7, mouse_project_str='7ss_excitatory_astro', sheet_name='7ss_fragX_excitatory_astro')
+            mouse_number=7, mouse_project_str='7ss_excitatory_astro1slice', sheet_name='7ss_fragX_excitatory_astro1slice')
 
     else:
         print('we have arguments')
