@@ -106,10 +106,10 @@ def main():
         # sheet_name = '2ss_fragX'
         # python run_fragX.py 4 '4ss_YFP' '4ss_YFP_fragX'
 
-        run_list_of_queries(
-            mouse_number=1, mouse_project_str='1ss', sheet_name='1ss_fragX_vglut2')
-        run_list_of_queries(
-            mouse_number=22, mouse_project_str='22ss', sheet_name='22ss_fragX_vglut2')
+        # run_list_of_queries(
+        #     mouse_number=1, mouse_project_str='1ss', sheet_name='1ss_fragX_vglut2')
+        # run_list_of_queries(
+        #     mouse_number=22, mouse_project_str='22ss', sheet_name='22ss_fragX_vglut2')
         run_list_of_queries(
             mouse_number=2, mouse_project_str='2ss', sheet_name='2ss_fragX_vglut2')
         run_list_of_queries(
