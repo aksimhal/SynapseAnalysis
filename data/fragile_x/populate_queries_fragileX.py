@@ -202,6 +202,56 @@ def mouse_query_vglut2(mouse_number):
         str(mouse_number) + 'ss_vglut2_queries.json'
     da.writeJSONFile(fn, data)
 
+def mouse_query_gs_vglut2(mouse_number):
+    """ query for psd, synapsin, GS, vglut1, and vglut2
+
+    Parameters
+    -------------
+    mouse_number
+    """
+
+    listOfQueries = []
+    punctum_size = 2
+
+    # Query 2
+    preIF_str1 = str(mouse_number) + 'ss_Synap.tif'
+    preIF_str2 = str(mouse_number) + 'ss_VGluT2.tif'
+    preIF = [preIF_str1, preIF_str2]
+    preIF_z = [1, 2]
+    postIF_str1 = str(mouse_number) + 'ss_PSD.tif'
+    postIF = [postIF_str1]
+    postIF_z = [1]
+    glialIF_str = str(mouse_number) + 'ss_GS.tif'
+    glialIF = [glialIF_str]
+    glialIF_z = [1]
+    query = {'glialIF': glialIF, 'glialIF_z': glialIF_z, 'preIF': preIF,
+                'preIF_z': preIF_z, 'postIF': postIF, 'postIF_z': postIF_z,
+                'punctumSize': punctum_size}
+    listOfQueries.append(query)
+
+    # Query 3
+    preIF_str1 = str(mouse_number) + 'ss_Synap.tif'
+    preIF_str2 = str(mouse_number) + 'ss_VGluT1.tif'
+    preIF_str3 = str(mouse_number) + 'ss_VGluT2.tif'
+    preIF = [preIF_str1, preIF_str2, preIF_str3]
+    preIF_z = [1, 1, 2]
+    postIF_str1 = str(mouse_number) + 'ss_PSD.tif'
+    postIF = [postIF_str1]
+    postIF_z = [1]
+    glialIF_str = str(mouse_number) + 'ss_GS.tif'
+    glialIF = [glialIF_str]
+    glialIF_z = [1]
+    query = {'glialIF': glialIF, 'glialIF_z': glialIF_z, 'preIF': preIF,
+                'preIF_z': preIF_z, 'postIF': postIF, 'postIF_z': postIF_z,
+                'punctumSize': punctum_size}
+    listOfQueries.append(query)
+
+    data = {'listOfQueries': listOfQueries}
+    fn = '/Users/anish/Documents/Connectome/SynapseAnalysis/data/fragile_x/queries/' + \
+        str(mouse_number) + 'ss_gs_vglut2_queries.json'
+
+    da.writeJSONFile(fn, data)
+
 
 def inhibitory_queries(mouse_number):
     """ Inhibitory queries at different sizes
@@ -585,7 +635,7 @@ def main():
     #     single_channel_queries(n)
 
     for n in mice_list:
-        mouse_query_vglut2(n)
+        mouse_query_gs_vglut2(n)
 
 
 if __name__ == '__main__':
