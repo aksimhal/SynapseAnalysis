@@ -123,21 +123,21 @@ def main():
         #     mouse_number=7, mouse_project_str='7ss_inhibitory_astro', sheet_name='7ss_inhibitory_astro')
 
         run_list_of_queries(
-            mouse_number=1, mouse_project_str='1ss_excitatory_astro1slice', sheet_name='1ss_fragX_e_astro1slice')
+            mouse_number=1, mouse_project_str='1ss_excitatory_astro', sheet_name='1ss_excitatory_astro')
         run_list_of_queries(
-            mouse_number=22, mouse_project_str='22ss_excitatory_astro1slice', sheet_name='22ss_fragX_e_astro1slice')
+            mouse_number=22, mouse_project_str='22ss_excitatory_astro', sheet_name='22ss_excitatory_astro')
         run_list_of_queries(
-            mouse_number=2, mouse_project_str='2ss_excitatory_astro1slice', sheet_name='2ss_fragX_e_astro1slice')
+            mouse_number=2, mouse_project_str='2ss_excitatory_astro', sheet_name='2ss_excitatory_astro')
         run_list_of_queries(
-            mouse_number=3, mouse_project_str='3ss_excitatory_astro1slice', sheet_name='3ss_fragX_e_astro1slice')
+            mouse_number=3, mouse_project_str='3ss_excitatory_astro', sheet_name='3ss_excitatory_astro')
         run_list_of_queries(
-            mouse_number=4, mouse_project_str='4ss_excitatory_astro1slice', sheet_name='4ss_fragX_e_astro1slice')
+            mouse_number=4, mouse_project_str='4ss_excitatory_astro', sheet_name='4ss_excitatory_astro')
         run_list_of_queries(
-            mouse_number=6, mouse_project_str='6ss_excitatory_astro1slice', sheet_name='6ss_fragX_e_astro1slice')
+            mouse_number=6, mouse_project_str='6ss_excitatory_astro', sheet_name='6ss_excitatory_astro')
         run_list_of_queries(
-            mouse_number=5, mouse_project_str='5ss_excitatory_astro1slice', sheet_name='5ss_fragX_e_astro1slice')
+            mouse_number=5, mouse_project_str='5ss_excitatory_astro', sheet_name='5ss_excitatory_astro')
         run_list_of_queries(
-            mouse_number=7, mouse_project_str='7ss_excitatory_astro1slice', sheet_name='7ss_fragX_e_astro1slice')
+            mouse_number=7, mouse_project_str='7ss_excitatory_astro', sheet_name='7ss_excitatory_astro')
 
     else:
         print('we have arguments')
