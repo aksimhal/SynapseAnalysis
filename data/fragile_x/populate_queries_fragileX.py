@@ -410,6 +410,57 @@ def inhibitory_astro_queries(mouse_number):
     da.writeJSONFile(fn, data)
 
 
+def excitatory_ratio_test(mouse_number):
+    """ List of excitatory queries
+
+    Parameters
+    -------------
+    mouse_number
+    """
+    listOfQueries = []
+    punctum_size = 2
+
+    # Query 0
+    preIF_str = str(mouse_number) + 'ss_Synap.tif'
+    preIF = [preIF_str]
+    preIF_z = [2]
+    postIF_str = str(mouse_number) + 'ss_PSD.tif'
+    postIF = [postIF_str]
+    postIF_z = [1]
+    query = {'preIF': preIF, 'preIF_z': preIF_z, 'postIF': postIF,
+             'postIF_z': postIF_z, 'punctumSize': punctum_size}
+    listOfQueries.append(query)
+
+    # Query 1
+    preIF_str1 = str(mouse_number) + 'ss_Synap.tif'
+    preIF_str2 = str(mouse_number) + 'ss_VGluT1.tif'
+    preIF = [preIF_str1, preIF_str2]
+    preIF_z = [1, 2]
+    postIF_str = str(mouse_number) + 'ss_PSD.tif'
+    postIF = [postIF_str]
+    postIF_z = [1]
+    query = {'preIF': preIF, 'preIF_z': preIF_z, 'postIF': postIF,
+             'postIF_z': postIF_z, 'punctumSize': punctum_size}
+    listOfQueries.append(query)
+
+    # Query 2
+    preIF_str1 = str(mouse_number) + 'ss_Synap.tif'
+    preIF_str2 = str(mouse_number) + 'ss_VGluT2.tif'
+    preIF = [preIF_str1, preIF_str2]
+    preIF_z = [1, 2]
+    postIF_str = str(mouse_number) + 'ss_PSD.tif'
+    postIF = [postIF_str]
+    postIF_z = [1]
+    query = {'preIF': preIF, 'preIF_z': preIF_z, 'postIF': postIF,
+             'postIF_z': postIF_z, 'punctumSize': punctum_size}
+    listOfQueries.append(query)
+
+    data = {'listOfQueries': listOfQueries}
+    fn = '/Users/anish/Documents/Connectome/SynapseAnalysis/data/fragile_x/queries/' + \
+        str(mouse_number) + 'ss_ratio_queries.json'
+    da.writeJSONFile(fn, data)
+
+
 def main():
     mice_list = [1, 2, 3, 4, 5, 6, 7, 22]
 
@@ -427,6 +478,9 @@ def main():
 
     for n in mice_list:
         single_channel_queries(n)
+
+    for n in mice_list:
+        excitatory_ratio_test(n)
 
 
 if __name__ == '__main__':
