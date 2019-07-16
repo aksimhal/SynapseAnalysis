@@ -27,7 +27,7 @@ def run_list_of_queries(mouse_number, mouse_project_str, sheet_name):
     """
 
     output_foldername = 'results_' + sheet_name
-    query_fn = 'queries/' + mouse_project_str + '_ratio_queries.json'
+    query_fn = 'queries/' + mouse_project_str + '_ratio2_queries.json'
     data_location = '/Users/anish/Documents/yi_mice/' + \
         str(mouse_number) + 'ss_stacks/'
 
@@ -123,21 +123,21 @@ def main():
         #     mouse_number=7, mouse_project_str='7ss_inhibitory', sheet_name='7ss_inhibitory_fragX')
 
         run_list_of_queries(
-            mouse_number=1, mouse_project_str='1ss', sheet_name='1ss_ratio_fragX')
+            mouse_number=1, mouse_project_str='1ss', sheet_name='1ss_ratio2_fragX')
         run_list_of_queries(
-            mouse_number=22, mouse_project_str='22ss', sheet_name='22ss_ratio_fragX')
+            mouse_number=22, mouse_project_str='22ss', sheet_name='22ss_ratio2_fragX')
         run_list_of_queries(
-            mouse_number=2, mouse_project_str='2ss', sheet_name='2ss_ratio_fragX')
+            mouse_number=2, mouse_project_str='2ss', sheet_name='2ss_ratio2_fragX')
         run_list_of_queries(
-            mouse_number=3, mouse_project_str='3ss', sheet_name='3ss_ratio_fragX')
+            mouse_number=3, mouse_project_str='3ss', sheet_name='3ss_ratio2_fragX')
         run_list_of_queries(
-            mouse_number=4, mouse_project_str='4ss', sheet_name='4ss_ratio_fragX')
+            mouse_number=4, mouse_project_str='4ss', sheet_name='4ss_ratio2_fragX')
         run_list_of_queries(
-            mouse_number=6, mouse_project_str='6ss', sheet_name='6ss_ratio_fragX')
+            mouse_number=6, mouse_project_str='6ss', sheet_name='6ss_ratio2_fragX')
         run_list_of_queries(
-            mouse_number=5, mouse_project_str='5ss', sheet_name='5ss_ratio_fragX')
+            mouse_number=5, mouse_project_str='5ss', sheet_name='5ss_ratio2_fragX')
         run_list_of_queries(
-            mouse_number=7, mouse_project_str='7ss', sheet_name='7ss_ratio_fragX')
+            mouse_number=7, mouse_project_str='7ss', sheet_name='7ss_ratio2_fragX')
 
     else:
         print('we have arguments')
