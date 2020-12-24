@@ -7,7 +7,7 @@ This webpage contains the following:
     - Notes
     - Data location 
 
-This repository is maintained by Anish - email anish.simhal@duke.edu if you have any questions. 
+This repository is maintained by Anish - email aksimhal @ gmail.com if you have any questions. 
 
 
 ## Installation Guide 
