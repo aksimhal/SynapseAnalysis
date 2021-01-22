@@ -39,8 +39,7 @@ source activate synapse_analysis
 #### Step 3
 Install dependencies: 
 ```
-conda install numpy scipy scikit-image shapely pandas xlsxwriter pillow xlrd
-conda install --channel https://conda.anaconda.org/menpo opencv3
+conda install numpy scipy scikit-image pandas xlsxwriter pillow xlrd
 ```
 
 #### Step 4
@@ -62,6 +61,8 @@ Prior to running the program, the user has to create a runme.py file, similar to
 
 ## Notes - Sample Runme
 After installing the tool, navigate to <https://github.com/aksimhal/SynapseAnalysis/tree/master/data/SACT_example/> and open runme.py. Instructions on how to use the runme are included in the readme.md file included in the folder. 
+
+Tutorial notebook is located here: https://github.com/aksimhal/synapse-detection-examples/blob/master/python/Example_runme.ipynb
 
 To run the data presented in the paper, navigate to <https://github.com/aksimhal/SynapseAnalysis/tree/master/data/antibody_analysis.>  The readme file in that directory explains what each file is for and what's needed to run it. 
 
